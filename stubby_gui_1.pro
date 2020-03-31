@@ -17,10 +17,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    servicemanager.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    servicemanager.h \
+    #servicemanager_macos.h
 
 FORMS += \
     mainwindow.ui
@@ -29,6 +32,3 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    03_pc_drawrect_green.png

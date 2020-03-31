@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-03-26T13:33:09. -->
+<!-- Written by QtCreator 4.11.0, 2020-03-27T17:49:16. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -302,8 +302,9 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/sad/SIT/Development/stubby_gui/stubby_gui_1/stubby_gui_1/stubby_gui_1.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/sad/SIT/Development/stubby_gui/stubby_gui_1/stubby_gui_1/stubby_gui_1.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">stubby_gui_12</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/sad/SIT/Development/stubby_gui/stubby_gui_proto/stubby_gui_1.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/sad/SIT/Development/stubby_gui/stubby_gui_proto/stubby_gui_1.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
