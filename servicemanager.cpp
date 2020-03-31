@@ -9,7 +9,7 @@ ServiceMgr::ServiceMgr(MainWindow *parent) :
     m_mainwindow(parent),
     m_serviceState(ServiceMgr::Unknown)
 {
-    qInfo("Creating service mgr");
+    qInfo("Creating base service mgr");
 }
 
 ServiceMgr::~ServiceMgr()
@@ -17,6 +17,7 @@ ServiceMgr::~ServiceMgr()
 }
 
 int ServiceMgr::getState() {
+    qInfo("getting base state");
     emit serviceStateChanged(Error);
     return ServiceState::Error;
 }

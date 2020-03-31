@@ -2,6 +2,7 @@
 
 #include "mainwindow.h"
 #include "servicemanager.h"
+#include "servicemanager_macos.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -14,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->main_tab->setFocus();
 
     // Discover service state
-    m_serviceMgr = new ServiceMgr(this);
+    m_serviceMgr = new ServiceMgrMacos(this);
     if (!m_serviceMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();

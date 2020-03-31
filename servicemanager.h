@@ -2,6 +2,7 @@
 #define SERVICEMANAGER_H
 
 #include <QObject>
+#include <QProcess>
 
 class MainWindow;
 
@@ -25,14 +26,16 @@ public:
 //    int start();
 //    int stop();
 //    int restart();
-    int getState();
+    virtual int getState();
 
 signals:
     void serviceStateChanged(ServiceMgr::ServiceState state);
 
+protected:
+    ServiceState m_serviceState;
+
 private:
     MainWindow *m_mainwindow;
-    ServiceState m_serviceState;
 
 };
 

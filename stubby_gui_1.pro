@@ -4,6 +4,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+macx {
+  message(using macx to set scope)
+  QT += macextras
+  #ICON = Stubby.icns
+  LIBS += -framework Foundation
+  LIBS += -framework AppKit
+  LIBS += -framework Security
+}
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -18,12 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    servicemanager.cpp
+    servicemanager.cpp \
+    servicemanager_macos.cpp \
+    runtask_macos.cpp
 
 HEADERS += \
     mainwindow.h \
     servicemanager.h \
-    #servicemanager_macos.h
+    servicemanager_macos.h \
+    runtask_macos.h
 
 FORMS += \
     mainwindow.ui
