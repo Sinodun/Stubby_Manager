@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 
-#include "servicemanager.h"
+#ifdef Q_OS_MACOS
+#include "servicemanager_macos.h"
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,7 +21,7 @@ public:
 
 private slots:
 
-    void on_start_stop_button_clicked();
+    void on_startStopButton_clicked();
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 

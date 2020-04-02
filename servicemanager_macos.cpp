@@ -1,20 +1,21 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-#include "servicemanager_macos.h"
+#include "mainwindow.h"
 #include "runtask_macos.h"
 
 
-ServiceMgrMacos::ServiceMgrMacos(MainWindow *parent) :
-    ServiceMgr(parent),
+ServiceMgr::ServiceMgr(MainWindow *parent) :
+    QObject(parent),
+    m_mainwindow(parent),
+    m_serviceState(ServiceMgr::Unknown),
     m_checkerProcess(0),
     m_checkerProcess_output("")
+
 {
     qInfo("Creating Macos service mgr");
 
     m_checkerProcess = new RunHelperTaskMacos("list", QString(), QString(), this, parent);
-
-
     connect(m_checkerProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_checkerProcess_finished(int, QProcess::ExitStatus)));
     connect(m_checkerProcess, SIGNAL(readyReadStandardError()), this, SLOT(on_checkerProcess_readyReadStderr()));
     connect(m_checkerProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(on_checkerProcess_readyReadStdout()));
@@ -22,19 +23,18 @@ ServiceMgrMacos::ServiceMgrMacos(MainWindow *parent) :
 
 }
 
-ServiceMgrMacos::~ServiceMgrMacos()
+ServiceMgr::~ServiceMgr()
 {
 }
 
-int ServiceMgrMacos::getState() {
+int ServiceMgr::getState() {
     qInfo("gettting macos state");
     m_checkerProcess_output = "";
     m_checkerProcess->start();
     return 0;
 }
 
-
-void ServiceMgrMacos::on_checkerProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void ServiceMgr::on_checkerProcess_finished(int, QProcess::ExitStatus exitStatus)
 {
 
     if (exitStatus == QProcess::NormalExit) {
@@ -57,17 +57,17 @@ void ServiceMgrMacos::on_checkerProcess_finished(int exitCode, QProcess::ExitSta
     }
 }
 
-void ServiceMgrMacos::on_checkerProcess_readyReadStderr()
+void ServiceMgr::on_checkerProcess_readyReadStderr()
 {
 
 }
 
-void ServiceMgrMacos::on_checkerProcess_readyReadStdout()
+void ServiceMgr::on_checkerProcess_readyReadStdout()
 {
     m_checkerProcess_output = m_checkerProcess_output + QString::fromLatin1(m_checkerProcess->readAllStandardOutput().data());
 }
 
-void ServiceMgrMacos::on_checkerProcess_errorOccurred(QProcess::ProcessError)
+void ServiceMgr::on_checkerProcess_errorOccurred(QProcess::ProcessError)
 {
 
 }

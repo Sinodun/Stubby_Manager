@@ -68,7 +68,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="running_status">
+          <widget class="QLabel" name="runningStatus">
            <property name="font">
             <font>
              <family>Arial</family>
@@ -114,7 +114,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="start_stop_button">
+          <widget class="QPushButton" name="startStopButton">
            <property name="font">
             <font>
              <pointsize>18</pointsize>
@@ -543,6 +543,7 @@
                <widget class="QCheckBox" name="checkBox_4">
                 <property name="font">
                  <font>
+                  <family>Arial</family>
                   <pointsize>13</pointsize>
                  </font>
                 </property>
@@ -581,6 +582,7 @@
                  <widget class="QComboBox" name="comboBox">
                   <property name="font">
                    <font>
+                    <family>Arial</family>
                     <pointsize>13</pointsize>
                    </font>
                   </property>
@@ -622,6 +624,7 @@
                  <widget class="QPushButton" name="pushButton_11">
                   <property name="font">
                    <font>
+                    <family>Arial</family>
                     <pointsize>12</pointsize>
                    </font>
                   </property>
@@ -634,6 +637,7 @@
                  <widget class="QPushButton" name="pushButton_4">
                   <property name="font">
                    <font>
+                    <family>Arial</family>
                     <pointsize>12</pointsize>
                    </font>
                   </property>
@@ -646,6 +650,7 @@
                  <widget class="QPushButton" name="pushButton_6">
                   <property name="font">
                    <font>
+                    <family>Arial</family>
                     <pointsize>12</pointsize>
                    </font>
                   </property>
@@ -671,6 +676,7 @@
                  <widget class="QPushButton" name="pushButton_7">
                   <property name="font">
                    <font>
+                    <family>Arial</family>
                     <pointsize>12</pointsize>
                    </font>
                   </property>

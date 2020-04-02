@@ -26,19 +26,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
-    servicemanager.cpp \
-    servicemanager_macos.cpp \
-    runtask_macos.cpp
+    mainwindow.cpp
+
 
 HEADERS += \
-    mainwindow.h \
-    servicemanager.h \
-    servicemanager_macos.h \
-    runtask_macos.h
+    mainwindow.h
+
 
 FORMS += \
     mainwindow.ui
+
+macx {
+  SOURCES += servicemanager_macos.cpp \
+             runtask_macos.cpp
+  HEADERS += servicemanager_macos.h\
+             runtask_macos.h
+}
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

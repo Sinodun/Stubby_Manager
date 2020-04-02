@@ -1,8 +1,9 @@
 #include <QDebug>
 
 #include "mainwindow.h"
-#include "servicemanager.h"
+#ifdef Q_OS_MACOS
 #include "servicemanager_macos.h"
+#endif
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->main_tab->setFocus();
 
     // Discover service state
-    m_serviceMgr = new ServiceMgrMacos(this);
+    m_serviceMgr = new ServiceMgr(this);
     if (!m_serviceMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
@@ -42,7 +43,7 @@ MainWindow::~MainWindow()
  * Slots functions
  */
 
-void MainWindow::on_start_stop_button_clicked()
+void MainWindow::on_startStopButton_clicked()
 {
     // if state is stopped, start service, update button to 'stop'
     // if state is running, stop service, update button to 'start'
@@ -75,5 +76,5 @@ QString MainWindow::getServiceStateString(const ServiceMgr::ServiceState state)
 
 
 void MainWindow::updateMainTab() {
-    ui->running_status->setText(getServiceStateString(m_serviceState));
+    ui->runningStatus->setText(getServiceStateString(m_serviceState));
 }
