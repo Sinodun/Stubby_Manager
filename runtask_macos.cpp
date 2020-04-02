@@ -47,22 +47,22 @@ RunHelperTaskMacos::RunHelperTaskMacos(const QString command, QString need_right
 
     OSStatus oss = AuthorizationCreate(NULL, NULL, 0, &m_auth_ref);
     assert(oss == errAuthorizationSuccess);
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth create " << (oss == errAuthorizationSuccess);
+    //qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth create " << (oss == errAuthorizationSuccess);
 
     // Ensure rights have been created.
     oss = AuthorizationRightGet(RIGHT_DAEMON_RUN, NULL);
     assert(oss == errAuthorizationSuccess);
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth daemon " << (oss == errAuthorizationSuccess);
+    //qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth daemon " << (oss == errAuthorizationSuccess);
     oss = AuthorizationRightGet(RIGHT_DNS_LOCAL, NULL);
     assert(oss == errAuthorizationSuccess);
-    qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth dns " << (oss == errAuthorizationSuccess);
+    //qDebug() << __FILE__ << ":" << __FUNCTION__ << "Auth dns " << (oss == errAuthorizationSuccess);
 }
 
 RunHelperTaskMacos::~RunHelperTaskMacos()
 {
     AuthorizationFree(m_auth_ref, kAuthorizationFlagDefaults);
 
-    qDebug() << __FILE__ << ":" << __FUNCTION__;
+    //qDebug() << __FILE__ << ":" << __FUNCTION__;
     if (state() == Running) {
         terminate();
         waitForFinished();

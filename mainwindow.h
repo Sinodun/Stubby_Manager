@@ -5,6 +5,7 @@
 
 #ifdef Q_OS_MACOS
 #include "servicemanager_macos.h"
+#include "systemdnsmanager_macos.h"
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -25,14 +26,19 @@ private slots:
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 
+    void on_systemDNSStateChanged(SystemDNSMgr::SystemDNSState state);
+
 private:
     Ui::MainWindow *ui;
 
     ServiceMgr *m_serviceMgr;
-    ServiceMgr::ServiceState m_serviceState;
-
+    ServiceMgr::ServiceState m_serviceState; 
     QString getServiceStateString(const ServiceMgr::ServiceState state);
 
+    SystemDNSMgr *m_systemDNSMgr;
+    SystemDNSMgr::SystemDNSState m_systemDNSState;
+
+    bool m_startStopFromMainTab;
     void updateMainTab();
 
 };

@@ -121,7 +121,7 @@
             </font>
            </property>
            <property name="autoFillBackground">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgba(33, 208, 109, 222);

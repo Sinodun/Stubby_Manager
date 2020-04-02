@@ -38,9 +38,11 @@ FORMS += \
 
 macx {
   SOURCES += servicemanager_macos.cpp \
-             runtask_macos.cpp
+             runtask_macos.cpp \
+             systemdnsmanager.cpp
   HEADERS += servicemanager_macos.h\
-             runtask_macos.h
+             runtask_macos.h \
+             systemdnsmanager_macos.h
 }
 
 # Default rules for deployment.
