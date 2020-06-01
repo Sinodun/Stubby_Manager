@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 
 #ifdef Q_OS_MACOS
 #include "servicemanager_macos.h"
@@ -40,6 +41,11 @@ private:
 
     bool m_startStopFromMainTab;
     void updateMainTab();
+
+    QAction *quitAction;
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
+
 
 };
 #endif // MAINWINDOW_H

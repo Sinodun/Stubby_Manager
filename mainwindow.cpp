@@ -41,6 +41,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Update connection settings
 
+    quitAction = new QAction(tr("&Quit"), this);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(quitAction);
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
+    trayIcon->show();
+
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +117,9 @@ QString MainWindow::getServiceStateString(const ServiceMgr::ServiceState state)
 }
 
 void MainWindow::updateMainTab() {
-    //TODO: Handle all the permutations of the states correctly....
+    //TODO: Handle all the permutations of the states correctly because
+    // 1) Error states aren't handled correctly at the moment
+    // 2) state shows as 'Unknown' while in progress.....
     if (m_serviceState == ServiceMgr::Running && m_systemDNSState == SystemDNSMgr::Localhost)
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
     else if (m_serviceState == ServiceMgr::Stopped && m_systemDNSState == SystemDNSMgr::NotLocalhost)
