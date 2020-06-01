@@ -21,6 +21,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+     void closeEvent(QCloseEvent *event) override;
+
 private slots:
 
     void on_startStopButton_clicked();

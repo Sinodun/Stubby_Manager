@@ -1,4 +1,6 @@
 #include <QDebug>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -57,6 +59,27 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+
+#ifdef Q_OS_OSX
+    if (!event->spontaneous() || !isVisible()) {
+        return;
+    }
+#endif
+
+    if (trayIcon->isVisible()) {
+        QMessageBox::information(this, tr("Systray"),
+                                 tr("Stubby Manager will keep running in the system tray. "
+                                    "**We recommend you keep Stubby Manager running to "
+                                    "properly monitor your system.**"
+                                    "To terminate Stubby Manager, "
+                                    "choose <b>Quit</b> in the context menu "
+                                    "of the system tray entry (this won't stop Stubby itself!)."));
+        hide();
+        event->ignore();
+    }
 }
 
 
