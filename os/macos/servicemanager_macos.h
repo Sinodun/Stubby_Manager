@@ -1,41 +1,20 @@
-#ifndef SERVICEMGR_H
-#define SERVICEMGR_H
+#ifndef SERVICEMGRMACOS_H
+#define SERVICEMGRMACOS_H
 
-#include <QObject>
 #include <QProcess>
 
+#include "servicemanager.h"
 #include "runtask_macos.h"
 
 class MainWindow;
 
-class ServiceMgr : public QObject
+class ServiceMgrMacos : public ServiceMgr
 {
     Q_OBJECT
 
 public:
-    ServiceMgr(MainWindow *parent);
-    virtual ~ServiceMgr();
-
-    typedef enum {
-        Stopped,
-        Starting,
-        Running,
-        Stopping,
-        Unknown,
-        Error
-    } ServiceState;
-
-    int getState();
-    int start();
-    int stop();
-    int restart();
-
-signals:
-    void serviceStateChanged(ServiceMgr::ServiceState state);
-
-private:
-    MainWindow *m_mainwindow;
-    ServiceState m_serviceState;
+    ServiceMgrMacos(MainWindow *parent);
+    virtual ~ServiceMgrMacos();
     
 private slots:
     void on_checkerProcess_finished(int, QProcess::ExitStatus);
@@ -51,6 +30,13 @@ private:
     RunHelperTaskMacos *m_stopperProcess;
     QString m_checkerProcess_output;
 
+
+private:
+    int getStateofService();
+    int startService();
+    int stopService();
+    int restartService();
+
 };
 
-#endif // SERVICEMGR_H
+#endif // SERVICEMGRMACOS_H

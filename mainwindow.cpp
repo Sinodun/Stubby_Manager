@@ -5,7 +5,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #ifdef Q_OS_MACOS
-#include "servicemanager_macos.h"
+#include "servicemanager.h"
+#include "os/macos/servicemanager_macos.h"
 #include "systemdnsmanager_macos.h"
 #endif
 
@@ -22,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->main_tab->setFocus();
 
     // Discover service state
-    m_serviceMgr = new ServiceMgr(this);
+    m_serviceMgr = ServiceMgr::factory(this);
+    // m_serviceMgr = new ServiceMgr(this);
     if (!m_serviceMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
@@ -118,7 +120,7 @@ void MainWindow::on_startStopButton_clicked()
     }
 }
 
-void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
+void MainWindow::on_serviceStateChanged(ServiceMgrMacos::ServiceState state) {
 
     qDebug("MAIN WINDOW: Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
@@ -158,9 +160,11 @@ void MainWindow::updateMainTab() {
     //TODO: Handle all the permutations of the states correctly because
     // 1) Error states aren't handled correctly at the moment
     // 2) state shows as 'Unknown' while in progress.....
-    if (m_serviceState == ServiceMgr::Running && m_systemDNSState == SystemDNSMgr::Localhost)
+    if (m_serviceState   == ServiceMgr::Running &&
+        m_systemDNSState == SystemDNSMgr::Localhost)
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-    else if (m_serviceState == ServiceMgr::Stopped && m_systemDNSState == SystemDNSMgr::NotLocalhost)
+    else if (m_serviceState   == ServiceMgr::Stopped &&
+             m_systemDNSState == SystemDNSMgr::NotLocalhost)
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
     else
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));

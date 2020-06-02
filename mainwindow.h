@@ -5,7 +5,7 @@
 #include <QSystemTrayIcon>
 
 #ifdef Q_OS_MACOS
-#include "servicemanager_macos.h"
+#include "servicemanager.h"
 #include "systemdnsmanager_macos.h"
 #endif
 
@@ -38,7 +38,7 @@ private:
     Ui::MainWindow *ui;
 
     ServiceMgr *m_serviceMgr;
-    ServiceMgr::ServiceState m_serviceState; 
+    ServiceMgr::ServiceState m_serviceState;
     QString getServiceStateString(const ServiceMgr::ServiceState state);
 
     SystemDNSMgr *m_systemDNSMgr;

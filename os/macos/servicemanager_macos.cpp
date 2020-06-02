@@ -2,13 +2,12 @@
 #include <QRegularExpression>
 
 #include "mainwindow.h"
+#include "servicemanager_macos.h"
 #include "runtask_macos.h"
 
 
-ServiceMgr::ServiceMgr(MainWindow *parent) :
-    QObject(parent),
-    m_mainwindow(parent),
-    m_serviceState(ServiceMgr::Unknown),
+ServiceMgrMacos::ServiceMgrMacos(MainWindow *parent) :
+    ServiceMgr(parent),
     m_checkerProcess(0),
     m_starterProcess(0),
     m_stopperProcess(0),
@@ -25,53 +24,44 @@ ServiceMgr::ServiceMgr(MainWindow *parent) :
     m_stopperProcess = new RunHelperTaskMacos("stop", RunHelperTaskMacos::RIGHT_DAEMON_RUN, QString(), this, parent);
 }
 
-ServiceMgr::~ServiceMgr()
+ServiceMgrMacos::~ServiceMgrMacos()
 {
 }
 
-int ServiceMgr::getState() {
+int ServiceMgrMacos::getStateofService() {
     qInfo("gettting macos state");
     m_checkerProcess_output = "";
     m_checkerProcess->start();
     return 0;
 }
 
-int ServiceMgr::start()
+int ServiceMgrMacos::startService()
 {
-    if (m_serviceState == Unknown || m_serviceState == Stopped) {
-        m_mainwindow->statusMsg("Starting Stubby service...");
-        connect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_starterProcess_finished(int, QProcess::ExitStatus)));
-        m_serviceState = Starting;
-        m_starterProcess->start();
-    }
+    connect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_starterProcess_finished(int, QProcess::ExitStatus)));
+    m_serviceState = Starting;
+    m_starterProcess->start();
     return 0;
 }
 
-int ServiceMgr::stop()
+int ServiceMgrMacos::stopService()
 {
-    if (m_serviceState == Unknown || m_serviceState == Running) {
-        m_mainwindow->statusMsg("Stopping Stubby service...");
-        connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_stopperProcess_finished(int, QProcess::ExitStatus)));
-        m_serviceState = Stopping;
-        m_stopperProcess->start();
-    }
+    connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_stopperProcess_finished(int, QProcess::ExitStatus)));
+    m_serviceState = Stopping;
+    m_stopperProcess->start();
     return 0;
 }
 
-int ServiceMgr::restart()
+int ServiceMgrMacos::restartService()
 {
-    if (m_serviceState == Unknown || m_serviceState == Running) {
-        m_mainwindow->statusMsg("Re-starting Stubby service...");
-        m_serviceState = Stopping;
-        connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStopperProcess_finished(int, QProcess::ExitStatus)));
-        m_stopperProcess->start();
-    }
+    m_serviceState = Stopping;
+    connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStopperProcess_finished(int, QProcess::ExitStatus)));
+    m_stopperProcess->start();
     return 0;
 }
 
 /* private slots to handle QProcess signals */
 
-void ServiceMgr::on_checkerProcess_finished(int, QProcess::ExitStatus exitStatus)
+void ServiceMgrMacos::on_checkerProcess_finished(int, QProcess::ExitStatus exitStatus)
 {
     if (exitStatus == QProcess::NormalExit) {
         /* search for "PID" = integer in the text */
@@ -96,36 +86,41 @@ void ServiceMgr::on_checkerProcess_finished(int, QProcess::ExitStatus exitStatus
     }
 }
 
-void ServiceMgr::on_checkerProcess_readyReadStdout()
+void ServiceMgrMacos::on_checkerProcess_readyReadStdout()
 {
     m_checkerProcess_output = m_checkerProcess_output + QString::fromLatin1(m_checkerProcess->readAllStandardOutput().data());
 }
 
-void ServiceMgr::on_starterProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void ServiceMgrMacos::on_starterProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug("Exit status %d, launchstl exit code %d", exitStatus, exitCode);
     disconnect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_starterProcess_finished(int, QProcess::ExitStatus)));
     getState();
 }
 
-void ServiceMgr::on_restartStarterProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void ServiceMgrMacos::on_restartStarterProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug("Exit status %d, launchstl exit code %d", exitStatus, exitCode);
     disconnect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStarterProcess_finished(int, QProcess::ExitStatus)));
     getState();
 }
 
-void ServiceMgr::on_stopperProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void ServiceMgrMacos::on_stopperProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug("Exit status %d, launchstl exit code %d", exitStatus, exitCode);
     disconnect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_stopperProcess_finished(int, QProcess::ExitStatus)));
     getState();
 }
 
-void ServiceMgr::on_restartStopperProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void ServiceMgrMacos::on_restartStopperProcess_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug("Exit status %d, launchstl exit code %d", exitStatus, exitCode);
     disconnect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStopperProcess_finished(int, QProcess::ExitStatus)));
     connect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStarterProcess_finished(int, QProcess::ExitStatus)));
     m_starterProcess->start();
+}
+
+ServiceMgr *ServiceMgr::factory(MainWindow *parent)
+{
+    return new ServiceMgrMacos(parent);
 }

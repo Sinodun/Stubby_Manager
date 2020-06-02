@@ -2,12 +2,11 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++14
 
 macx {
   message(using macx to set scope)
   QT += macextras
-  #ICON = Stubby.icns
   LIBS += -framework Foundation
   LIBS += -framework AppKit
   LIBS += -framework Security
@@ -26,23 +25,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    servicemanager.cpp
 
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    servicemanager.h \
+    systemdnsmanager_macos.h
 
 
 FORMS += \
     mainwindow.ui
 
 macx {
-  SOURCES += servicemanager_macos.cpp \
-             runtask_macos.cpp \
+  SOURCES += runtask_macos.cpp \
+             os/macos/servicemanager_macos.cpp \
              systemdnsmanager.cpp
-  HEADERS += servicemanager_macos.h\
-             runtask_macos.h \
-             systemdnsmanager_macos.h
+  HEADERS += runtask_macos.h \
+             os/macos/servicemanager_macos.h \
 }
 
 # Default rules for deployment.
