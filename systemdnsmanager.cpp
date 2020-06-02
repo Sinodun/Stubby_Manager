@@ -32,12 +32,14 @@ SystemDNSMgr::~SystemDNSMgr()
 int SystemDNSMgr::setLocalhost()
 {
     m_setLocalhost->start();
+    m_mainwindow->statusMsg("Setting DNS to localhost...");
     return 0;
 }
 
 int SystemDNSMgr::unsetLocalhost()
 {
     m_unsetLocalhost->start();
+    m_mainwindow->statusMsg("Setting DNS back to system settings...");
     return 0;
 }
 
@@ -104,6 +106,7 @@ void SystemDNSMgr::on_getSystemDNSState_finished(int exitCode, QProcess::ExitSta
             m_systemDNSState = Localhost;
             emit systemDNSStateChanged(Localhost);
             qDebug("All connections are using Localhost");
+            m_mainwindow->statusMsg("Status: DNS settings using localhost.");
             return;
         }
 
@@ -114,14 +117,16 @@ void SystemDNSMgr::on_getSystemDNSState_finished(int exitCode, QProcess::ExitSta
             m_systemDNSState = NotLocalhost;
             emit systemDNSStateChanged(NotLocalhost);
             qDebug("No connections are using Localhost");
-             return;
+            m_mainwindow->statusMsg("Status: DNS settings using default system settings.");
+            return;
         }
 
         /* otherwhise, the true state is unknown.*/
      }
      m_systemDNSState = Unknown;
      emit systemDNSStateChanged(Unknown);
-     qDebug("Error - dns server use of Localhost is not clear");
+     qDebug("Error - DNS server use of localhost is not clear");
+     m_mainwindow->statusMsg("Error - DNS server use of localhost is not clear");
 }
 
 void SystemDNSMgr::on_getSystemDNSState_readyReadStdout()

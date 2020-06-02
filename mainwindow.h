@@ -21,6 +21,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void statusMsg(QString status_msg);
+
 protected:
      void closeEvent(QCloseEvent *event) override;
 
@@ -48,7 +50,6 @@ private:
     QAction *quitAction;
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
-
 
 };
 #endif // MAINWINDOW_H

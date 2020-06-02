@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_serviceState(ServiceMgr::Unknown)
     , m_systemDNSState(SystemDNSMgr::Unknown)
-    , m_startStopFromMainTab(true)
+    , m_startStopFromMainTab(false)
 {
     ui->setupUi(this);
 
@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Update connection settings
 
+    // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     trayIconMenu = new QMenu(this);
@@ -54,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
 
+    // Update status
+    // TODO - add a 'clear status messages' button to the GUI
+    statusMsg("Stubby Manager Started.");
 }
 
 MainWindow::~MainWindow()
@@ -70,16 +74,26 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 #endif
 
     if (trayIcon->isVisible()) {
-        QMessageBox::information(this, tr("Systray"),
-                                 tr("Stubby Manager will keep running in the system tray. "
-                                    "**We recommend you keep Stubby Manager running to "
-                                    "properly monitor your system.**"
-                                    "To terminate Stubby Manager, "
-                                    "choose <b>Quit</b> in the context menu "
-                                    "of the system tray entry (this won't stop Stubby itself!)."));
+// Comment this out whilst in development....
+//        QMessageBox::information(this, tr("Systray"),
+//                                 tr("Stubby Manager will keep running in the system tray. "
+//                                    "**We recommend you keep Stubby Manager running to "
+//                                    "properly monitor your system.**"
+//                                    "To terminate Stubby Manager, "
+//                                    "choose <b>Quit</b> in the context menu "
+//                                    "of the system tray entry (this won't stop Stubby itself!)."));
         hide();
         event->ignore();
     }
+}
+
+// crude mechanism to output status changes to GUI...
+// TODO - have manager class connected to a slot for this and derive other classes from that
+void MainWindow::statusMsg(QString statusMsg) {
+    ui->statusOutput->moveCursor (QTextCursor::End);
+    ui->statusOutput->insertPlainText (statusMsg);
+    ui->statusOutput->insertPlainText ("\n");
+    ui->statusOutput->moveCursor (QTextCursor::End);
 }
 
 
@@ -89,6 +103,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::on_startStopButton_clicked()
 {
+    statusMsg("\nStarting Stubby... ");
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
     m_startStopFromMainTab = true;
     if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting &&  m_serviceState != ServiceMgr::Stopping) {
@@ -98,7 +113,7 @@ void MainWindow::on_startStopButton_clicked()
     }
     else {
         ui->startStopButton->setText("Start Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(33, 208, 109, 222);");
+        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
         m_serviceMgr->stop();
     }
 }

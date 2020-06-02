@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>596</height>
+    <width>700</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>40</x>
       <y>30</y>
       <width>611</width>
-      <height>441</height>
+      <height>491</height>
      </rect>
     </property>
     <property name="font">
@@ -48,7 +48,7 @@
         <x>20</x>
         <y>10</y>
         <width>571</width>
-        <height>301</height>
+        <height>241</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0,6">
@@ -99,7 +99,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10,7,10">
          <item>
           <spacer name="horizontalSpacer_8">
            <property name="orientation">
@@ -121,10 +121,11 @@
             </font>
            </property>
            <property name="autoFillBackground">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(33, 208, 109, 222);
+            <string notr="true">background-color: rgb(29, 163, 18);
+
 </string>
            </property>
            <property name="text">
@@ -183,7 +184,7 @@
           </spacer>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="4,0,0,4">
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,0,0,2">
            <item>
             <spacer name="verticalSpacer_3">
              <property name="orientation">
@@ -262,7 +263,7 @@
           </spacer>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="20,10,20,20">
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="10,10,20,10">
            <item>
             <spacer name="verticalSpacer_5">
              <property name="orientation">
@@ -347,6 +348,24 @@
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QTextEdit" name="statusOutput">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>260</y>
+        <width>511</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="config_tab">
@@ -724,8 +743,8 @@
    <widget class="QWidget" name="horizontalLayoutWidget_6">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>500</y>
+      <x>330</x>
+      <y>530</y>
       <width>354</width>
       <height>41</height>
      </rect>
@@ -769,7 +788,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>687</width>
+     <width>700</width>
      <height>22</height>
     </rect>
    </property>

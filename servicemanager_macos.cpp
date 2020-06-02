@@ -39,6 +39,7 @@ int ServiceMgr::getState() {
 int ServiceMgr::start()
 {
     if (m_serviceState == Unknown || m_serviceState == Stopped) {
+        m_mainwindow->statusMsg("Starting Stubby service...");
         connect(m_starterProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_starterProcess_finished(int, QProcess::ExitStatus)));
         m_serviceState = Starting;
         m_starterProcess->start();
@@ -49,6 +50,7 @@ int ServiceMgr::start()
 int ServiceMgr::stop()
 {
     if (m_serviceState == Unknown || m_serviceState == Running) {
+        m_mainwindow->statusMsg("Stopping Stubby service...");
         connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_stopperProcess_finished(int, QProcess::ExitStatus)));
         m_serviceState = Stopping;
         m_stopperProcess->start();
@@ -59,6 +61,7 @@ int ServiceMgr::stop()
 int ServiceMgr::restart()
 {
     if (m_serviceState == Unknown || m_serviceState == Running) {
+        m_mainwindow->statusMsg("Re-starting Stubby service...");
         m_serviceState = Stopping;
         connect(m_stopperProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartStopperProcess_finished(int, QProcess::ExitStatus)));
         m_stopperProcess->start();
@@ -79,14 +82,17 @@ void ServiceMgr::on_checkerProcess_finished(int, QProcess::ExitStatus exitStatus
         if (match.hasMatch()) {
             m_serviceState = Running;
             emit serviceStateChanged(m_serviceState);
+            m_mainwindow->statusMsg("Status: Stubby service running.");
         } else {
             m_serviceState = Stopped;
             emit serviceStateChanged(m_serviceState);
+            m_mainwindow->statusMsg("Status: Stubby service stopped.");
         }
     } else {
         qInfo("Checker process failed");
         m_serviceState = Unknown;
         emit serviceStateChanged(m_serviceState);
+        m_mainwindow->statusMsg("Status: Problem with Stubby service - state unknown.");
     }
 }
 
