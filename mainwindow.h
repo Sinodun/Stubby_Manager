@@ -4,10 +4,8 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 
-#ifdef Q_OS_MACOS
 #include "servicemanager.h"
-#include "systemdnsmanager_macos.h"
-#endif
+#include "systemdnsmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

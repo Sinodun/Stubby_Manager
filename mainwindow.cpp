@@ -4,11 +4,8 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#ifdef Q_OS_MACOS
 #include "servicemanager.h"
-#include "os/macos/servicemanager_macos.h"
-#include "systemdnsmanager_macos.h"
-#endif
+#include "systemdnsmanager.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -24,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Discover service state
     m_serviceMgr = ServiceMgr::factory(this);
-    // m_serviceMgr = new ServiceMgr(this);
     if (!m_serviceMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
@@ -33,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_serviceMgr->getState();
 
     // Check system DNS settings
-    m_systemDNSMgr = new SystemDNSMgr(this);
+    m_systemDNSMgr = SystemDNSMgr::factory(this);
     if (!m_systemDNSMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
@@ -43,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Discover network and profile
 
-    // Update connection settings
+    // Update connection settings display
 
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
@@ -76,6 +72,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 #endif
 
     if (trayIcon->isVisible()) {
+// TODO: Restore system tray
 // Comment this out whilst in development....
 //        QMessageBox::information(this, tr("Systray"),
 //                                 tr("Stubby Manager will keep running in the system tray. "
@@ -120,7 +117,7 @@ void MainWindow::on_startStopButton_clicked()
     }
 }
 
-void MainWindow::on_serviceStateChanged(ServiceMgrMacos::ServiceState state) {
+void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
     qDebug("MAIN WINDOW: Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;

@@ -26,24 +26,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    servicemanager.cpp
+    servicemanager.cpp \
+    systemdnsmanager.cpp
 
 
 HEADERS += \
     mainwindow.h \
     servicemanager.h \
-    systemdnsmanager_macos.h
+    systemdnsmanager.h
 
 
 FORMS += \
     mainwindow.ui
 
 macx {
-  SOURCES += runtask_macos.cpp \
+  SOURCES += os/macos/runtask_macos.cpp \
              os/macos/servicemanager_macos.cpp \
-             systemdnsmanager.cpp
-  HEADERS += runtask_macos.h \
+             os/macos/systemdnsmanager_macos.cpp
+  HEADERS += os/macos/runtask_macos.h \
              os/macos/servicemanager_macos.h \
+             os/macos/systemdnsmanager_macos.h
 }
 
 # Default rules for deployment.

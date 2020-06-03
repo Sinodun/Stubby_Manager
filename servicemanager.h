@@ -38,7 +38,6 @@ protected:
     ServiceState m_serviceState;
 
 private:
-
     virtual int getStateofService() = 0;
     virtual int startService() = 0;
     virtual int stopService() = 0;
