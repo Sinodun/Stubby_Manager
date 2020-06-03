@@ -4,8 +4,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "servicemanager.h"
-#include "systemdnsmanager.h"
 
 
 MainWindow::MainWindow(QWidget *parent)

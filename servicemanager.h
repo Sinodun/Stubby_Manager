@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-
 class MainWindow;
+
 
 class ServiceMgr : public QObject
 {

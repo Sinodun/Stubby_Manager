@@ -5,6 +5,7 @@
 
 class MainWindow;
 
+
 class SystemDNSMgr : public QObject
 {
     Q_OBJECT

@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QProcess>
 
-#include "mainwindow.h"
 #include "systemdnsmanager.h"
 #include "os/macos/runtask_macos.h"
+
 
 class SystemDNSMgrMacos : public SystemDNSMgr
 {

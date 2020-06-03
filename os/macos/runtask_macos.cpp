@@ -1,11 +1,12 @@
-#include "runtask_macos.h"
-
 #include <assert.h>
 
 #include <Security/AuthorizationDB.h>
 
 #include <QDebug>
 #include <QRegularExpression>
+
+#include "runtask_macos.h"
+
 
 RunTaskMacos::RunTaskMacos(const QString command, QObject *parent) :
     QProcess(parent),

@@ -8,6 +8,7 @@
 
 class MainWindow;
 
+
 class RunTaskMacos : public QProcess
 {
     Q_OBJECT

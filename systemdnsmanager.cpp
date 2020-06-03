@@ -34,13 +34,3 @@ int SystemDNSMgr::getState()
 {
     return getStateDNS();
 }
-
-//void SystemDNSMgr::on_setLocalhost_finished(int exitCode, QProcess::ExitStatus)
-//{
-//    getState();
-//}
-
-//void SystemDNSMgr::on_unsetLocalhost_finished(int exitCode, QProcess::ExitStatus)
-//{
-//    getState();
-//}
