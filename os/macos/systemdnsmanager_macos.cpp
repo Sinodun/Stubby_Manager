@@ -29,14 +29,12 @@ SystemDNSMgrMacos::~SystemDNSMgrMacos()
 int SystemDNSMgrMacos::setLocalhostDNS()
 {
     m_setLocalhost->start();
-    m_mainwindow->statusMsg("Setting DNS to localhost...");
     return 0;
 }
 
 int SystemDNSMgrMacos::unsetLocalhostDNS()
 {
     m_unsetLocalhost->start();
-    m_mainwindow->statusMsg("Setting DNS back to default system settings...");
     return 0;
 }
 

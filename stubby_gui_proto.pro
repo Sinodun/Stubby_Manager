@@ -48,6 +48,12 @@ macx {
              os/macos/systemdnsmanager_macos.h
 }
 
+win32 {
+  SOURCES += os/windows/servicemanager_macos.cpp \
+             os/windows/systemdnsmanager_macos.cpp
+  HEADERS += os/windows/servicemanager_macos.h \
+             os/windows/systemdnsmanager_macos.h
+}
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
