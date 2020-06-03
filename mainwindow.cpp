@@ -104,15 +104,15 @@ void MainWindow::on_startStopButton_clicked()
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
     m_startStopFromMainTab = true;
     if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting &&  m_serviceState != ServiceMgr::Stopping) {
-        ui->startStopButton->setText("Stop Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(85, 170, 255);");
+        ui->startStopButton->setText("Stubby starting...");
         m_serviceMgr->start();
     }
     else {
-        ui->startStopButton->setText("Start Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
+        ui->startStopButton->setText("Stubby stopping...");
         m_serviceMgr->stop();
     }
+    ui->startStopButton->setStyleSheet("background-color: rgb(145, 145, 145);");
+    // Disable button until state known?
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
@@ -155,12 +155,23 @@ void MainWindow::updateMainTab() {
     //TODO: Handle all the permutations of the states correctly because
     // 1) Error states aren't handled correctly at the moment
     // 2) state shows as 'Unknown' while in progress.....
+
     if (m_serviceState   == ServiceMgr::Running &&
-        m_systemDNSState == SystemDNSMgr::Localhost)
+        m_systemDNSState == SystemDNSMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
+        ui->startStopButton->setText("Stop Stubby");
+        ui->startStopButton->setStyleSheet("background-color: rgb(85, 170, 255);");
+    }
     else if (m_serviceState   == ServiceMgr::Stopped &&
-             m_systemDNSState == SystemDNSMgr::NotLocalhost)
+             m_systemDNSState == SystemDNSMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-    else
+        ui->startStopButton->setText("Start Stubby");
+        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
+    }
+    else if (m_serviceState   == ServiceMgr::Unknown ||
+             m_systemDNSState == SystemDNSMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
+        ui->startStopButton->setText("Start Stubby");
+        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
+    }
 }

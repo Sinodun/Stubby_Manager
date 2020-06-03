@@ -37,7 +37,6 @@ int ServiceMgrMacos::getStateofService() {
 int ServiceMgrMacos::startService()
 {
     connect(m_startService, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_startService_finished(int, QProcess::ExitStatus)));
-    m_serviceState = Starting;
     m_startService->start();
     return 0;
 }
@@ -45,7 +44,6 @@ int ServiceMgrMacos::startService()
 int ServiceMgrMacos::stopService()
 {
     connect(m_stopService, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_stopService_finished(int, QProcess::ExitStatus)));
-    m_serviceState = Stopping;
     m_stopService->start();
     return 0;
 }
@@ -114,6 +112,7 @@ void ServiceMgrMacos::on_stopService_finished(int exitCode, QProcess::ExitStatus
 void ServiceMgrMacos::on_restartServiceStopper_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug("Exit status %d, launchstl exit code %d", exitStatus, exitCode);
+    m_serviceState = Starting;
     disconnect(m_stopService, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartServiceStopper_finished(int, QProcess::ExitStatus)));
     connect(m_startService, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_restartServiceStarter_finished(int, QProcess::ExitStatus)));
     m_startService->start();

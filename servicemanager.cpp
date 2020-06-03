@@ -26,6 +26,7 @@ int ServiceMgr::start()
 {
     if (m_serviceState == Unknown || m_serviceState == Stopped) {
         m_mainwindow->statusMsg("Starting Stubby service...");
+        m_serviceState = Starting;
         return startService();
     }
     return 0;
@@ -35,6 +36,7 @@ int ServiceMgr::stop()
 {
     if (m_serviceState == Unknown || m_serviceState == Running) {
         m_mainwindow->statusMsg("Stopping Stubby service...");
+           m_serviceState = Stopping;
         return stopService();
     }
     return 0;
