@@ -9,7 +9,7 @@ SystemDNSMgrWindows::SystemDNSMgrWindows(MainWindow *parent) :
 {
 }
 
-SystemDNSMgrMacos::~SystemDNSMgrMacos()
+SystemDNSMgrWindows::~SystemDNSMgrWindows()
 {
 }
 

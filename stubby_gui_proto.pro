@@ -49,10 +49,10 @@ macx {
 }
 
 win32 {
-  SOURCES += os/windows/servicemanager_macos.cpp \
-             os/windows/systemdnsmanager_macos.cpp
-  HEADERS += os/windows/servicemanager_macos.h \
-             os/windows/systemdnsmanager_macos.h
+  SOURCES += os/windows/servicemanager_windows.cpp \
+             os/windows/systemdnsmanager_windows.cpp
+  HEADERS += os/windows/servicemanager_windows.h \
+             os/windows/systemdnsmanager_windows.h
 }
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

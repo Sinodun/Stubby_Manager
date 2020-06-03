@@ -26,14 +26,14 @@
     <property name="font">
      <font>
       <family>Arial</family>
-      <pointsize>18</pointsize>
+      <pointsize>13</pointsize>
      </font>
     </property>
     <property name="tabShape">
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideRight</enum>
@@ -72,7 +72,7 @@
            <property name="font">
             <font>
              <family>Arial</family>
-             <pointsize>18</pointsize>
+             <pointsize>13</pointsize>
             </font>
            </property>
            <property name="text">
@@ -117,7 +117,7 @@
           <widget class="QPushButton" name="startStopButton">
            <property name="font">
             <font>
-             <pointsize>18</pointsize>
+             <pointsize>13</pointsize>
             </font>
            </property>
            <property name="autoFillBackground">
@@ -282,7 +282,7 @@
              <property name="font">
               <font>
                <family>Arial</family>
-               <pointsize>14</pointsize>
+               <pointsize>13</pointsize>
               </font>
              </property>
              <property name="text">
@@ -297,7 +297,7 @@
             <widget class="QLabel" name="conn_status">
              <property name="font">
               <font>
-               <pointsize>14</pointsize>
+               <pointsize>13</pointsize>
               </font>
              </property>
              <property name="styleSheet">
@@ -360,7 +360,8 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>12</pointsize>
+        <family>Arial</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="readOnly">
@@ -389,7 +390,7 @@
            <property name="font">
             <font>
              <family>Arial</family>
-             <pointsize>15</pointsize>
+             <pointsize>13</pointsize>
             </font>
            </property>
            <property name="text">
@@ -436,7 +437,7 @@
          <property name="font">
           <font>
            <family>Arial</family>
-           <pointsize>15</pointsize>
+           <pointsize>13</pointsize>
           </font>
          </property>
          <property name="tabPosition">
@@ -457,7 +458,7 @@
             <rect>
              <x>-1</x>
              <y>9</y>
-             <width>554</width>
+             <width>556</width>
              <height>314</height>
             </rect>
            </property>
@@ -469,7 +470,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>13</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -501,7 +502,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>12</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -518,7 +519,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>13</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -534,7 +535,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>13</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -550,7 +551,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>13</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -563,7 +564,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>13</pointsize>
+                  <pointsize>11</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -589,7 +590,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>15</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -602,7 +603,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>13</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <item>
@@ -627,7 +628,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>13</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -644,7 +645,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>12</pointsize>
+                    <pointsize>10</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -657,7 +658,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>12</pointsize>
+                    <pointsize>10</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -670,7 +671,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>12</pointsize>
+                    <pointsize>10</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -696,7 +697,7 @@
                   <property name="font">
                    <font>
                     <family>Arial</family>
-                    <pointsize>12</pointsize>
+                    <pointsize>10</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -789,7 +790,7 @@
      <x>0</x>
      <y>0</y>
      <width>700</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
