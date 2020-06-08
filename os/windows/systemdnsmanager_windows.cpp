@@ -1,3 +1,25 @@
+/*#include <algorithm>
+#include <exception>
+#include <functional>
+#include <iomanip>
+#include <map>
+#include <memory>
+#include <sstream>
+
+#include <Poco/UnicodeConverter.h>
+#include <Poco/Net/IPAddress.h>
+#include <Poco/Path.h>
+
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <ipifcons.h>
+#include <processenv.h>
+#include <processthreadsapi.h>
+#include <shellapi.h>
+#include <synchapi.h>
+#include <versionhelpers.h>
+#include <wlanapi.h>*/
+
 #include <QDebug>
 
 #include "mainwindow.h"
@@ -7,10 +29,15 @@
 SystemDNSMgrWindows::SystemDNSMgrWindows(MainWindow *parent) :
     SystemDNSMgr(parent)
 {
+    //IP_ADAPTER_UNICAST_ADDRESS addr;
+    //Poco::Net::IPAddress(addr.Address);
 }
 
 SystemDNSMgrWindows::~SystemDNSMgrWindows()
 {
+    //HANDLE handle_;
+    //handle_ = nullptr;
+    //WlanCloseHandle(handle_, nullptr);
 }
 
 int SystemDNSMgrWindows::setLocalhostDNS()
