@@ -112,7 +112,8 @@ void MainWindow::on_startStopButton_clicked()
         m_serviceMgr->stop();
     }
     ui->startStopButton->setStyleSheet("background-color: rgb(145, 145, 145);");
-    // Disable button until state known?
+    // TODO: Disable button until state known?
+    // Also - add a timer incase the start processes do not return?
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
@@ -152,9 +153,7 @@ QString MainWindow::getServiceStateString(const ServiceMgr::ServiceState state)
 }
 
 void MainWindow::updateMainTab() {
-    //TODO: Handle all the permutations of the states correctly because
-    // 1) Error states aren't handled correctly at the moment
-    // 2) state shows as 'Unknown' while in progress.....
+    //TODO: May need to handle more states..
 
     if (m_serviceState   == ServiceMgr::Running &&
         m_systemDNSState == SystemDNSMgr::Localhost) {
