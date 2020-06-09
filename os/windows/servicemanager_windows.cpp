@@ -17,17 +17,24 @@ ServiceMgrWindows::~ServiceMgrWindows()
 
 int ServiceMgrWindows::getStateofService() {
     qInfo("gettting windows state");
-    m_mainwindow->statusMsg("Status: Stubby service - not implemented.");
+    emit serviceStateChanged(m_serviceState);
+    m_mainwindow->statusMsg("Status: FAKE Stubby service state is Unknown");
     return 0;
 }
 
 int ServiceMgrWindows::startService()
 {
+    m_serviceState = Running;
+    emit serviceStateChanged(m_serviceState);
+    m_mainwindow->statusMsg("Status: FAKE Stubby service started.");
     return 0;
 }
 
 int ServiceMgrWindows::stopService()
 {
+    m_serviceState = Stopped;
+    emit serviceStateChanged(m_serviceState);
+    m_mainwindow->statusMsg("Status: FAKE Stubby service stopped.");
     return 0;
 }
 

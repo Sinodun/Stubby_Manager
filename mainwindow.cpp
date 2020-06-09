@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->main_tab->setFocus();
 
+    // TODO - add a 'clear status messages' button to the GUI
+    statusMsg("Stubby Manager Started.");
+
     // Discover service state
     m_serviceMgr = ServiceMgr::factory(this);
     if (!m_serviceMgr) {
@@ -51,9 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
 
-    // Update status
-    // TODO - add a 'clear status messages' button to the GUI
-    statusMsg("Stubby Manager Started.");
 }
 
 MainWindow::~MainWindow()
@@ -100,7 +100,7 @@ void MainWindow::statusMsg(QString statusMsg) {
 
 void MainWindow::on_startStopButton_clicked()
 {
-    statusMsg("\nStarting Stubby... ");
+    statusMsg("");
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
     m_startStopFromMainTab = true;
     if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting &&  m_serviceState != ServiceMgr::Stopping) {
@@ -118,7 +118,7 @@ void MainWindow::on_startStopButton_clicked()
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
-    qDebug("MAIN WINDOW: Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
+    qDebug("Stubby Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
     if (m_startStopFromMainTab) {
         if (m_serviceState == ServiceMgr::Running)

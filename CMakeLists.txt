@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -52,10 +52,15 @@ add_executable(stubby_gui_proto
   servicemanager.cpp 
   systemdnsmanager.cpp
   systray.qrc
-  ${os_src_dir}/servicemanager_macos.cpp
-  ${os_src_dir}/systemdnsmanager_macos.cpp
-  ${os_src_dir}/runtask_macos.cpp
+  ${os_src_dir}/servicemanager_${HOSTOS}.cpp
+  ${os_src_dir}/systemdnsmanager_${HOSTOS}.cpp
 )
+
+if(WIN32)
+  target_sources(stubby_gui_proto PRIVATE ${os_src_dir}/networkinterface_${HOSTOS}.cpp)
+elseif(APPLE)
+  target_sources(stubby_gui_proto PRIVATE ${os_src_dir}/runtask_${HOSTOS}.cpp)
+endif()
 
 target_include_directories(stubby_gui_proto
   PUBLIC
