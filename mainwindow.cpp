@@ -170,28 +170,35 @@ QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
 
 
 void MainWindow::updateMainTab() {
+    //TODO: Updating the button colour does not work reliably on windows, so for now
+    // update the label background until we have a fix...
+
     //TODO: May need to handle more states..
     qDebug ("Updating state with service %s and network %s ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
     if (m_serviceState   == ServiceMgr::Running &&
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
+        ui->runningStatus->setStyleSheet("background-color: rgb(29, 163, 18);");
         ui->startStopButton->setText("Stop Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(85, 170, 255);");
     }
     else if (m_serviceState   == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
+        ui->runningStatus->setStyleSheet("background-color: rgb(85, 170, 255);");
         ui->startStopButton->setText("Start Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
     else if (m_serviceState   == ServiceMgr::Unknown ||
              m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
+        ui->runningStatus->setStyleSheet("background-color: none);");
         ui->startStopButton->setText("Start Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
     else {
         ui->runningStatus->setText("Partially running...");
+        ui->runningStatus->setStyleSheet("background-color: none;");
         ui->startStopButton->setText("Start Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
