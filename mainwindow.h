@@ -5,7 +5,7 @@
 #include <QSystemTrayIcon>
 
 #include "servicemanager.h"
-#include "systemdnsmanager.h"
+#include "networkmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,7 +31,7 @@ private slots:
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 
-    void on_systemDNSStateChanged(SystemDNSMgr::SystemDNSState state);
+    void on_networkStateChanged(NetworkMgr::NetworkState state);
 
 private:
     Ui::MainWindow *ui;
@@ -40,8 +40,9 @@ private:
     ServiceMgr::ServiceState m_serviceState;
     QString getServiceStateString(const ServiceMgr::ServiceState state);
 
-    SystemDNSMgr *m_systemDNSMgr;
-    SystemDNSMgr::SystemDNSState m_systemDNSState;
+    NetworkMgr *m_networkMgr;
+    NetworkMgr::NetworkState m_networkState;
+    QString getNetworkStateString(const NetworkMgr::NetworkState state);
 
     bool m_startStopFromMainTab;
     void updateMainTab();

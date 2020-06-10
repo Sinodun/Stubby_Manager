@@ -27,13 +27,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     servicemanager.cpp \
-    systemdnsmanager.cpp
+    networkmanager.cpp
 
 
 HEADERS += \
     mainwindow.h \
     servicemanager.h \
-    systemdnsmanager.h
+    networkmanager.h
 
 
 FORMS += \
@@ -42,17 +42,17 @@ FORMS += \
 macx {
   SOURCES += os/macos/runtask_macos.cpp \
              os/macos/servicemanager_macos.cpp \
-             os/macos/systemdnsmanager_macos.cpp
+             os/macos/networkmanager_macos.cpp
   HEADERS += os/macos/runtask_macos.h \
              os/macos/servicemanager_macos.h \
-             os/macos/systemdnsmanager_macos.h
+             os/macos/networkmanager_macos.h
 }
 
 win32 {
   SOURCES += os/windows/servicemanager_windows.cpp \
-             os/windows/systemdnsmanager_windows.cpp
+             os/windows/networkmanager_windows.cpp
   HEADERS += os/windows/servicemanager_windows.h \
-             os/windows/systemdnsmanager_windows.h
+             os/windows/networkmanager_windows.h
 }
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

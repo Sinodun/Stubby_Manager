@@ -25,7 +25,7 @@
 #include <QDebug>
 
 #include "mainwindow.h"
-#include "systemdnsmanager_windows.h"
+#include "networkmanager_windows.h"
 
 #include "networkinterface_windows.hpp"
 
@@ -214,27 +214,27 @@ std::map<std::string, std::string> WlanApi::connected_SSIDs() const
     return res;
 }
 
-std::vector<std::unique_ptr<WindowsNetworkInterface>> SystemDNSMgrWindows::getInterfaces()
+std::vector<std::unique_ptr<NetworkInterfaceWindows>> NetworkMgrWindows::getInterfaces()
 {
-    std::vector<std::unique_ptr<WindowsNetworkInterface>> res;
+    std::vector<std::unique_ptr<NetworkInterfaceWindows>> res;
 
     for ( auto iface : interfaces )
-        res.emplace_back(std::make_unique<WindowsNetworkInterface>(iface));
+        res.emplace_back(std::make_unique<NetworkInterfaceWindows>(iface));
     return res;
 }
 
 
-SystemDNSMgrWindows::SystemDNSMgrWindows(MainWindow *parent) :
-    SystemDNSMgr(parent)
+NetworkMgrWindows::NetworkMgrWindows(MainWindow *parent) :
+    NetworkMgr(parent)
 {
 }
 
-SystemDNSMgrWindows::~SystemDNSMgrWindows()
+NetworkMgrWindows::~NetworkMgrWindows()
 {
 
 }
 
-int SystemDNSMgrWindows::setLocalhostDNS()
+int NetworkMgrWindows::setLocalhostDNS()
 {
     try {
         run_dns_process("-Loopback");
@@ -245,29 +245,29 @@ int SystemDNSMgrWindows::setLocalhostDNS()
     return 0;
 }
 
-int SystemDNSMgrWindows::unsetLocalhostDNS()
+int NetworkMgrWindows::unsetLocalhostDNS()
 {
     run_dns_process("");
     getStateDNS();
     return 0;
 }
 
-int SystemDNSMgrWindows::getStateDNS()
+int NetworkMgrWindows::getStateDNS()
 {
     reload();
     if (isResolverLoopback()) {
-      m_systemDNSState = Localhost;
-      emit systemDNSStateChanged(Localhost);
+      m_networkState = Localhost;
+      emit networkStateChanged(Localhost);
       m_mainwindow->statusMsg("Status: DNS settings using localhost.");
     } else {
-        m_systemDNSState = NotLocalhost;
-        emit systemDNSStateChanged(NotLocalhost);
+        m_networkState = NotLocalhost;
+        emit networkStateChanged(NotLocalhost);
         m_mainwindow->statusMsg("Status: DNS settings NOT using localhost.");
     }
     return 0;
 }
 
-void SystemDNSMgrWindows::reload()
+void NetworkMgrWindows::reload()
 {
     if ( !IsWindows7OrGreater() )
         throw std::runtime_error("Windows 7 or later required.");
@@ -363,7 +363,7 @@ void SystemDNSMgrWindows::reload()
     }
 }
 
-bool SystemDNSMgrWindows::isResolverLoopback() const
+bool NetworkMgrWindows::isResolverLoopback() const
 {
    if ( interfaces.empty() ) {
         qDebug("No interfaces found");
@@ -377,7 +377,7 @@ bool SystemDNSMgrWindows::isResolverLoopback() const
                        });
 }
 
-bool SystemDNSMgrWindows::isRunning() const
+bool NetworkMgrWindows::isRunning() const
 {
     if ( interfaces.empty() )
         return false;
@@ -391,6 +391,6 @@ bool SystemDNSMgrWindows::isRunning() const
 }
 
 
-SystemDNSMgr *SystemDNSMgr::factory(MainWindow *parent) {
-    return new SystemDNSMgrWindows(parent);
+NetworkMgr *NetworkMgr::factory(MainWindow *parent) {
+    return new NetworkMgrWindows(parent);
 }

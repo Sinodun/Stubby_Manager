@@ -50,10 +50,10 @@ add_executable(stubby_gui_proto
   mainwindow.cpp
   mainwindow.ui
   servicemanager.cpp 
-  systemdnsmanager.cpp
+  networkmanager.cpp
   systray.qrc
   ${os_src_dir}/servicemanager_${HOSTOS}.cpp
-  ${os_src_dir}/systemdnsmanager_${HOSTOS}.cpp
+  ${os_src_dir}/networkmanager_${HOSTOS}.cpp
 )
 
 if(WIN32)

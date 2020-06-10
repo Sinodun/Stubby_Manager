@@ -4,33 +4,33 @@
 #include "mainwindow.h"
 
 
-SystemDNSMgr::SystemDNSMgr(MainWindow *parent) :
+NetworkMgr::NetworkMgr(MainWindow *parent) :
     QObject(parent),
     m_mainwindow(parent),
-    m_systemDNSState(SystemDNSMgr::Unknown)
+    m_networkState(NetworkMgr::Unknown)
 
 {
-    qInfo("Creating service mgr");
+    qInfo("Creating network mgr");
 }
 
-SystemDNSMgr::~SystemDNSMgr()
+NetworkMgr::~NetworkMgr()
 {
 }
 
-int SystemDNSMgr::setLocalhost()
+int NetworkMgr::setLocalhost()
 {
     // TODO: Should we check state here before trying to update?
     m_mainwindow->statusMsg("Setting DNS to localhost...");
     return setLocalhostDNS();
 }
 
-int SystemDNSMgr::unsetLocalhost()
+int NetworkMgr::unsetLocalhost()
 {
     m_mainwindow->statusMsg("Setting DNS back to system settings...");
     return unsetLocalhostDNS();
 }
 
-int SystemDNSMgr::getState()
+int NetworkMgr::getState()
 {
     return getStateDNS();
 }

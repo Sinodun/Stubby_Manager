@@ -2,14 +2,14 @@
 #include <QRegularExpression>
 
 #include "mainwindow.h"
-#include "systemdnsmanager_macos.h"
+#include "networkmanager_macos.h"
 
 
-SystemDNSMgrMacos::SystemDNSMgrMacos(MainWindow *parent) :
-    SystemDNSMgr(parent),
+NetworkMgrMacos::NetworkMgrMacos(MainWindow *parent) :
+    NetworkMgr(parent),
     m_setLocalhost(0),
     m_unsetLocalhost(0),
-    m_getSystemDNSState(0)
+    m_getNetworkState(0)
 {
     m_setLocalhost = new RunHelperTaskMacos("dns_stubby", RunHelperTaskMacos::RIGHT_DNS_LOCAL, QString(), this, parent);
     connect(m_setLocalhost, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_setLocalhost_finished(int,QProcess::ExitStatus)));
@@ -17,49 +17,49 @@ SystemDNSMgrMacos::SystemDNSMgrMacos(MainWindow *parent) :
     m_unsetLocalhost = new RunHelperTaskMacos("dns_default", RunHelperTaskMacos::RIGHT_DNS_LOCAL, QString(), this, parent);
     connect(m_unsetLocalhost, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_unsetLocalhost_finished(int, QProcess::ExitStatus)));
 
-    m_getSystemDNSState = new RunHelperTaskMacos("dns_list", QString(), QString(), this, parent);
-    connect(m_getSystemDNSState, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_getSystemDNSState_finished(int, QProcess::ExitStatus)));
-    connect(m_getSystemDNSState, SIGNAL(readyReadStandardOutput()), this, SLOT(on_getSystemDNSState_readyReadStdout()));
+    m_getNetworkState = new RunHelperTaskMacos("dns_list", QString(), QString(), this, parent);
+    connect(m_getNetworkState, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_getNetworkState_finished(int, QProcess::ExitStatus)));
+    connect(m_getNetworkState, SIGNAL(readyReadStandardOutput()), this, SLOT(on_getNetworkState_readyReadStdout()));
 }
 
-SystemDNSMgrMacos::~SystemDNSMgrMacos()
+NetworkMgrMacos::~NetworkMgrMacos()
 {
 }
 
-int SystemDNSMgrMacos::setLocalhostDNS()
+int NetworkMgrMacos::setLocalhostDNS()
 {
     m_setLocalhost->start();
     return 0;
 }
 
-int SystemDNSMgrMacos::unsetLocalhostDNS()
+int NetworkMgrMacos::unsetLocalhostDNS()
 {
     m_unsetLocalhost->start();
     return 0;
 }
 
-int SystemDNSMgrMacos::getStateDNS()
+int NetworkMgrMacos::getStateDNS()
 {
-    m_getSystemDNSState_output = "";
-    m_getSystemDNSState->start();
+    m_getNetworkState_output = "";
+    m_getNetworkState->start();
     return 0;
 }
 
-void SystemDNSMgrMacos::on_setLocalhost_finished(int exitCode, QProcess::ExitStatus)
+void NetworkMgrMacos::on_setLocalhost_finished(int exitCode, QProcess::ExitStatus)
 {
-    qDebug("Exit code is %d", exitCode);
+    qDebug("SetLocalhost exit code is %d", exitCode);
     getState();
 }
 
-void SystemDNSMgrMacos::on_unsetLocalhost_finished(int exitCode, QProcess::ExitStatus)
+void NetworkMgrMacos::on_unsetLocalhost_finished(int exitCode, QProcess::ExitStatus)
 {
-    qDebug("Exit code is %d", exitCode);
+    qDebug("UnsetLocalhost exit code is %d", exitCode);
     getState();
 }
 
-void SystemDNSMgrMacos::on_getSystemDNSState_finished(int exitCode, QProcess::ExitStatus exitStatus)
+void NetworkMgrMacos::on_getNetworkState_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug("Exit code is %d", exitCode);
+    qDebug("getState exit code is %d", exitCode);
     /*
      * $ sudo ./stubby-setdns.sh -l
      * ** Current DNS settings **
@@ -75,8 +75,8 @@ void SystemDNSMgrMacos::on_getSystemDNSState_finished(int exitCode, QProcess::Ex
      */
 
      if (exitStatus == QProcess::NormalExit) {
-        QStringList slist = m_getSystemDNSState_output.split("\n");
-        qDebug("Output from stdout is\n%s", m_getSystemDNSState_output.toLatin1().data());
+        QStringList slist = m_getNetworkState_output.split("\n");
+        qDebug("Output from stdout is\n%s", m_getNetworkState_output.toLatin1().data());
         int numberOfConnectors = slist.length() - 2;
         bool isLocalhost[numberOfConnectors];
         bool isNotLocalhost[numberOfConnectors];
@@ -98,8 +98,8 @@ void SystemDNSMgrMacos::on_getSystemDNSState_finished(int exitCode, QProcess::Ex
         i = 0;
         while ((i < numberOfConnectors) && isLocalhost[i]) { i++; }
         if (i==numberOfConnectors) {
-            m_systemDNSState = Localhost;
-            emit systemDNSStateChanged(Localhost);
+            m_networkState = Localhost;
+            emit networkStateChanged(Localhost);
             qDebug("All connections are using Localhost");
             m_mainwindow->statusMsg("Status: DNS settings using localhost.");
             return;
@@ -109,8 +109,8 @@ void SystemDNSMgrMacos::on_getSystemDNSState_finished(int exitCode, QProcess::Ex
         i = 0;
         while ((i < numberOfConnectors) && isNotLocalhost[i]) { i++; }
         if (i==numberOfConnectors) {
-            m_systemDNSState = NotLocalhost;
-            emit systemDNSStateChanged(NotLocalhost);
+            m_networkState = NotLocalhost;
+            emit networkStateChanged(NotLocalhost);
             qDebug("No connections are using Localhost");
             m_mainwindow->statusMsg("Status: DNS settings using default system settings.");
             return;
@@ -118,18 +118,18 @@ void SystemDNSMgrMacos::on_getSystemDNSState_finished(int exitCode, QProcess::Ex
 
         /* otherwhise, the true state is unknown.*/
      }
-     m_systemDNSState = Unknown;
-     emit systemDNSStateChanged(Unknown);
+     m_networkState = Unknown;
+     emit networkStateChanged(Unknown);
      qDebug("Error - DNS server use of localhost is not clear");
      m_mainwindow->statusMsg("Error - DNS server use of localhost is not clear");
 }
 
-void SystemDNSMgrMacos::on_getSystemDNSState_readyReadStdout()
+void NetworkMgrMacos::on_getNetworkState_readyReadStdout()
 
 {
-    m_getSystemDNSState_output = m_getSystemDNSState_output + QString::fromLatin1(m_getSystemDNSState->readAllStandardOutput().data());
+    m_getNetworkState_output = m_getNetworkState_output + QString::fromLatin1(m_getNetworkState->readAllStandardOutput().data());
 }
 
-SystemDNSMgr *SystemDNSMgr::factory(MainWindow *parent) {
-    return new SystemDNSMgrMacos(parent);
+NetworkMgr *NetworkMgr::factory(MainWindow *parent) {
+    return new NetworkMgrMacos(parent);
 }

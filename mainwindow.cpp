@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_serviceState(ServiceMgr::Unknown)
-    , m_systemDNSState(SystemDNSMgr::Unknown)
+    , m_networkState(NetworkMgr::Unknown)
     , m_startStopFromMainTab(false)
 {
     ui->setupUi(this);
@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
+    ui->runningStatus->setText("Checking status...");
 
     // Discover service state
     m_serviceMgr = ServiceMgr::factory(this);
@@ -30,13 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_serviceMgr->getState();
 
     // Check system DNS settings
-    m_systemDNSMgr = SystemDNSMgr::factory(this);
-    if (!m_systemDNSMgr) {
+    m_networkMgr = NetworkMgr::factory(this);
+    if (!m_networkMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
     }
-    connect(m_systemDNSMgr, SIGNAL(systemDNSStateChanged(SystemDNSMgr::SystemDNSState)), this, SLOT(on_systemDNSStateChanged(SystemDNSMgr::SystemDNSState)));
-    m_systemDNSMgr->getState();
+    connect(m_networkMgr, SIGNAL(networkStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_networkStateChanged(NetworkMgr::NetworkState)));
+    m_networkMgr->getState();
 
     // Discover network and profile
 
@@ -107,6 +108,10 @@ void MainWindow::on_startStopButton_clicked()
         ui->startStopButton->setText("Stubby starting...");
         m_serviceMgr->start();
     }
+    else if (m_serviceState == ServiceMgr::Running && m_networkState != NetworkMgr::Localhost) {
+        ui->startStopButton->setText("Stubby starting...");
+        m_networkMgr->setLocalhost();
+    }
     else {
         ui->startStopButton->setText("Stubby stopping...");
         m_serviceMgr->stop();
@@ -122,16 +127,16 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     m_serviceState = state;
     if (m_startStopFromMainTab) {
         if (m_serviceState == ServiceMgr::Running)
-            m_systemDNSMgr->setLocalhost();
+            m_networkMgr->setLocalhost();
         else if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting)
-            m_systemDNSMgr->unsetLocalhost();
+            m_networkMgr->unsetLocalhost();
     }
     updateMainTab();
 }
 
-void MainWindow::on_systemDNSStateChanged(SystemDNSMgr::SystemDNSState state) {
-    qDebug("MAIN WINDOW: System DNS state changed from %d to %d ", m_systemDNSState, state);
-    m_systemDNSState = state;
+void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
+    qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
+    m_networkState = state;
     updateMainTab();
 }
 
@@ -152,24 +157,41 @@ QString MainWindow::getServiceStateString(const ServiceMgr::ServiceState state)
     }
 }
 
+QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
+{
+    switch (state) {
+        case NetworkMgr::Localhost    : return "Localhost";
+        case NetworkMgr::NotLocalhost : return "Not Localhost";
+        //case NetworkMgr::Error      : return "Error determining state";
+        case NetworkMgr::Unknown :
+        default : return "Unknown";
+    }
+}
+
+
 void MainWindow::updateMainTab() {
     //TODO: May need to handle more states..
-
+    qDebug ("Updating state with service %s and network %s ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
     if (m_serviceState   == ServiceMgr::Running &&
-        m_systemDNSState == SystemDNSMgr::Localhost) {
+        m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->startStopButton->setText("Stop Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(85, 170, 255);");
     }
     else if (m_serviceState   == ServiceMgr::Stopped &&
-             m_systemDNSState == SystemDNSMgr::NotLocalhost) {
+             m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->startStopButton->setText("Start Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
     else if (m_serviceState   == ServiceMgr::Unknown ||
-             m_systemDNSState == SystemDNSMgr::Unknown) {
+             m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
+        ui->startStopButton->setText("Start Stubby");
+        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
+    }
+    else {
+        ui->runningStatus->setText("Partially running...");
         ui->startStopButton->setText("Start Stubby");
         ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }

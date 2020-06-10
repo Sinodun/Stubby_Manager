@@ -1,15 +1,15 @@
-#ifndef WINDOWSNETWORKINTERFACE
-#define WINDOWSNETWORKINTERFACE
+#ifndef NETWORKINTERFACEWINDOWS_H
+#define NETWORKINTERFACEWINDOWS_H
 
 //#include <ifdef.h>
 #include <windows.h>
 
 #include "networkinterface.hpp"
 
-class WindowsNetworkInterface : public NetworkInterface
+class NetworkInterfaceWindows : public NetworkInterface
 {
 public:
-    WindowsNetworkInterface(const std::string& name,
+    NetworkInterfaceWindows(const std::string& name,
                             const std::string& adapter_name,
                             const std::string& descripton,
                             const std::string& dns_suffix,
@@ -18,7 +18,7 @@ public:
                             bool is_running,
                             DWORD if_type);
                             //IF_OPER_STATUS oper_status);
-    ~WindowsNetworkInterface() = default;
+    ~NetworkInterfaceWindows() = default;
 
     std::string name() const override;
 

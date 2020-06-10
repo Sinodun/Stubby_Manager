@@ -2,7 +2,7 @@
 
 #include "networkinterface_windows.hpp"
 
-WindowsNetworkInterface::WindowsNetworkInterface(
+NetworkInterfaceWindows::NetworkInterfaceWindows(
     const std::string& name,
     const std::string& adapter_name,
     const std::string& description,
@@ -21,33 +21,33 @@ WindowsNetworkInterface::WindowsNetworkInterface(
 {
 }
 
-std::string WindowsNetworkInterface::name() const
+std::string NetworkInterfaceWindows::name() const
 {
     return name_;
 }
 
-bool WindowsNetworkInterface::is_resolver_loopback() const
+bool NetworkInterfaceWindows::is_resolver_loopback() const
 {
     return is_resolver_loopback_;
 }
 
-bool WindowsNetworkInterface::is_running() const
+bool NetworkInterfaceWindows::is_running() const
 {
     return is_running_;
 }
 
-/*bool WindowsNetworkInterface::is_up() const
+/*bool NetworkInterfaceWindows::is_up() const
 {
     return oper_status_ & IfOperStatusUp;
 }*/
 
-bool WindowsNetworkInterface::is_wireless() const
+bool NetworkInterfaceWindows::is_wireless() const
 {
     //return if_type_ == IF_TYPE_IEEE80211;
     return false;
 }
 
-std::string WindowsNetworkInterface::ssid() const
+std::string NetworkInterfaceWindows::ssid() const
 {
     return ssid_;
 }

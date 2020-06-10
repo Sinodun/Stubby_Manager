@@ -1,33 +1,33 @@
-#ifndef SYSTEMDNSMGR_H
-#define SYSTEMDNSMGR_H
+#ifndef NETWORKMGR_H
+#define NETWORKMGR_H
 
 #include <QObject>
 
 class MainWindow;
 
 
-class SystemDNSMgr : public QObject
+class NetworkMgr : public QObject
 {
     Q_OBJECT
 
 public:
-    SystemDNSMgr(MainWindow *parent);
-    virtual ~SystemDNSMgr();
+    NetworkMgr(MainWindow *parent);
+    virtual ~NetworkMgr();
 
-    static SystemDNSMgr * factory(MainWindow *parent);
+    static NetworkMgr * factory(MainWindow *parent);
 
     typedef enum {
         NotLocalhost = 0,
         Localhost,
         Unknown
-    } SystemDNSState;
+    } NetworkState;
 
     int setLocalhost();
     int unsetLocalhost();
     int getState();
 
 signals:
-    void systemDNSStateChanged(SystemDNSMgr::SystemDNSState state);
+    void networkStateChanged(NetworkMgr::NetworkState state);
 
 protected:
     virtual int setLocalhostDNS() = 0;
@@ -35,8 +35,8 @@ protected:
     virtual int getStateDNS() = 0;
 
     MainWindow *m_mainwindow;
-    SystemDNSState m_systemDNSState;
+    NetworkState m_networkState;
 
 };
 
-#endif // SYSTEMDNSMGR_H
+#endif // NETWORKMGR_H
