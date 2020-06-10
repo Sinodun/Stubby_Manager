@@ -1,3 +1,4 @@
+*.autosave
 *.user*
 build*
 build_qmake*
