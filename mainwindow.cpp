@@ -1,10 +1,27 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QPixmap>
+#include <QPainter>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+class CirclePixmap: public QPixmap {
+public:
+    CirclePixmap(QColor col);
+};
+
+CirclePixmap::CirclePixmap(QColor col)
+    :QPixmap(15,15) {
+
+    fill(QColor(255, 0, 0, 0));
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
+    QBrush brush(col);
+    p.setBrush(brush);
+    p.drawEllipse(0, 0, 15, 15);
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,10 +33,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     ui->main_tab->setFocus();
+#ifdef Q_OS_MAC
+    QFont f = ui->tabWidget->font();
+    f.setPointSize(15);
+    ui->tabWidget->setFont(f);
+#endif
 
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
     ui->runningStatus->setText("Checking status...");
+    ui->startStopButton->setText("Start Stubby");
 
     // Discover service state
     m_serviceMgr = ServiceMgr::factory(this);
@@ -54,6 +77,15 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
+
+    greenPixmap = new CirclePixmap(Qt::green);
+    yellowPixmap = new CirclePixmap(Qt::darkYellow);
+    redPixmap = new CirclePixmap(Qt::darkRed);
+    greyPixmap = new CirclePixmap(Qt::lightGray);
+
+    ui->serviceStatus->setPixmap(*greyPixmap);
+    ui->networkStatus->setPixmap(*greyPixmap);
+    ui->connectStatus->setPixmap(*greyPixmap);
 
 }
 
@@ -126,17 +158,25 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     qDebug("Stubby Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
     if (m_startStopFromMainTab) {
-        if (m_serviceState == ServiceMgr::Running)
+        if (m_serviceState == ServiceMgr::Running) {
             m_networkMgr->setLocalhost();
-        else if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting)
+        }
+        else if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting) {
             m_networkMgr->unsetLocalhost();
+        }
     }
+    if (m_serviceState == ServiceMgr::Running)       ui->serviceStatus->setPixmap(*greenPixmap);
+    else if (m_serviceState == ServiceMgr::Stopped)  ui->serviceStatus->setPixmap(*greyPixmap);
+    else                                             ui->serviceStatus->setPixmap(*yellowPixmap);
     updateMainTab();
 }
 
 void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
     qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
     m_networkState = state;
+    if (m_networkState == NetworkMgr::Localhost)  ui->networkStatus->setPixmap(*greenPixmap);
+    else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
+    else ui->networkStatus->setPixmap(*yellowPixmap);
     updateMainTab();
 }
 
@@ -178,28 +218,20 @@ void MainWindow::updateMainTab() {
     if (m_serviceState   == ServiceMgr::Running &&
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        ui->runningStatus->setStyleSheet("background-color: rgb(29, 163, 18);");
         ui->startStopButton->setText("Stop Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(85, 170, 255);");
     }
     else if (m_serviceState   == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        ui->runningStatus->setStyleSheet("background-color: rgb(85, 170, 255);");
         ui->startStopButton->setText("Start Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
     else if (m_serviceState   == ServiceMgr::Unknown ||
              m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
-        ui->runningStatus->setStyleSheet("background-color: none);");
         ui->startStopButton->setText("Start Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
     else {
-        ui->runningStatus->setText("Partially running...");
-        ui->runningStatus->setStyleSheet("background-color: none;");
+        ui->runningStatus->setText("Partly running...");
         ui->startStopButton->setText("Start Stubby");
-        ui->startStopButton->setStyleSheet("background-color: rgb(29, 163, 18);");
     }
 }

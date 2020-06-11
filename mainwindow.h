@@ -51,5 +51,10 @@ private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
 
+    QPixmap *greenPixmap;
+    QPixmap *yellowPixmap;
+    QPixmap *redPixmap;
+    QPixmap *greyPixmap;
+
 };
 #endif // MAINWINDOW_H
