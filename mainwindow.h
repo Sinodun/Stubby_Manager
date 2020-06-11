@@ -27,7 +27,7 @@ protected:
 
 private slots:
 
-    void on_startStopButton_clicked();
+    void on_onOffSlider_valueChanged();
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 

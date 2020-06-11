@@ -14,20 +14,19 @@
    <string>Stubby</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>30</y>
+      <y>80</y>
       <width>611</width>
-      <height>491</height>
+      <height>451</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>13</pointsize>
-     </font>
     </property>
     <property name="tabShape">
      <enum>QTabWidget::Rounded</enum>
@@ -48,126 +47,12 @@
         <x>20</x>
         <y>10</y>
         <width>571</width>
-        <height>241</height>
+        <height>131</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0,6">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="6">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="runningStatus">
-           <property name="text">
-            <string>Not running</string>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="stubbyStatus">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10,0,10">
-         <item>
-          <spacer name="horizontalSpacer_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="startStopButton">
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border:none;
-background-color: rgb(60, 130, 255);</string>
-           </property>
-           <property name="text">
-            <string>Start Stubby</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_7">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>6</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,40,10,10,10">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,30,10,20,10">
          <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
@@ -280,7 +165,7 @@ background-color: rgb(60, 130, 255);</string>
              <item>
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>Service:   </string>
+                <string>Service running:   </string>
                </property>
               </widget>
              </item>
@@ -301,7 +186,7 @@ background-color: rgb(60, 130, 255);</string>
              <item>
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>Network:  </string>
+                <string>Service in use:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -376,16 +261,15 @@ background-color: rgb(60, 130, 255);</string>
      <widget class="QTextEdit" name="statusOutput">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>260</y>
+        <x>50</x>
+        <y>160</y>
         <width>511</width>
-        <height>171</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Arial</family>
-        <pointsize>10</pointsize>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="readOnly">
@@ -402,7 +286,7 @@ background-color: rgb(60, 130, 255);</string>
        <rect>
         <x>9</x>
         <y>9</y>
-        <width>561</width>
+        <width>581</width>
         <height>391</height>
        </rect>
       </property>
@@ -411,12 +295,6 @@ background-color: rgb(60, 130, 255);</string>
         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="30,10,10">
          <item>
           <widget class="QLabel" name="label_7">
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>13</pointsize>
-            </font>
-           </property>
            <property name="text">
             <string>Network Profile</string>
            </property>
@@ -426,12 +304,6 @@ background-color: rgb(60, 130, 255);</string>
           <widget class="QCheckBox" name="checkBox_2">
            <property name="enabled">
             <bool>false</bool>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>13</pointsize>
-            </font>
            </property>
            <property name="text">
             <string>Lock config</string>
@@ -443,12 +315,6 @@ background-color: rgb(60, 130, 255);</string>
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>13</pointsize>
-            </font>
-           </property>
            <property name="text">
             <string>Expert mode</string>
            </property>
@@ -458,12 +324,6 @@ background-color: rgb(60, 130, 255);</string>
        </item>
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>13</pointsize>
-          </font>
-         </property>
          <property name="tabPosition">
           <enum>QTabWidget::North</enum>
          </property>
@@ -480,23 +340,17 @@ background-color: rgb(60, 130, 255);</string>
           <widget class="QWidget" name="verticalLayoutWidget_3">
            <property name="geometry">
             <rect>
-             <x>-1</x>
+             <x>9</x>
              <y>9</y>
-             <width>556</width>
+             <width>551</width>
              <height>314</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10,10,1000">
+           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="15,15,95">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,10,8">
               <item>
                <widget class="QCheckBox" name="checkBox_3">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Use as default profile</string>
                 </property>
@@ -523,12 +377,6 @@ background-color: rgb(60, 130, 255);</string>
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Configure Specific Networks</string>
                 </property>
@@ -540,12 +388,6 @@ background-color: rgb(60, 130, 255);</string>
              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="10,10,7,0">
               <item>
                <widget class="QCheckBox" name="checkBox_8">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Encrypt all traffic</string>
                 </property>
@@ -556,12 +398,6 @@ background-color: rgb(60, 130, 255);</string>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_7">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Always Autheticate</string>
                 </property>
@@ -572,12 +408,6 @@ background-color: rgb(60, 130, 255);</string>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_6">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Validate data</string>
                 </property>
@@ -585,12 +415,6 @@ background-color: rgb(60, 130, 255);</string>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_4">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                 <property name="text">
                  <string>Round robin</string>
                 </property>
@@ -599,7 +423,7 @@ background-color: rgb(60, 130, 255);</string>
              </layout>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,1,1,200">
+             <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,1,3,10">
               <item>
                <widget class="Line" name="line_3">
                 <property name="orientation">
@@ -608,28 +432,29 @@ background-color: rgb(60, 130, 255);</string>
                </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,20,10">
+               <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,0,15,0,10">
                 <item>
                  <widget class="QLabel" name="label_6">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>11</pointsize>
-                   </font>
-                  </property>
                   <property name="text">
                    <string>DNS Servers</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>11</pointsize>
-                   </font>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox">
                   <item>
                    <property name="text">
                     <string>Exclude network provided servers</string>
@@ -648,13 +473,20 @@ background-color: rgb(60, 130, 255);</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_3">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>11</pointsize>
-                   </font>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_3">
                   <property name="text">
                    <string>Test the servers</string>
                   </property>
@@ -666,12 +498,6 @@ background-color: rgb(60, 130, 255);</string>
                <layout class="QHBoxLayout" name="horizontalLayout_9">
                 <item>
                  <widget class="QPushButton" name="pushButton_11">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
                   <property name="text">
                    <string>Add</string>
                   </property>
@@ -679,12 +505,6 @@ background-color: rgb(60, 130, 255);</string>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_4">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
                   <property name="text">
                    <string>Edit</string>
                   </property>
@@ -692,12 +512,6 @@ background-color: rgb(60, 130, 255);</string>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_6">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
                   <property name="text">
                    <string>Delete</string>
                   </property>
@@ -718,12 +532,6 @@ background-color: rgb(60, 130, 255);</string>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_7">
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
                   <property name="text">
                    <string>Filter</string>
                   </property>
@@ -769,7 +577,7 @@ background-color: rgb(60, 130, 255);</string>
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>530</y>
+      <y>550</y>
       <width>354</width>
       <height>41</height>
      </rect>
@@ -807,6 +615,140 @@ background-color: rgb(60, 130, 255);</string>
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="runningStatus">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>30</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Not Running</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="stubbyStatus">
+    <property name="geometry">
+     <rect>
+      <x>444</x>
+      <y>30</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>30</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Status:</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="onOffSlider">
+    <property name="geometry">
+     <rect>
+      <x>299</x>
+      <y>25</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">groove:horizontal {
+    border: 1px solid #999999;
+    height: 28px;}</string>
+    </property>
+    <property name="maximum">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>315</x>
+      <y>10</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stubby</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>295</x>
+      <y>50</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OFF</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>50</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ON</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>3</y>
+      <width>611</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(234, 237, 255);</string>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+   </widget>
+   <zorder>groupBox</zorder>
+   <zorder>tabWidget</zorder>
+   <zorder>horizontalLayoutWidget_6</zorder>
+   <zorder>runningStatus</zorder>
+   <zorder>stubbyStatus</zorder>
+   <zorder>label_2</zorder>
+   <zorder>onOffSlider</zorder>
+   <zorder>label_8</zorder>
+   <zorder>label_10</zorder>
+   <zorder>label_11</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -814,7 +756,7 @@ background-color: rgb(60, 130, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>700</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

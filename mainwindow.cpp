@@ -42,7 +42,17 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
     ui->runningStatus->setText("Checking status...");
-    ui->startStopButton->setText("Start Stubby");
+    //ui->startStopButton->setText("Start Stubby");
+
+    // Set up circle icons
+    greenPixmap = new CirclePixmap(Qt::green);
+    yellowPixmap = new CirclePixmap(Qt::yellow);
+    redPixmap = new CirclePixmap(Qt::red);
+    greyPixmap = new CirclePixmap(Qt::lightGray);
+    ui->serviceStatus->setPixmap(*greyPixmap);
+    ui->networkStatus->setPixmap(*greyPixmap);
+    ui->connectStatus->setPixmap(*greyPixmap);
+    ui->stubbyStatus->setPixmap(*greyPixmap);
 
     // Discover service state
     m_serviceMgr = ServiceMgr::factory(this);
@@ -77,15 +87,6 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
-
-    greenPixmap = new CirclePixmap(Qt::green);
-    yellowPixmap = new CirclePixmap(Qt::darkYellow);
-    redPixmap = new CirclePixmap(Qt::darkRed);
-    greyPixmap = new CirclePixmap(Qt::lightGray);
-
-    ui->serviceStatus->setPixmap(*greyPixmap);
-    ui->networkStatus->setPixmap(*greyPixmap);
-    ui->connectStatus->setPixmap(*greyPixmap);
 
 }
 
@@ -131,26 +132,27 @@ void MainWindow::statusMsg(QString statusMsg) {
  * Slots functions
  */
 
-void MainWindow::on_startStopButton_clicked()
+void MainWindow::on_onOffSlider_valueChanged()
 {
     statusMsg("");
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
     m_startStopFromMainTab = true;
-    if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting &&  m_serviceState != ServiceMgr::Stopping) {
-        ui->startStopButton->setText("Stubby starting...");
-        m_serviceMgr->start();
-    }
-    else if (m_serviceState == ServiceMgr::Running && m_networkState != NetworkMgr::Localhost) {
-        ui->startStopButton->setText("Stubby starting...");
-        m_networkMgr->setLocalhost();
+    int value = ui->onOffSlider->value();
+    if (value == 1) {
+        ui->runningStatus->setText("Stubby starting...");
+        if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting)
+            m_serviceMgr->start();
+        else if (m_networkState != NetworkMgr::Localhost)
+            m_networkMgr->setLocalhost();
     }
     else {
-        ui->startStopButton->setText("Stubby stopping...");
-        m_serviceMgr->stop();
+        if (m_serviceState != ServiceMgr::Stopped && m_serviceState != ServiceMgr::Stopping) {
+            ui->runningStatus->setText("Stubby stopping...");
+            m_serviceMgr->stop();
+        }
+        else if (m_networkState != NetworkMgr::NotLocalhost)
+             m_networkMgr->unsetLocalhost();
     }
-    ui->startStopButton->setStyleSheet("background-color: rgb(145, 145, 145);");
-    // TODO: Disable button until state known?
-    // Also - add a timer incase the start processes do not return?
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
@@ -167,6 +169,8 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     }
     if (m_serviceState == ServiceMgr::Running)       ui->serviceStatus->setPixmap(*greenPixmap);
     else if (m_serviceState == ServiceMgr::Stopped)  ui->serviceStatus->setPixmap(*greyPixmap);
+    else if (m_serviceState == ServiceMgr::Unknown)  ui->serviceStatus->setPixmap(*redPixmap);
+    else if (m_serviceState == ServiceMgr::Error)    ui->serviceStatus->setPixmap(*redPixmap);
     else                                             ui->serviceStatus->setPixmap(*yellowPixmap);
     updateMainTab();
 }
@@ -218,20 +222,27 @@ void MainWindow::updateMainTab() {
     if (m_serviceState   == ServiceMgr::Running &&
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        ui->startStopButton->setText("Stop Stubby");
+        //ui->startStopButton->setText("Stop Stubby");
+        ui->stubbyStatus->setPixmap(*greenPixmap);
+        ui->onOffSlider->setValue(1);
     }
     else if (m_serviceState   == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        ui->startStopButton->setText("Start Stubby");
+        //ui->startStopButton->setText("Start Stubby");
+        ui->stubbyStatus->setPixmap(*greyPixmap);
+        ui->onOffSlider->setValue(0);
     }
     else if (m_serviceState   == ServiceMgr::Unknown ||
              m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
-        ui->startStopButton->setText("Start Stubby");
+        //ui->startStopButton->setText("Start Stubby");
+        ui->stubbyStatus->setPixmap(*redPixmap);
+        ui->onOffSlider->setValue(0);
     }
     else {
         ui->runningStatus->setText("Partly running...");
-        ui->startStopButton->setText("Start Stubby");
+        //ui->startStopButton->setText("Start Stubby");
+        ui->stubbyStatus->setPixmap(*yellowPixmap);
     }
 }

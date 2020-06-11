@@ -17,8 +17,9 @@ ServiceMgrWindows::~ServiceMgrWindows()
 
 int ServiceMgrWindows::getStateofService() {
     qInfo("gettting windows state");
+    m_serviceState = Stopped;
     emit serviceStateChanged(m_serviceState);
-    m_mainwindow->statusMsg("Status: FAKE Stubby service state is Unknown");
+    m_mainwindow->statusMsg("Status: FAKE Stubby service state is stopped");
     return 0;
 }
 
