@@ -88,7 +88,6 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
-
 }
 
 MainWindow::~MainWindow()
@@ -133,13 +132,13 @@ void MainWindow::statusMsg(QString statusMsg) {
  * Slots functions
  */
 
-void MainWindow::on_onOffSlider_valueChanged()
+void MainWindow::on_onOffSlider_stateChanged()
 {
     statusMsg("");
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
     m_startStopFromMainTab = true;
-    int value = ui->onOffSlider->value();
-    if (value == 1) {
+    bool value = ui->onOffSlider->isChecked();
+    if (value == true) {
         ui->runningStatus->setText("Stubby starting...");
         if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting)
             m_serviceMgr->start();
@@ -160,6 +159,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
     qDebug("Stubby Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
+    // TODO: revist the m_startStopFromMainTab flag usage... need something better
     if (m_startStopFromMainTab) {
         if (m_serviceState == ServiceMgr::Running) {
             m_networkMgr->setLocalhost();
@@ -173,7 +173,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     else if (m_serviceState == ServiceMgr::Unknown)  ui->serviceStatus->setPixmap(*redPixmap);
     else if (m_serviceState == ServiceMgr::Error)    ui->serviceStatus->setPixmap(*redPixmap);
     else                                             ui->serviceStatus->setPixmap(*yellowPixmap);
-    updateMainTab();
+    updateMainTab(m_startStopFromMainTab);
 }
 
 void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
@@ -182,7 +182,8 @@ void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
     if (m_networkState == NetworkMgr::Localhost)  ui->networkStatus->setPixmap(*greenPixmap);
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
-    updateMainTab();
+    updateMainTab(m_startStopFromMainTab);
+    if (m_startStopFromMainTab) m_startStopFromMainTab = false;
 }
 
 /*
@@ -214,36 +215,44 @@ QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
 }
 
 
-void MainWindow::updateMainTab() {
-    //TODO: Updating the button colour does not work reliably on windows, so for now
-    // update the label background until we have a fix...
+void MainWindow::updateMainTab(bool action) {
 
-    //TODO: May need to handle more states..
+    // the action flag tells us if the update is becasue of a user
+    // action (as opposed to periodic probing)
+
     qDebug ("Updating state with service %s and network %s ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
-    if (m_serviceState   == ServiceMgr::Running &&
+    if (m_serviceState == ServiceMgr::Running &&
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        //ui->startStopButton->setText("Stop Stubby");
         ui->stubbyStatus->setPixmap(*greenPixmap);
-        ui->onOffSlider->setValue(1);
+        ui->onOffSlider->setChecked(true);
     }
-    else if (m_serviceState   == ServiceMgr::Stopped &&
+    else if (m_serviceState == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
-        //ui->startStopButton->setText("Start Stubby");
         ui->stubbyStatus->setPixmap(*greyPixmap);
-        ui->onOffSlider->setValue(0);
+        ui->onOffSlider->setChecked(false);
     }
-    else if (m_serviceState   == ServiceMgr::Unknown ||
-             m_networkState == NetworkMgr::Unknown) {
-        ui->runningStatus->setText(getServiceStateString(ServiceMgr::Unknown));
-        //ui->startStopButton->setText("Start Stubby");
+    else if ((m_serviceState == ServiceMgr::Running &&
+              m_networkState == NetworkMgr::NotLocalhost) ||
+             (m_serviceState == ServiceMgr::Stopped &&
+              m_networkState == NetworkMgr::Localhost)) {
+        if (action)
+            ui->runningStatus->setText("Updating...");
+        else
+            ui->runningStatus->setText("Partly running...");
+        ui->stubbyStatus->setPixmap(*yellowPixmap);
+    }
+    else if (m_serviceState == ServiceMgr::Unknown ||
+             m_networkState == NetworkMgr::Unknown ||
+             m_serviceState == ServiceMgr::Error ) {
+             //m_networkState == NetworkMgr::Unknown) {
+        ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*redPixmap);
-        ui->onOffSlider->setValue(0);
+        ui->onOffSlider->setChecked(false);
     }
     else {
-        ui->runningStatus->setText("Partly running...");
-        //ui->startStopButton->setText("Start Stubby");
+        ui->runningStatus->setText("Updating...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
     }
 }

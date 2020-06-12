@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(systray);
+    Q_INIT_RESOURCE(stubby);
 
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 

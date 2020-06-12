@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Stubby</string>
+   <string>Stubby Manager</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="font">
@@ -660,69 +660,6 @@
      <string>Status:</string>
     </property>
    </widget>
-   <widget class="QSlider" name="onOffSlider">
-    <property name="geometry">
-     <rect>
-      <x>299</x>
-      <y>35</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">groove:horizontal {
-    border: 1px solid #999999;
-    height: 28px;}</string>
-    </property>
-    <property name="maximum">
-     <number>1</number>
-    </property>
-    <property name="pageStep">
-     <number>1</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>315</x>
-      <y>20</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stubby</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>295</x>
-      <y>60</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OFF</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_11">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>60</y>
-      <width>21</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ON</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -739,6 +676,71 @@ border:none;</string>
     <property name="title">
      <string/>
     </property>
+    <widget class="QCheckBox" name="onOffSlider">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>10</y>
+       <width>81</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QCheckBox::indicator {
+     width: 80px;
+     height: 60px;
+ }
+ QCheckBox::indicator:checked
+  {
+    image: url(:/images/on.png);
+  }
+  QCheckBox::indicator:unchecked
+  {
+    image: url(:/images/off.png);
+  }</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>50</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>OFF</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>50</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ON</string>
+     </property>
+    </widget>
    </widget>
    <zorder>groupBox</zorder>
    <zorder>tabWidget</zorder>
@@ -746,10 +748,6 @@ border:none;</string>
    <zorder>runningStatus</zorder>
    <zorder>stubbyStatus</zorder>
    <zorder>label_2</zorder>
-   <zorder>onOffSlider</zorder>
-   <zorder>label_8</zorder>
-   <zorder>label_10</zorder>
-   <zorder>label_11</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

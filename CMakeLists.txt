@@ -51,7 +51,7 @@ add_executable(stubby_gui_proto
   mainwindow.ui
   servicemanager.cpp 
   networkmanager.cpp
-  systray.qrc
+  stubby.qrc
   ${os_src_dir}/servicemanager_${HOSTOS}.cpp
   ${os_src_dir}/networkmanager_${HOSTOS}.cpp
 )

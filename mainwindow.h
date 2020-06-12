@@ -27,7 +27,7 @@ protected:
 
 private slots:
 
-    void on_onOffSlider_valueChanged();
+    void on_onOffSlider_stateChanged();
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 
@@ -45,7 +45,7 @@ private:
     QString getNetworkStateString(const NetworkMgr::NetworkState state);
 
     bool m_startStopFromMainTab;
-    void updateMainTab();
+    void updateMainTab(bool action);
 
     QAction *quitAction;
     QSystemTrayIcon *trayIcon;
