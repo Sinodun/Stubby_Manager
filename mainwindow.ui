@@ -23,7 +23,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>90</y>
+      <y>100</y>
       <width>611</width>
       <height>461</height>
      </rect>
@@ -47,7 +47,7 @@
         <x>20</x>
         <y>10</y>
         <width>571</width>
-        <height>131</height>
+        <height>138</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout" stretch="6">
@@ -146,7 +146,7 @@
           </spacer>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="10,0,0,0,10">
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="10,0,0,0,0,10">
            <item>
             <spacer name="verticalSpacer_5">
              <property name="orientation">
@@ -225,6 +225,13 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QPushButton" name="restartButton">
+             <property name="text">
+              <string>Restart Stubby</string>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="verticalSpacer_4">

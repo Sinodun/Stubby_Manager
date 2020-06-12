@@ -3,6 +3,7 @@
 #include <QCloseEvent>
 #include <QPixmap>
 #include <QPainter>
+#include <QTimer>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -28,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_serviceState(ServiceMgr::Unknown)
     , m_networkState(NetworkMgr::Unknown)
-    , m_startStopFromMainTab(false)
+    , updateState(Probe)
 {
     ui->setupUi(this);
 
@@ -43,39 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
     ui->runningStatus->setText("Checking status...");
-    //ui->startStopButton->setText("Start Stubby");
-
-    // Set up circle icons
-    greenPixmap = new CirclePixmap(Qt::green);
-    yellowPixmap = new CirclePixmap(Qt::yellow);
-    redPixmap = new CirclePixmap(Qt::red);
-    greyPixmap = new CirclePixmap(Qt::lightGray);
-    ui->serviceStatus->setPixmap(*greyPixmap);
-    ui->networkStatus->setPixmap(*greyPixmap);
-    ui->connectStatus->setPixmap(*greyPixmap);
-    ui->stubbyStatus->setPixmap(*greyPixmap);
-
-    // Discover service state
-    m_serviceMgr = ServiceMgr::factory(this);
-    if (!m_serviceMgr) {
-        qFatal("Could not initialise Service Mgr");
-        abort();
-    }
-    connect(m_serviceMgr, SIGNAL(serviceStateChanged(ServiceMgr::ServiceState)), this, SLOT(on_serviceStateChanged(ServiceMgr::ServiceState)));
-    m_serviceMgr->getState();
-
-    // Check system DNS settings
-    m_networkMgr = NetworkMgr::factory(this);
-    if (!m_networkMgr) {
-        qFatal("Could not initialise Service Mgr");
-        abort();
-    }
-    connect(m_networkMgr, SIGNAL(networkStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_networkStateChanged(NetworkMgr::NetworkState)));
-    m_networkMgr->getState();
-
-    // Discover network and profile
-
-    // Update connection settings display
+    updateState = Init;
 
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
@@ -88,11 +57,78 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
+
+    // Set up circle icons
+    greenPixmap = new CirclePixmap(Qt::green);
+    yellowPixmap = new CirclePixmap(Qt::yellow);
+    redPixmap = new CirclePixmap(Qt::red);
+    greyPixmap = new CirclePixmap(Qt::lightGray);
+    ui->serviceStatus->setPixmap(*greyPixmap);
+    ui->networkStatus->setPixmap(*greyPixmap);
+    ui->connectStatus->setPixmap(*greyPixmap);
+    ui->stubbyStatus->setPixmap(*greyPixmap);
+
+    // Set up service state
+    m_serviceMgr = ServiceMgr::factory(this);
+    if (!m_serviceMgr) {
+        qFatal("Could not initialise Service Mgr");
+        abort();
+    }
+    connect(m_serviceMgr, SIGNAL(serviceStateChanged(ServiceMgr::ServiceState)), this, SLOT(on_serviceStateChanged(ServiceMgr::ServiceState)));
+    m_serviceMgr->getState();
+
+    // Set up network manager
+    m_networkMgr = NetworkMgr::factory(this);
+    if (!m_networkMgr) {
+        qFatal("Could not initialise Service Mgr");
+        abort();
+    }
+    connect(m_networkMgr, SIGNAL(networkStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_networkStateChanged(NetworkMgr::NetworkState)));
+    m_networkMgr->getState();
+
+    // Discover network and profile
+
+    // Update connection settings display
+
+    //Create a timer
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::timerExpired));
+    probeTimer = new QTimer(this);
+    connect(probeTimer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::probeTimerExpired));
+    probeTimer->start(60000);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_networkMgr;
+    delete m_serviceMgr;
+    delete timer;
+    delete probeTimer;
+    delete quitAction;
+    delete trayIcon;
+    delete trayIconMenu;
+    delete greenPixmap;
+    delete yellowPixmap;
+    delete redPixmap;
+    delete greyPixmap;
+}
+
+void MainWindow::timerExpired() {
+    if (updateState == StartStop || updateState == Restart) {
+        statusMsg("Stubby timed out trying to complete an action");
+        updateMainTab();
+        updateState = None;
+    }
+}
+
+void MainWindow::probeTimerExpired() {
+    if (updateState != None)
+        return;
+    statusMsg("Probing State");
+    updateState = Probe;
+    m_serviceMgr->getState();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -134,9 +170,11 @@ void MainWindow::statusMsg(QString statusMsg) {
 
 void MainWindow::on_onOffSlider_stateChanged()
 {
+    if (updateState != None)
+        return;
     statusMsg("");
     // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
-    m_startStopFromMainTab = true;
+    updateState = StartStop;
     bool value = ui->onOffSlider->isChecked();
     if (value == true) {
         ui->runningStatus->setText("Stubby starting...");
@@ -153,27 +191,54 @@ void MainWindow::on_onOffSlider_stateChanged()
         else if (m_networkState != NetworkMgr::NotLocalhost)
              m_networkMgr->unsetLocalhost();
     }
+    timer->start(20000);
+}
+
+void MainWindow::on_restartButton_clicked() {
+    statusMsg("");
+    // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
+    updateState = Restart;
+    m_serviceMgr->restart();
+    ui->runningStatus->setText("Stubby restarting...");
+    timer->start(20000);
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
     qDebug("Stubby Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
-    // TODO: revist the m_startStopFromMainTab flag usage... need something better
-    if (m_startStopFromMainTab) {
+    switch (m_serviceState) {
+        case ServiceMgr::Running:
+            ui->serviceStatus->setPixmap(*greenPixmap);
+            break;
+        case ServiceMgr::Stopped:
+            ui->serviceStatus->setPixmap(*greyPixmap);
+            break;
+        case ServiceMgr::Error:
+            ui->serviceStatus->setPixmap(*redPixmap);
+            if (updateState == StartStop || updateState == Restart) {
+                updateMainTab();
+                updateState = None;
+            }
+            return;
+        default:
+            ui->serviceStatus->setPixmap(*yellowPixmap);
+            break;
+    }
+
+    if (updateState == StartStop) {
         if (m_serviceState == ServiceMgr::Running) {
             m_networkMgr->setLocalhost();
         }
         else if (m_serviceState != ServiceMgr::Running && m_serviceState != ServiceMgr::Starting) {
             m_networkMgr->unsetLocalhost();
         }
-    }
-    if (m_serviceState == ServiceMgr::Running)       ui->serviceStatus->setPixmap(*greenPixmap);
-    else if (m_serviceState == ServiceMgr::Stopped)  ui->serviceStatus->setPixmap(*greyPixmap);
-    else if (m_serviceState == ServiceMgr::Unknown)  ui->serviceStatus->setPixmap(*redPixmap);
-    else if (m_serviceState == ServiceMgr::Error)    ui->serviceStatus->setPixmap(*redPixmap);
-    else                                             ui->serviceStatus->setPixmap(*yellowPixmap);
-    updateMainTab(m_startStopFromMainTab);
+    } else if (updateState == Restart)
+        m_networkMgr->setLocalhost();
+    else if (updateState == Probe)
+        m_networkMgr->getState();
+
+    updateMainTab();
 }
 
 void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
@@ -182,8 +247,8 @@ void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
     if (m_networkState == NetworkMgr::Localhost)  ui->networkStatus->setPixmap(*greenPixmap);
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
-    updateMainTab(m_startStopFromMainTab);
-    if (m_startStopFromMainTab) m_startStopFromMainTab = false;
+    updateMainTab();
+    updateState = None;
 }
 
 /*
@@ -215,10 +280,7 @@ QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
 }
 
 
-void MainWindow::updateMainTab(bool action) {
-
-    // the action flag tells us if the update is becasue of a user
-    // action (as opposed to periodic probing)
+void MainWindow::updateMainTab() {
 
     qDebug ("Updating state with service %s and network %s ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
     if (m_serviceState == ServiceMgr::Running &&
@@ -237,14 +299,14 @@ void MainWindow::updateMainTab(bool action) {
               m_networkState == NetworkMgr::NotLocalhost) ||
              (m_serviceState == ServiceMgr::Stopped &&
               m_networkState == NetworkMgr::Localhost)) {
-        if (action)
+        if (updateState == StartStop || updateState == Restart)
             ui->runningStatus->setText("Updating...");
         else
             ui->runningStatus->setText("Partly running...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
     }
-    else if (m_serviceState == ServiceMgr::Unknown ||
-             m_networkState == NetworkMgr::Unknown ||
+    else if ((m_serviceState == ServiceMgr::Unknown &&
+             m_networkState == NetworkMgr::Unknown) ||
              m_serviceState == ServiceMgr::Error ) {
              //m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
@@ -255,4 +317,6 @@ void MainWindow::updateMainTab(bool action) {
         ui->runningStatus->setText("Updating...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
     }
+    statusMsg("State Updated");
+
 }

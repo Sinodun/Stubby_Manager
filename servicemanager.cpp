@@ -44,10 +44,10 @@ int ServiceMgr::stop()
 
 int ServiceMgr::restart()
 {
-    if (m_serviceState == Unknown || m_serviceState == Running) {
+    //if (m_serviceState == Unknown || m_serviceState == Running) {
         m_mainwindow->statusMsg("Re-starting Stubby service...");
         return restartService();
-    }
+    //}
     return 0;
 }
 

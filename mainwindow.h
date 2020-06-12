@@ -29,6 +29,8 @@ private slots:
 
     void on_onOffSlider_stateChanged();
 
+    void on_restartButton_clicked();
+
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
 
     void on_networkStateChanged(NetworkMgr::NetworkState state);
@@ -44,8 +46,13 @@ private:
     NetworkMgr::NetworkState m_networkState;
     QString getNetworkStateString(const NetworkMgr::NetworkState state);
 
-    bool m_startStopFromMainTab;
-    void updateMainTab(bool action);
+    enum UpdateState{Init, StartStop, Restart, Probe, None};
+    UpdateState updateState;
+    void updateMainTab();
+    QTimer *timer;
+    void timerExpired();
+    QTimer *probeTimer;
+    void probeTimerExpired();
 
     QAction *quitAction;
     QSystemTrayIcon *trayIcon;
