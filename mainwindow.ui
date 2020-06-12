@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>636</height>
+    <width>703</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,9 +23,9 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>80</y>
+      <y>90</y>
       <width>611</width>
-      <height>451</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="tabShape">
@@ -432,7 +432,7 @@
                </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,0,15,0,10">
+               <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="5,10,50,5,5">
                 <item>
                  <widget class="QLabel" name="label_6">
                   <property name="text">
@@ -619,7 +619,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>30</y>
+      <y>38</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -637,8 +637,8 @@
    <widget class="QLabel" name="stubbyStatus">
     <property name="geometry">
      <rect>
-      <x>444</x>
-      <y>30</y>
+      <x>446</x>
+      <y>38</y>
       <width>21</width>
       <height>16</height>
      </rect>
@@ -651,7 +651,7 @@
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>30</y>
+      <y>40</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -664,7 +664,7 @@
     <property name="geometry">
      <rect>
       <x>299</x>
-      <y>25</y>
+      <y>35</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -688,7 +688,7 @@
     <property name="geometry">
      <rect>
       <x>315</x>
-      <y>10</y>
+      <y>20</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -701,7 +701,7 @@
     <property name="geometry">
      <rect>
       <x>295</x>
-      <y>50</y>
+      <y>60</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -714,7 +714,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>50</y>
+      <y>60</y>
       <width>21</width>
       <height>16</height>
      </rect>
@@ -727,13 +727,14 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>3</y>
+      <y>13</y>
       <width>611</width>
       <height>67</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(234, 237, 255);</string>
+     <string notr="true">background-color: rgb(230, 230, 230);
+border:none;</string>
     </property>
     <property name="title">
      <string/>
@@ -755,8 +756,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>700</width>
-     <height>21</height>
+     <width>703</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

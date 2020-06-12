@@ -35,8 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->main_tab->setFocus();
 #ifdef Q_OS_MAC
     QFont f = ui->tabWidget->font();
-    f.setPointSize(15);
+    f.setPointSize(14);
     ui->tabWidget->setFont(f);
+    ui->statusOutput->setFont(f);
 #endif
 
     // TODO - add a 'clear status messages' button to the GUI
