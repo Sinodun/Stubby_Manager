@@ -105,6 +105,8 @@ int ServiceMgrWindows::getStateofService() {
 
         CloseServiceHandle(schSCManager);
     }
+    else
+        winlasterr("Open service manager failed");
 
     emit serviceStateChanged(m_serviceState);
     m_mainwindow->statusMsg(QString("Status: Stubby service state is %1").arg(state));
