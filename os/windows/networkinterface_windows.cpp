@@ -1,4 +1,5 @@
 #include <winsock2.h>
+#include <iptypes.h>
 
 #include "networkinterface_windows.hpp"
 
@@ -43,8 +44,7 @@ bool NetworkInterfaceWindows::is_running() const
 
 bool NetworkInterfaceWindows::is_wireless() const
 {
-    //return if_type_ == IF_TYPE_IEEE80211;
-    return false;
+    return if_type_ == IF_TYPE_IEEE80211;
 }
 
 std::string NetworkInterfaceWindows::ssid() const
