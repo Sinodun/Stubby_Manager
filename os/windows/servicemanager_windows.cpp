@@ -115,23 +115,84 @@ int ServiceMgrWindows::getStateofService() {
 
 int ServiceMgrWindows::startService()
 {
-    m_serviceState = Running;
-    emit serviceStateChanged(m_serviceState);
-    m_mainwindow->statusMsg("Status: FAKE Stubby service started.");
-    return 0;
+    SC_HANDLE schSCManager;
+    SC_HANDLE schService;
+    int res = 1;
+
+    schSCManager = OpenSCManager(
+        NULL,                    // local computer
+        NULL,                    // ServicesActive database
+        STANDARD_RIGHTS_WRITE);  // Just read
+
+    if ( schSCManager ) {
+        schService = OpenService(
+            schSCManager,              // SCM database
+            SVCNAME,                   // name of service
+            SERVICE_START);            // intention
+
+        if ( schService ) {
+            if ( StartService(schService, 0, NULL) )
+                res = 0;
+            else
+                winlasterr("Start service failed");
+
+            CloseServiceHandle(schService);
+        } else {
+            winlasterr("Open service failed");
+        }
+
+        CloseServiceHandle(schSCManager);
+    }
+    else
+        winlasterr("Open service manager failed");
+
+    getStateofService();
+    return res;
 }
 
 int ServiceMgrWindows::stopService()
 {
-    m_serviceState = Stopped;
-    emit serviceStateChanged(m_serviceState);
-    m_mainwindow->statusMsg("Status: FAKE Stubby service stopped.");
-    return 0;
+    SC_HANDLE schSCManager;
+    SC_HANDLE schService;
+    int res = 1;
+
+    schSCManager = OpenSCManager(
+        NULL,                    // local computer
+        NULL,                    // ServicesActive database
+        STANDARD_RIGHTS_WRITE);  // Just read
+
+    if ( schSCManager ) {
+        schService = OpenService(
+            schSCManager,              // SCM database
+            SVCNAME,                   // name of service
+            SERVICE_STOP);             // intention
+
+        if ( schService ) {
+            SERVICE_STATUS st;
+
+            if ( ControlService(schService, SERVICE_CONTROL_STOP, &st) )
+                res = 0;
+            else
+                winlasterr("Start service failed");
+
+            CloseServiceHandle(schService);
+        } else {
+            winlasterr("Open service failed");
+        }
+
+        CloseServiceHandle(schSCManager);
+    }
+    else
+        winlasterr("Open service manager failed");
+
+    getStateofService();
+    return res;
 }
 
 int ServiceMgrWindows::restartService()
 {
-    return 0;
+    stopService();
+    return startService();
 }
 
 
