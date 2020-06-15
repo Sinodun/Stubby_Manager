@@ -40,7 +40,7 @@ ServiceMgrWindows::~ServiceMgrWindows()
 }
 
 int ServiceMgrWindows::getStateofService() {
-    qInfo("gettting windows state");
+    qInfo("getting windows state");
 
     m_serviceState = Error;
     const char* state = "error";
