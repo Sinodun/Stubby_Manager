@@ -67,6 +67,10 @@ endif()
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 if (WIN32)
   find_package(Poco COMPONENTS Net REQUIRED)
+
+  set(VER_PRODUCTVERSION "${PACKAGE_VERSION_MAJOR},${PACKAGE_VERSION_MINOR},${PACKAGE_VERSION_RELEASE},0")
+  set(VER_PRODUCTVERSION_STR "${PACKAGE_VERSION}${RELEASE_CANDIDATE}")
+  configure_file(${os_src_dir}/stubbygui.rc.in stubbygui.rc @ONLY)
 elseif (APPLE)
   find_package(Qt5 COMPONENTS Macextras REQUIRED)
 endif()
@@ -84,6 +88,7 @@ add_executable(stubby_gui_proto
 
 if(WIN32)
   target_sources(stubby_gui_proto PRIVATE ${os_src_dir}/networkinterface_${HOSTOS}.cpp)
+  target_sources(stubby_gui_proto PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/stubbygui.rc)
 elseif(APPLE)
   target_sources(stubby_gui_proto PRIVATE ${os_src_dir}/runtask_${HOSTOS}.cpp)
 endif()
