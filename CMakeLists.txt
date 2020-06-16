@@ -1,6 +1,32 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(stubby_gui_proto LANGUAGES CXX)
+if (POLICY CMP0075)
+  cmake_policy(SET CMP0075 NEW)
+endif ()
+
+# The following must be set BEFORE doing project() or enable_language().
+if (NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type defined; defaulting to 'Debug'")
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+    "The type of build. Possible values are: Debug, Release, RelWithDebInfo and MinSizeRel.")
+endif ()
+
+set(PACKAGE_NAME "Stubby GUI")
+set(PACKAGE_VERSION_MAJOR 0)
+set(PACKAGE_VERSION_MINOR 1)
+set(PACKAGE_VERSION_RELEASE 0)
+set(PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_RELEASE}")
+set(PACKAGE_BUGREPORT "team@getdnsapi.net")
+set(RELEASE_CANDIDATE "")
+
+set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}${RELEASE_CANDIDATE}")
+set(PACKAGE_TARNAME "${PACKAGE}-${PACKAGE_VERSION}${RELEASE_CANDIDATE}")
+
+if (WIN32)
+  project (stubby_gui_proto VERSION ${PACKAGE_VERSION} LANGUAGES CXX RC)
+else()
+  project (stubby_gui_proto VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
@@ -49,7 +75,7 @@ add_executable(stubby_gui_proto
   main.cpp
   mainwindow.cpp
   mainwindow.ui
-  servicemanager.cpp 
+  servicemanager.cpp
   networkmanager.cpp
   stubby.qrc
   ${os_src_dir}/servicemanager_${HOSTOS}.cpp
