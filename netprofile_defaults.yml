@@ -1,0 +1,171 @@
+servers:
+  - name: Stubby server (Sinodun)
+    link: dnsprivacy.org
+    addresses:
+      - 145.100.185.15
+    tls_auth_name: dnsovertls.sinodun.com
+    tls_pubkey_pinset:
+      digest: sha256
+      value: 62lKu9HsDVbyiPenApnc4sfmSYTHOVfFgL3pyB+cBL4=
+    hidden:
+      []
+    inactive:
+      - hostile
+  - name: Stubby server (Sinodun1)
+    link: dnsprivacy.org
+    addresses:
+      - 145.100.185.16
+    tls_auth_name: dnsovertls1.sinodun.com
+    tls_pubkey_pinset:
+      digest: sha256
+      value: cE2ecALeE5B+urJhDrJlVFmf38cJLAvqekONvjvpqUA=
+    hidden:
+      []
+    inactive:
+      - hostile
+  - name: Stubby server (getdnsapi.net)
+    link: dnsprivacy.org
+    addresses:
+      - 185.49.141.37
+    tls_auth_name: getdnsapi.net
+    tls_pubkey_pinset:
+      digest: sha256
+      value: foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q=
+    hidden:
+      []
+    inactive:
+      - hostile
+  - name: Quad9 (9.9.9.9)
+    link: quad9.net
+    addresses:
+      - 9.9.9.9
+    tls_auth_name: dns.quad9.net
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+  - name: Comcast
+    link: corporate.comcast.com/privacy
+    addresses:
+      - 96.113.151.145
+    tls_auth_name: dot.xfinity.com
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: Cloudflare (1.1.1.1)
+    link: developers.cloudflare.com/1.1.1.1
+    addresses:
+      - 1.1.1.1
+    tls_auth_name: cloudflare-dns.com
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: Google (8.8.8.8)
+    link: developers.google.com/speed/public-dns
+    addresses:
+      - 8.8.8.8
+    tls_auth_name: dns.google
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: Foundation for Applied Privacy
+    link: appliedprivacy.net/services/dns/
+    addresses:
+      - 146.255.56.98
+    tls_auth_name: dot1.applied-privacy.net
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: CleanBrownsing
+    link: cleanbrowsing.org/privacy
+    addresses:
+      - 85.228.168.9:853
+    tls_auth_name: family-filter-dns.cleanbrowsing.org
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: AgGuard
+    link: adguard.com/en/privacy.html
+    addresses:
+      - 176.103.130.130
+    tls_auth_name: dns.adguard.com
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+  - name: UncensoredDNS
+    link: blog.uncensoreddns.org/
+    addresses:
+      - "89.233.43.71 "
+    tls_auth_name: unicast.censurfridns.dk
+    tls_pubkey_pinset:
+      digest: sha256
+      value: ""
+    hidden:
+      []
+    inactive:
+      - trusted
+      - untrusted
+      - hostile
+profiles:
+  trusted:
+    encrypt_all: false
+    always_authenticate: false
+    validate_data: false
+    round_robin: false
+    user_network_provided_servers: use-only
+  untrusted:
+    encrypt_all: true
+    always_authenticate: true
+    validate_data: false
+    round_robin: false
+    user_network_provided_servers: include
+  hostile:
+    encrypt_all: true
+    always_authenticate: true
+    validate_data: false
+    round_robin: false
+    user_network_provided_servers: exclude
+default_network_profile: untrusted
+default_network_profile_set: true
+networks:
+  {}

@@ -1,0 +1,5 @@
+*.autosave
+*.user*
+build*
+build_qmake*
+build-stubby*

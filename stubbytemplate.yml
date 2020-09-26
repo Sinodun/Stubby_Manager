@@ -1,0 +1,23 @@
+resolution_type: GETDNS_RESOLUTION_STUB
+dns_transport_list: {{TRANSPORT_LIST}}
+tls_authentication: {{AUTHENTICATION}}
+tls_query_padding_blocksize: 128
+edns_client_subnet_private : 1
+round_robin_upstreams: {{ROUND_ROBIN}}
+dnssec: {{DNSSEC}}
+idle_timeout: 10000
+listen_addresses:
+  - 127.0.0.1
+  - 0::1
+upstream_recursive_servers:
+{{#SERVER}}
+  - address_data: {{SERVER_ADDRESS}}
+  {{#AUTHNAME}}
+    tls_auth_name: "{{SERVER_AUTH_NAME}}"
+  {{/AUTHNAME}}  
+  {{#PINSET}}
+    tls_pubkey_pinset:
+      - digest: "{{SERVER_DIGEST_TYPE}}"
+        value: {{SERVER_DIGEST_VALUE}}
+  {{/PINSET}}
+{{/SERVER}}
