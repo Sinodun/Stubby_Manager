@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Stubby Manager</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="stubby.qrc">
+    <normaloff>:/images/stubby.ico</normaloff>:/images/stubby.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="font">
     <font>

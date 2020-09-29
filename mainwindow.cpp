@@ -63,14 +63,18 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    openAction = new QAction(tr("&Open"), this);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(show()));
     trayIconMenu = new QMenu(this);
     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(openAction);
     trayIconMenu->addAction(quitAction);
-
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+             this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
     // Set up circle icons
     greenPixmap = new CirclePixmap(Qt::green);
@@ -203,6 +207,21 @@ MainWindow::~MainWindow()
     delete greyPixmap;
 }
 
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason){
+        case QSystemTrayIcon::Trigger:
+            if(!this->isVisible()){
+                this->show();
+            } else {
+                this->hide();
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void MainWindow::timerExpired() {
     if (updateState == None)
         return;
@@ -230,13 +249,35 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     handleUnsavedChanges();
 
     if (trayIcon->isVisible()) {
-       QMessageBox::information(this, "Systray",
-                                "Stubby Manager will keep running in the system tray.<br> "
-                                   "*We recommend you keep Stubby Manager running to actively monitor Stubby*<br>"
-                                   "To terminate Stubby Manager, choose 'Quit' in the context menu "
-                                   "of the system tray entry (this won't stop Stubby itself!).");
-        hide();
-        event->ignore();
+       QVariant exitMessage = stubbySettings->value("app/exitMessage");
+       if (!exitMessage.isNull() && exitMessage.toBool() == false) {
+           hide();
+           event->ignore();
+           return;
+       }
+       QMessageBox msgBox;
+       setMinimumSize(600,200);
+       msgBox.setText("Stubby Manager will keep running in the system tray.");
+       msgBox.setInformativeText("*We recommend you keep Stubby Manager running to actively monitor Stubby*<br><br>"
+                                 "To terminate Stubby Manager, choose 'Quit' in the context menu "
+                                 "of the system tray entry (this won't stop Stubby itself!).<br><br>"
+                                 "Hit 'Ok' if you don't want to see this message everytime the window is closed,"
+                                 "otherwise hit 'Close'.");
+       msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Close);
+       msgBox.setDefaultButton(QMessageBox::Ok);
+       int ret = msgBox.exec();
+       switch (ret) {
+         case QMessageBox::Ok:
+            stubbySettings->setValue("app/exitMessage", false);
+            break;
+         case QMessageBox::Close:
+            break;
+         default:
+            // should never be reached
+            break;
+      }
+       hide();
+       event->ignore();
     }
 }
 
@@ -262,7 +303,7 @@ void MainWindow::firstRunPopUp()
         return;
     QMessageBox::information(this, "Systray",
                              "Stubby Manager runs as a system tray application.<br> "
-                             "We recommend you make the Stubby Manager icon visible "
+                             "We recommend that you make the Stubby Manager icon visible "
                              "in your system tray so you can easily see the state of "
                              "Stubby Manager (select the Start menu and type 'select "
                              "which icons appear on the taskbar').<br>");

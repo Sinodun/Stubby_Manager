@@ -87,6 +87,7 @@ if (WIN32)
   set(VER_PRODUCTVERSION_STR "${PACKAGE_VERSION}${RELEASE_CANDIDATE}")
   configure_file(${os_src_dir}/stubbygui.rc.in stubbygui.rc @ONLY)
   configure_file(${os_src_dir}/stubbygui.ico stubbygui.ico COPYONLY)
+  set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/stubby.qrc")
   set(WINDOWS_PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_RELEASE}.${PACKAGE_VERSION_PATCH}")
   configure_file(${os_src_dir}/windows_package_version.in windows_package_version @ONLY)
 elseif (APPLE)
@@ -120,6 +121,7 @@ add_executable( stubby_gui ${PLAFORM_BUILD}
   ${os_src_dir}/servicemanager_${HOSTOS}.cpp
   ${os_src_dir}/networkmanager_${HOSTOS}.cpp
   ${os_src_dir}/logmanager_${HOSTOS}.cpp
+  ${APP_ICON_RESOURCE_WINDOWS}
 )
 
 if(WIN32)
