@@ -23,6 +23,7 @@
       <Directory Id="CommonAppDataFolder">
         <Directory Id="FACTORYDATAFOLDER" Name="Stubby" />
       </Directory>
+      <UIRef Id="WixUI_Minimal" />
     </Directory>
 
     <FeatureRef Id="StubbyFeature" />
