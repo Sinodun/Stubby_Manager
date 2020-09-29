@@ -13,6 +13,8 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QSettings>
+
 
 #include "configmanager.h"
 #include "servicemanager.h"
@@ -73,6 +75,7 @@ private slots:
 private:
     void setButtonStates();
     void updateCurrentNetworkInfo();
+    void firstRunPopUp();
 
     Ui::MainWindow *ui;
 
@@ -108,6 +111,7 @@ private:
     QAction *quitAction;
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
+    QSettings *stubbySettings;
 
     QPixmap *greenPixmap;
     QPixmap *yellowPixmap;

@@ -163,6 +163,12 @@ MainWindow::MainWindow(QWidget *parent)
         abort();
     }
 
+    // create the settings
+    stubbySettings = new QSettings("Sinodun.com", "Stubby Manager");
+    QVariant details = stubbySettings->value("info/hideDetails");
+    if (!details.isNull())
+        ui->hideDetailsCheckBox->setChecked(details.toBool());
+
     // Set initially displayed tab.
     ui->mainTabWidget->setCurrentIndex(0);
     ui->statusTab->setFocus();
@@ -248,6 +254,20 @@ void MainWindow::logMsg(QString logMsg) {
     ui->logOutput->moveCursor (QTextCursor::End);
 }
 
+void MainWindow::firstRunPopUp()
+{
+    // On the very first run pop up a useful message
+    QVariant firstRun = stubbySettings->value("app/firstRun");
+    if (!firstRun.isNull())
+        return;
+    QMessageBox::information(this, "Systray",
+                             "Stubby Manager runs as a system tray application.<br> "
+                             "We recommend you make the Stubby Manager icon visible "
+                             "in your system tray so you can easily see the state of "
+                             "Stubby Manager (select the Start menu and type 'select "
+                             "which icons appear on the taskbar').<br>");
+    stubbySettings->setValue("app/firstRun", false);
+}
 
 /*
  * Slots functions
@@ -261,6 +281,7 @@ void MainWindow::on_onOffSlider_stateChanged()
     statusMsg("");
     bool value = ui->onOffSlider->isChecked();
     if (value == true) {
+        firstRunPopUp();
         // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
         updateState = Start;
         ui->runningStatus->setText("Stubby starting...");
@@ -344,6 +365,8 @@ void MainWindow::on_testQueryResult(bool result) {
     else {
         statusMsg("Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
+        trayIcon->showMessage("Connection Test Failed",
+        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60);
     }
 }
 
@@ -361,9 +384,11 @@ void MainWindow::on_showLogButton_toggled() {
 void MainWindow::on_hideDetailsCheckBox_toggled() {
     if (ui->hideDetailsCheckBox->isChecked()) {
         ui->detailsLabel->setVisible(false);
+        stubbySettings->setValue("info/hideDetails", true);
     }
     else {
         ui->detailsLabel->setVisible(true);
+        stubbySettings->setValue("info/hideDetails", false);
     }
 }
 
