@@ -608,12 +608,14 @@ void MainWindow::updateMainTab() {
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*greenPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_green.png"));
         ui->onOffSlider->setChecked(true);
     }
     else if (m_serviceState == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*greyPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
         ui->onOffSlider->setChecked(false);
     }
     else if ((m_serviceState == ServiceMgr::Running &&
@@ -625,6 +627,7 @@ void MainWindow::updateMainTab() {
         else
             ui->runningStatus->setText("Partly running...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
     }
     else if ((m_serviceState == ServiceMgr::Unknown &&
              m_networkState == NetworkMgr::Unknown) ||
@@ -632,11 +635,13 @@ void MainWindow::updateMainTab() {
              //m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*redPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
         ui->onOffSlider->setChecked(false);
     }
     else {
         ui->runningStatus->setText("Waiting...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
     }
 
     ui->restartButton->setEnabled(m_serviceState == ServiceMgr::Running);

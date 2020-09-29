@@ -5,5 +5,7 @@
         <file>images/off.png</file>
         <file>images/getdns_logo.png</file>
         <file>images/stubby.ico</file>
+        <file>images/stubby@245x145_green.png</file>
+        <file>images/stubby@245x145_red.png</file>
     </qresource>
 </RCC>
