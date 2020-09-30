@@ -6,6 +6,7 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <stdexcept>
@@ -295,7 +296,7 @@ bool Config::operator==(const Config& cfg) const
         defaultNetworkProfile == cfg.defaultNetworkProfile &&
         profiles == cfg.profiles &&
         servers == cfg.servers &&
-        networks == cfg.networks;
+        !networksModifiedFrom(cfg.networks);
 }
 
 bool Config::operator!=(const Config& cfg) const
@@ -351,6 +352,29 @@ bool Config::equalProfile(const Config& cfg, Config::NetworkProfile networkProfi
     }
 
     return true;
+}
+
+bool Config::networksModifiedFrom(const std::map<std::string, NetworkProfileChoice>& from) const
+{
+    // Networks can just appear, and when they do they get a profile of
+    // 'default'. Two configs where one has no record for the network and
+    // the other has a record at 'default' are therefore the same.
+    // Calculate this by making copies of the network maps
+    // containing only non-default entries, and comparing those.
+    std::map<std::string, NetworkProfileChoice> nodef_nets;
+    std::map<std::string, NetworkProfileChoice> from_nodef_nets;
+
+    std::copy_if(networks.begin(), networks.end(),
+                 std::inserter(nodef_nets, nodef_nets.end()),
+                 [](auto const& p) {
+                     return p.second != NetworkProfileChoice::default;
+                 });
+    std::copy_if(from.begin(), from.end(),
+                 std::inserter(from_nodef_nets, from_nodef_nets.end()),
+                 [](auto const& p) {
+                     return p.second != NetworkProfileChoice::default;
+                 });
+    return nodef_nets != from_nodef_nets;
 }
 
 std::string Config::networkProfileDisplayName(Config::NetworkProfile np)
