@@ -55,7 +55,7 @@ public:
     void restoreFactory();
 
     void addNetwork(const std::string& name);
-    Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name);
+    Config::NetworkProfileChoice getDisplayedNetworkProfile(const std::string& name);
 
     bool unsavedChanges(bool profile, bool network);
     bool getRestartRequired() const {return restartRequired;};

@@ -299,12 +299,11 @@ void ConfigMgr::restoreFrom(const Config& cfg)
 
 void ConfigMgr::addNetwork(const std::string& name)
 {
-    // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() )
-        displayedConfig.networks[name] = displayedConfig.defaultNetworkProfile;
+        displayedConfig.networks[name] = Config::NetworkProfileChoice::default;
 }
 
-Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
+Config::NetworkProfileChoice ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
 {
     addNetwork(name);
     return displayedConfig.networks[name];

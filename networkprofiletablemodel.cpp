@@ -49,7 +49,7 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
                 return QString::fromStdString(n.first);
 
             case 1:
-                return QString::fromStdString(Config::networkProfileDisplayName(n.second));
+                return QString::fromStdString(Config::networkProfileChoiceDisplayName(n.second));
             }
         }
         else if ( role == Qt::EditRole)
@@ -105,7 +105,7 @@ bool NetworkProfileTableModel::setData(const QModelIndex &index, const QVariant 
         if ( row-- > 0 )
             continue;
 
-        m_config.networks[n.first] = Config::NetworkProfile(value.toInt());
+        m_config.networks[n.first] = Config::NetworkProfileChoice(value.toInt());
         emit dataChanged(index, index);
         return true;
     }

@@ -18,6 +18,7 @@
 struct Config
 {
     enum class NetworkProfile { trusted, untrusted, hostile };
+    enum class NetworkProfileChoice { default, trusted, untrusted, hostile };
 
     enum class UseNetworkProvidedServer { exclude, include, use_only };
 
@@ -58,7 +59,7 @@ struct Config
     std::unordered_map<NetworkProfile, Profile> profiles;
     NetworkProfile defaultNetworkProfile;
 
-    std::map<std::string, NetworkProfile> networks;
+    std::map<std::string, NetworkProfileChoice> networks;
 
     Config();
     void loadFromFile(const std::string& filePath);
@@ -73,6 +74,11 @@ struct Config
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileKey(NetworkProfile np);
     static NetworkProfile networkProfileFromKey(const std::string& key);
+    static std::string networkProfileChoiceDisplayName(NetworkProfileChoice npc);
+    static std::string networkProfileChoiceKey(NetworkProfileChoice npc);
+    static NetworkProfileChoice networkProfileChoiceFromKey(const std::string& key);
+    static NetworkProfile networkProfileFromChoice(NetworkProfileChoice npc, NetworkProfile default);
+    static NetworkProfileChoice networkChoiceFromProfile(NetworkProfile np);
 };
 
 #endif

@@ -640,7 +640,7 @@ void MainWindow::updateCurrentNetworkInfo()
             net_text.append("\n");
         net_text.append(s);
 
-        Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(s);
+        Config::NetworkProfile np = Config::networkProfileFromChoice(m_configMgr->getDisplayedNetworkProfile(s), m_configMgr->displayedConfig.defaultNetworkProfile);
         if ( np > m_currentNetworkProfile )
             m_currentNetworkProfile = np;
     }
