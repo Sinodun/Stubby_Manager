@@ -37,7 +37,7 @@
                Property="CreateScheduledTask"
                Return="check"
                Execute="immediate"
-               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /CREATE /TN &quot;StubbyManager&quot; /XML &quot;&quot;[INSTALLFOLDER]StubbyManager.xml&quot;&quot;" />
+               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /CREATE /TN &quot;StubbyManager&quot; /XML &quot;[INSTALLFOLDER]StubbyManager.xml&quot;" />
 
     <CustomAction Id="CreateScheduledTask"
               Return="check"
