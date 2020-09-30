@@ -132,7 +132,7 @@ void ConfigMgr::saveConfig(const Config& config)
 }
 
 std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfile)
-{    
+{
 
     // Look for template file in factory dir and current dir.
     QDir tpldir(QString::fromStdString(appDataDir()));
@@ -190,7 +190,7 @@ std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfil
                 sub_dict2->SetValue("SERVER_DIGEST_VALUE", s.pubKeyDigestValue);
             }
         }
-    }    
+    }
 
     //Basic check that the config is valid with 1 server.
     // TODO: Proper crosscheck of validity at save time
@@ -301,10 +301,7 @@ void ConfigMgr::addNetwork(const std::string& name)
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() )
-        displayedConfig.networks[name] =
-            displayedConfig.defaultNewNetworkProfileSet
-            ? displayedConfig.defaultNewNetworkProfile
-            : Config::NetworkProfile::untrusted;
+        displayedConfig.networks[name] = displayedConfig.defaultNetworkProfile;
 }
 
 Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
