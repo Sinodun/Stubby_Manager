@@ -211,12 +211,12 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_3">
+            <widget class="QPushButton" name="openWebsite">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Test the servers</string>
+              <string>Go to Website</string>
              </property>
             </widget>
            </item>

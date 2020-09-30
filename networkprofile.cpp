@@ -8,6 +8,9 @@
 
 #include <QDebug>
 #include <QCheckBox>
+#include <QTableView>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include "networkprofile.h"
 
@@ -35,6 +38,38 @@ NetworkProfileWidget::~NetworkProfileWidget()
     delete ui;
 
     delete m_serverTableModel;
+}
+
+void NetworkProfileWidget::on_openWebsite_clicked() {
+    QItemSelectionModel *select = ui->serverTable->selectionModel();
+    QModelIndexList selection = select->selectedIndexes();
+    QModelIndex index = selection.at(0);
+    QVariant link = m_serverTableModel->data(index.siblingAtColumn(2), Qt::DisplayRole);
+    QString url = "https://" + link.toString();
+    QDesktopServices::openUrl (QUrl(url));
+}
+
+void NetworkProfileWidget::on_serverTable_clicked() {
+    // Enable button if one and only one row is selected
+    QItemSelectionModel *select = ui->serverTable->selectionModel();
+    QModelIndexList selection = select->selectedIndexes();
+    if (selection.count() == 0) {
+        ui->openWebsite->setEnabled(false);
+        return;
+    }
+    int count = 0, row;
+    foreach (QModelIndex index, selection) {
+        if (count == 0) {
+         row = index.row();
+         count++;
+         continue;
+        }
+        if (row != index.row()) {
+            ui->openWebsite->setEnabled(false);
+            return;
+        }
+    }
+    ui->openWebsite->setEnabled(true);
 }
 
 void NetworkProfileWidget::on_useAsDefaultProfile_stateChanged(int state)
