@@ -55,8 +55,7 @@ Config::Profile::Profile()
 
 Config::Config()
     : servers(), profiles(),
-      defaultNewNetworkProfile(), defaultNewNetworkProfileSet(false),
-      networks()
+      defaultNetworkProfile(NetworkProfile::untrusted), networks()
 {
     reset();
 }
@@ -73,8 +72,7 @@ void Config::reset()
     profiles[NetworkProfile::untrusted] = Profile({ true, true, false, false, UseNetworkProvidedServer::include });
     profiles[NetworkProfile::hostile] = Profile({ true, true, false, false, UseNetworkProvidedServer::exclude });
 
-    defaultNewNetworkProfile = NetworkProfile::untrusted;
-    defaultNewNetworkProfileSet = true;
+    defaultNetworkProfile = NetworkProfile::untrusted;
 }
 
 static Config::NetworkProfile networkProfileFromYaml(const std::string& key, const YAML::Mark& mark)
@@ -167,10 +165,7 @@ void Config::loadFromFile(const std::string& path)
 
     YAML::Node ymldefnetprofile = ymlcfg["default_network_profile"];
     if ( ymldefnetprofile )
-        defaultNewNetworkProfile = networkProfileFromYaml(ymldefnetprofile.as<std::string>(), ymlcfg.Mark());
-    YAML::Node ymldefnetprofileset = ymlcfg["default_network_profile_set"];
-    if ( ymldefnetprofileset )
-        defaultNewNetworkProfileSet = ymldefnetprofileset.as<bool>();
+        defaultNetworkProfile = networkProfileFromYaml(ymldefnetprofile.as<std::string>(), ymlcfg.Mark());
 
     YAML::Node ymlnetworks = ymlcfg["networks"];
     if ( !ymlnetworks )
@@ -249,8 +244,7 @@ void Config::saveToFile(const std::string& path) const
     }
     out << YAML::EndMap;
 
-    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileKey(defaultNewNetworkProfile);
-    out << YAML::Key << "default_network_profile_set" << YAML::Value << defaultNewNetworkProfileSet;
+    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileKey(defaultNetworkProfile);
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : networks)
@@ -294,8 +288,7 @@ bool Config::NetworkInformation::operator==(const Config::NetworkInformation& ne
 bool Config::operator==(const Config& cfg) const
 {
     return
-        defaultNewNetworkProfile == cfg.defaultNewNetworkProfile &&
-        defaultNewNetworkProfileSet == cfg.defaultNewNetworkProfileSet &&
+        defaultNetworkProfile == cfg.defaultNetworkProfile &&
         profiles == cfg.profiles &&
         servers == cfg.servers &&
         networks == cfg.networks;
@@ -308,8 +301,7 @@ bool Config::operator!=(const Config& cfg) const
 
 void Config::copyProfile(const Config& cfg, Config::NetworkProfile networkProfile)
 {
-    defaultNewNetworkProfile = cfg.defaultNewNetworkProfile;
-    defaultNewNetworkProfileSet = cfg.defaultNewNetworkProfileSet;
+    defaultNetworkProfile = cfg.defaultNetworkProfile;
     profiles[networkProfile] = cfg.profiles.at(networkProfile);
 
     for ( auto& s : servers )
@@ -332,8 +324,7 @@ void Config::copyProfile(const Config& cfg, Config::NetworkProfile networkProfil
 bool Config::equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const
 {
     // TODO: strictly need to check if either of the default new profiles match the one we are interested in...
-    if ( defaultNewNetworkProfile != cfg.defaultNewNetworkProfile ||
-         defaultNewNetworkProfileSet != cfg.defaultNewNetworkProfileSet ||
+    if ( defaultNetworkProfile != cfg.defaultNetworkProfile ||
          !(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
         return false;    
 

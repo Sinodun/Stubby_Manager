@@ -56,8 +56,7 @@ struct Config
 
     std::vector<Server> servers;
     std::unordered_map<NetworkProfile, Profile> profiles;
-    NetworkProfile defaultNewNetworkProfile;
-    bool defaultNewNetworkProfileSet;
+    NetworkProfile defaultNetworkProfile;
 
     typedef enum {
         WiFi = 0,

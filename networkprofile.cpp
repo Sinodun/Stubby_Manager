@@ -74,16 +74,10 @@ void NetworkProfileWidget::on_serverTable_clicked() {
 
 void NetworkProfileWidget::on_useAsDefaultProfile_stateChanged(int state)
 {
-    if ( state == Qt::CheckState::Checked && m_configMgr.displayedConfig.defaultNewNetworkProfile != m_np )
+    if ( state == Qt::CheckState::Checked && m_configMgr.displayedConfig.defaultNetworkProfile != m_np )
     {
-        m_configMgr.displayedConfig.defaultNewNetworkProfile = m_np;
-        m_configMgr.displayedConfig.defaultNewNetworkProfileSet = true;
-        emit globalConfigChanged();
-    }
-    else if ( state == Qt::CheckState::Unchecked && m_configMgr.displayedConfig.defaultNewNetworkProfile == m_np )
-    {
-        m_configMgr.displayedConfig.defaultNewNetworkProfileSet = false;
-        emit globalConfigChanged();
+        m_configMgr.displayedConfig.defaultNetworkProfile = m_np;
+         emit globalConfigChanged();
     }
     setButtonStates();
 }
@@ -146,7 +140,7 @@ void NetworkProfileWidget::on_serverTableDataChanged(const QModelIndex &topLeft,
 
 void NetworkProfileWidget::setGuiState()
 {
-    ui->useAsDefaultProfile->setCheckState(m_configMgr.displayedConfig.defaultNewNetworkProfileSet && m_configMgr.displayedConfig.defaultNewNetworkProfile == m_np ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    ui->useAsDefaultProfile->setCheckState(m_configMgr.displayedConfig.defaultNetworkProfile == m_np ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
     ui->alwaysAuthenticate->setCheckState(m_configMgr.displayedConfig.profiles[m_np].alwaysAuthenticate ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->encryptAllTraffic->setCheckState(m_configMgr.displayedConfig.profiles[m_np].encryptAll ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -160,7 +154,7 @@ void NetworkProfileWidget::setButtonStates()
 {
     bool unsaved = m_configMgr.profileModifiedFromSaved(m_np);
     bool notdefault = m_configMgr.profileModifiedFromFactory(m_np);
-    bool not_default_profile = ( m_configMgr.displayedConfig.defaultNewNetworkProfile != m_np );
+    bool not_default_profile = ( m_configMgr.displayedConfig.defaultNetworkProfile != m_np );
 
     ui->applyButton->setEnabled(unsaved);
     ui->discardButton->setEnabled(unsaved);

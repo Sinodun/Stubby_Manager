@@ -748,7 +748,7 @@ void MainWindow::updateCurrentNetworkInfo()
 
     ui->network_name->setText(net_text.c_str());
     std::string net_profile = (Config::networkProfileDisplayName(m_currentNetworkProfile));
-    if (m_configMgr->displayedConfig.defaultNewNetworkProfileSet && m_configMgr->displayedConfig.defaultNewNetworkProfile == m_currentNetworkProfile)
+    if (m_configMgr->displayedConfig.defaultNetworkProfile == m_currentNetworkProfile)
         net_profile.append(" (Default)");
     ui->network_profile->setText(net_profile.c_str());
 
