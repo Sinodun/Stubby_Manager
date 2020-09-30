@@ -737,10 +737,10 @@ void MainWindow::updateCurrentNetworkInfo()
             if ( !net_text.empty())
                 net_text.append("\n");
             net_text.append(net_name);
-            if (net_type == Config::InterfaceTypes::WiFi)
+            if (net_type == NetworkMgr::InterfaceTypes::WiFi)
                 net_text.append(" (Wi-Fi)");
 
-            Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
+            Config::NetworkProfile np = Config::networkProfileFromChoice(m_configMgr->getDisplayedNetworkProfile(net_name), m_configMgr->displayedConfig.defaultNetworkProfile);
             if ( np > m_currentNetworkProfile )
                 m_currentNetworkProfile = np;
         }

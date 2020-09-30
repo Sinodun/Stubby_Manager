@@ -18,6 +18,7 @@
 struct Config
 {
     enum class NetworkProfile { trusted, untrusted, hostile };
+    enum class NetworkProfileChoice { default, trusted, untrusted, hostile };
 
     enum class UseNetworkProvidedServer { exclude, include, use_only };
 
@@ -65,7 +66,7 @@ struct Config
 
     struct NetworkInformation
     {
-        NetworkProfile profile;
+        NetworkProfileChoice profile;
         InterfaceTypes interfaceType;
         bool interfaceActive;
 
@@ -83,11 +84,18 @@ struct Config
     bool operator==(const Config& cfg) const;
     bool operator!=(const Config& cfg) const;
     bool equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const;
+    bool networksModifiedFrom(const std::map<std::string, NetworkProfileChoice>& from) const;
 
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileKey(NetworkProfile np);
     static NetworkProfile networkProfileFromKey(const std::string& key);
     static std::string interfaceTypeDisplayName(InterfaceTypes it);
+
+    static std::string              networkProfileChoiceDisplayName(NetworkProfileChoice npc);
+    static std::string              networkProfileChoiceKey(NetworkProfileChoice npc);
+    static NetworkProfileChoice     networkProfileChoiceFromKey(const std::string& key);
+    static NetworkProfile           networkProfileFromChoice(NetworkProfileChoice npc, NetworkProfile default);
+    static NetworkProfileChoice     networkChoiceFromProfile(NetworkProfile np);
 };
 
 #endif

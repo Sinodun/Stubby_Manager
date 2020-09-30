@@ -301,8 +301,7 @@ void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes t
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
-        displayedConfig.networks[name].profile = displayedConfig.defaultNetworkProfile;
-
+        displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default;
         qInfo("Added Network %s", name.c_str());
     }
     // qInfo("Updated status of %s to %d", name.c_str(), active);
@@ -317,7 +316,7 @@ void ConfigMgr::resetNetworksActiveState() {
     }
 }
 
-Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
+Config::NetworkProfileChoice ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
 {
     return displayedConfig.networks[name].profile;
 }

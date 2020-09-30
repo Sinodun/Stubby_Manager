@@ -6,6 +6,7 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <stdexcept>
@@ -80,6 +81,18 @@ static Config::NetworkProfile networkProfileFromYaml(const std::string& key, con
     try
     {
         return Config::networkProfileFromKey(key);
+    }
+    catch (const std::invalid_argument& ie)
+    {
+        throw YAML::ParserException(mark, ie.what());
+    }
+}
+
+static Config::NetworkProfileChoice networkProfileChoiceFromYaml(const std::string& key, const YAML::Mark& mark)
+{
+    try
+    {
+        return Config::networkProfileChoiceFromKey(key);
     }
     catch (const std::invalid_argument& ie)
     {
@@ -175,7 +188,7 @@ void Config::loadFromFile(const std::string& path)
     for ( const auto& n : ymlnetworks )
     {
         std::string name = n.first.as<std::string>();
-        NetworkProfile profile = networkProfileFromYaml(n.second.as<std::string>(), ymlnetworks.Mark());
+        NetworkProfileChoice profile = networkProfileChoiceFromYaml(n.second.as<std::string>(), ymlnetworks.Mark());
         networks[name].profile = profile;
     }
 }
@@ -248,7 +261,7 @@ void Config::saveToFile(const std::string& path) const
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : networks)
-        out << YAML::Key << nt.first << YAML::Value << networkProfileKey(nt.second.profile);
+        out << YAML::Key << nt.first << YAML::Value << networkProfileChoiceKey(nt.second.profile);
     out << YAML::EndMap;
 
     fout.close();
@@ -326,7 +339,7 @@ bool Config::equalProfile(const Config& cfg, Config::NetworkProfile networkProfi
     // TODO: strictly need to check if either of the default new profiles match the one we are interested in...
     if ( defaultNetworkProfile != cfg.defaultNetworkProfile ||
          !(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
-        return false;    
+        return false;
 
     for ( auto& s : servers )
     {
@@ -363,7 +376,7 @@ std::string Config::networkProfileDisplayName(Config::NetworkProfile np)
         return "Hostile";
     }
     assert("Unknown network type");
-    return "unknown";
+    return "Unknown";
 }
 
 std::string Config::networkProfileKey(Config::NetworkProfile np)
@@ -407,4 +420,64 @@ std::string Config::interfaceTypeDisplayName(Config::InterfaceTypes it)
     }
     assert("Unknown interface type");
     return "unknown";
+}
+
+std::string Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice npc)
+{
+    if ( npc == Config::NetworkProfileChoice::default )
+        return "Default";
+
+    return networkProfileDisplayName(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
+}
+
+std::string Config::networkProfileChoiceKey(Config::NetworkProfileChoice npc)
+{
+    if ( npc == Config::NetworkProfileChoice::default )
+        return "default";
+
+    return networkProfileKey(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
+}
+
+Config::NetworkProfileChoice Config::networkProfileChoiceFromKey(const std::string& key)
+{
+    if ( key == "default" )
+        return Config::NetworkProfileChoice::default;
+    else return networkChoiceFromProfile(networkProfileFromKey(key));
+}
+
+Config::NetworkProfile Config::networkProfileFromChoice(Config::NetworkProfileChoice npc, Config::NetworkProfile default)
+{
+    switch(npc)
+    {
+    case Config::NetworkProfileChoice::default:
+        return default;
+
+    case Config::NetworkProfileChoice::trusted:
+        return Config::NetworkProfile::trusted;
+
+    case Config::NetworkProfileChoice::untrusted:
+        return Config::NetworkProfile::untrusted;
+
+    case Config::NetworkProfileChoice::hostile:
+        return Config::NetworkProfile::hostile;
+    }
+    assert("Unknown network type");
+    return Config::NetworkProfile::untrusted;
+}
+
+Config::NetworkProfileChoice Config::networkChoiceFromProfile(Config::NetworkProfile np)
+{
+    switch(np)
+    {
+    case Config::NetworkProfile::trusted:
+        return Config::NetworkProfileChoice::trusted;
+
+    case Config::NetworkProfile::untrusted:
+        return Config::NetworkProfileChoice::untrusted;
+
+    case Config::NetworkProfile::hostile:
+        return Config::NetworkProfileChoice::hostile;
+    }
+    assert("Unknown network type");
+    return Config::NetworkProfileChoice::untrusted;
 }

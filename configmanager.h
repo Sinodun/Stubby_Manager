@@ -57,7 +57,7 @@ public:
 
     void addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
     void resetNetworksActiveState();
-    Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
+    Config::NetworkProfileChoice getDisplayedNetworkProfile(const std::string& name);
 
     bool unsavedChanges(bool profile, bool network);
     bool getRestartRequired() const {return restartRequired;};
