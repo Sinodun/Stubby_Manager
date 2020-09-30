@@ -35,12 +35,12 @@
     <!--Create StubbyManager Scheduled Task-->
     <CustomAction Id="CreateScheduledTaskId"
                Property="CreateScheduledTask"
-               Return="check"
+               Return="ignore"
                Execute="immediate"
-               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /CREATE /TN &quot;StubbyManager&quot; /XML &quot;[INSTALLFOLDER]StubbyManager.xml&quot;" />
+               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /CREATE /TN &quot;StubbyManager&quot; /XML &quot;[INSTALLFOLDER]StubbyManager.xml&quot; /RU &quot;[%USERDOMAIN]\[LogonUser]&quot;" />
 
     <CustomAction Id="CreateScheduledTask"
-              Return="check"
+              Return="ignore"
               Impersonate="no"
               Execute="deferred"
               BinaryKey="WixCA"
@@ -49,12 +49,12 @@
     <!--Delete StubbyManager Scheduled Task-->
     <CustomAction Id="DeleteScheduledTaskId"
               Property="DeleteScheduledTask"
-              Return="check"
+              Return="ignore"
               Execute="immediate"
               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /DELETE /TN &quot;StubbyManager&quot; /F" />
 
     <CustomAction Id="DeleteScheduledTask"
-              Return="check"
+              Return="ignore"
               Impersonate="no"
               Execute="deferred"
               BinaryKey="WixCA"
