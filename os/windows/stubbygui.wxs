@@ -122,6 +122,9 @@
       <Component Id="qwindows.dll">
         <File Id="qwindows.dll" Source="Stubby/qwindows.dll"  KeyPath="yes" Checksum="yes"/>
       </Component>
+    <Component Id="StubbyManager.xml">
+        <File Id="StubbyManager.xml" Source="Stubby/StubbyManager.xml"  KeyPath="yes" Checksum="yes"/>
+    </Component>
     </ComponentGroup>
     <ComponentGroup Id="StubbyManangerFactoryData" Directory="FACTORYDATAFOLDER">
       <Component Id="stubbytemplate.yml">
@@ -130,10 +133,6 @@
       <Component Id="netprofile_defaults.yml">
         <File Id="netprofile_defaults.yml" Source="Stubby/netprofile_defaults.yml"  KeyPath="yes" Checksum="yes"/>
       </Component>
-      <Component Id="StubbyManager.xml">
-        <File Id="StubbyManager.xml" Source="Stubby/StubbyManager.xml"  KeyPath="yes" Checksum="yes"/>
-      </Component>
-
     </ComponentGroup>
 
     <DirectoryRef Id="TARGETDIR">
