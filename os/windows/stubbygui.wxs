@@ -117,14 +117,14 @@
           <File Id="vcruntime140_1.dll" Source="Stubby/vcruntime140_1.dll"  KeyPath="yes" Checksum="yes"/>
         </Component>
       <?endif ?>
+      <Component Id="StubbyManager.xml">
+        <File Id="StubbyManager.xml" Source="Stubby/StubbyManager.xml"  KeyPath="yes" Checksum="yes"/>
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="StubbyManangerComponentsPlatforms" Directory="Platforms">
       <Component Id="qwindows.dll">
         <File Id="qwindows.dll" Source="Stubby/qwindows.dll"  KeyPath="yes" Checksum="yes"/>
       </Component>
-    <Component Id="StubbyManager.xml">
-        <File Id="StubbyManager.xml" Source="Stubby/StubbyManager.xml"  KeyPath="yes" Checksum="yes"/>
-    </Component>
     </ComponentGroup>
     <ComponentGroup Id="StubbyManangerFactoryData" Directory="FACTORYDATAFOLDER">
       <Component Id="stubbytemplate.yml">
