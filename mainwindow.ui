@@ -444,6 +444,22 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
          <string>Hide Details</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="helpButton">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>40</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(181, 213, 255);</string>
+        </property>
+        <property name="text">
+         <string>Open Help</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="networkProfilesTab">
        <attribute name="title">

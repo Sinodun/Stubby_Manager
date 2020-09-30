@@ -65,6 +65,8 @@ private slots:
 
     void on_showLogButton_toggled();
 
+    void on_helpButton_clicked();
+
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);

@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QSettings>
+#include <QDesktopServices>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -431,6 +432,10 @@ void MainWindow::on_hideDetailsCheckBox_toggled() {
         ui->detailsLabel->setVisible(true);
         stubbySettings->setValue("info/hideDetails", false);
     }
+}
+
+void MainWindow::on_helpButton_clicked() {
+    QDesktopServices::openUrl (QUrl("https://dnsprivacy.org/wiki/display/DP/Stubby+Manager+GUI"));
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
