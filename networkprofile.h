@@ -43,6 +43,8 @@ public slots:
     void on_applyButton_clicked();
     void on_discardButton_clicked();
     void on_revertButton_clicked();
+    void on_openWebsite_clicked();
+    void on_serverTable_clicked();
 
     void on_globalConfigChanged();
 

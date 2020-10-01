@@ -13,6 +13,8 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QSettings>
+
 
 #include "configmanager.h"
 #include "servicemanager.h"
@@ -63,6 +65,10 @@ private slots:
 
     void on_showLogButton_toggled();
 
+    void on_helpButton_clicked();
+
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
     void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
     void on_networksStateUpdated(bool unsaved);
     void on_applyAllButton_clicked();
@@ -73,6 +79,8 @@ private slots:
 private:
     void setButtonStates();
     void updateCurrentNetworkInfo();
+    void firstRunPopUp();
+
 
     Ui::MainWindow *ui;
 
@@ -106,8 +114,10 @@ private:
     int handleUnsavedChanges();
 
     QAction *quitAction;
+    QAction *openAction;
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
+    QSettings *stubbySettings;
 
     QPixmap *greenPixmap;
     QPixmap *yellowPixmap;

@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QSettings>
+#include <QDesktopServices>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -63,14 +64,18 @@ MainWindow::MainWindow(QWidget *parent)
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    openAction = new QAction(tr("&Open"), this);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(show()));
     trayIconMenu = new QMenu(this);
     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(openAction);
     trayIconMenu->addAction(quitAction);
-
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
     trayIcon->show();
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+             this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
     // Set up circle icons
     greenPixmap = new CirclePixmap(Qt::green);
@@ -163,6 +168,12 @@ MainWindow::MainWindow(QWidget *parent)
         abort();
     }
 
+    // create the settings
+    stubbySettings = new QSettings("Sinodun.com", "Stubby Manager");
+    QVariant details = stubbySettings->value("info/hideDetails");
+    if (!details.isNull())
+        ui->hideDetailsCheckBox->setChecked(details.toBool());
+
     // Set initially displayed tab.
     ui->mainTabWidget->setCurrentIndex(0);
     ui->statusTab->setFocus();
@@ -197,6 +208,21 @@ MainWindow::~MainWindow()
     delete greyPixmap;
 }
 
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason){
+        case QSystemTrayIcon::Trigger:
+            if(!this->isVisible()){
+                this->show();
+            } else {
+                this->hide();
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void MainWindow::timerExpired() {
     if (updateState == None)
         return;
@@ -224,13 +250,35 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     handleUnsavedChanges();
 
     if (trayIcon->isVisible()) {
-       QMessageBox::information(this, "Systray",
-                                "Stubby Manager will keep running in the system tray.<br> "
-                                   "*We recommend you keep Stubby Manager running to actively monitor Stubby*<br>"
-                                   "To terminate Stubby Manager, choose 'Quit' in the context menu "
-                                   "of the system tray entry (this won't stop Stubby itself!).");
-        hide();
-        event->ignore();
+       QVariant exitMessage = stubbySettings->value("app/exitMessage");
+       if (!exitMessage.isNull() && exitMessage.toBool() == false) {
+           hide();
+           event->ignore();
+           return;
+       }
+       QMessageBox msgBox;
+       setMinimumSize(600,200);
+       msgBox.setText("Stubby Manager will keep running in the system tray.");
+       msgBox.setInformativeText("*We recommend you keep Stubby Manager running to actively monitor Stubby*<br><br>"
+                                 "To terminate Stubby Manager, choose 'Quit' in the context menu "
+                                 "of the system tray entry (this won't stop Stubby itself!).<br><br>"
+                                 "Hit 'Ok' if you don't want to see this message everytime the window is closed,"
+                                 "otherwise hit 'Close'.");
+       msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Close);
+       msgBox.setDefaultButton(QMessageBox::Ok);
+       int ret = msgBox.exec();
+       switch (ret) {
+         case QMessageBox::Ok:
+            stubbySettings->setValue("app/exitMessage", false);
+            break;
+         case QMessageBox::Close:
+            break;
+         default:
+            // should never be reached
+            break;
+      }
+       hide();
+       event->ignore();
     }
 }
 
@@ -248,6 +296,20 @@ void MainWindow::logMsg(QString logMsg) {
     ui->logOutput->moveCursor (QTextCursor::End);
 }
 
+void MainWindow::firstRunPopUp()
+{
+    // On the very first run pop up a useful message
+    QVariant firstRun = stubbySettings->value("app/firstRun");
+    if (!firstRun.isNull())
+        return;
+    QMessageBox::information(this, "Systray",
+                             "Stubby Manager runs as a system tray application.<br> "
+                             "We recommend that you make the Stubby Manager icon visible "
+                             "in your system tray so you can easily see the state of "
+                             "Stubby Manager (select the Start menu and type 'select "
+                             "which icons appear on the taskbar').<br>");
+    stubbySettings->setValue("app/firstRun", false);
+}
 
 /*
  * Slots functions
@@ -261,6 +323,7 @@ void MainWindow::on_onOffSlider_stateChanged()
     statusMsg("");
     bool value = ui->onOffSlider->isChecked();
     if (value == true) {
+        firstRunPopUp();
         // Currently we handle the service status first and based on the result of that action we later update the system DNS settings
         updateState = Start;
         ui->runningStatus->setText("Stubby starting...");
@@ -344,6 +407,8 @@ void MainWindow::on_testQueryResult(bool result) {
     else {
         statusMsg("Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
+        trayIcon->showMessage("Connection Test Failed",
+        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60);
     }
 }
 
@@ -361,10 +426,16 @@ void MainWindow::on_showLogButton_toggled() {
 void MainWindow::on_hideDetailsCheckBox_toggled() {
     if (ui->hideDetailsCheckBox->isChecked()) {
         ui->detailsLabel->setVisible(false);
+        stubbySettings->setValue("info/hideDetails", true);
     }
     else {
         ui->detailsLabel->setVisible(true);
+        stubbySettings->setValue("info/hideDetails", false);
     }
+}
+
+void MainWindow::on_helpButton_clicked() {
+    QDesktopServices::openUrl (QUrl("https://dnsprivacy.org/wiki/display/DP/Stubby+Manager+GUI"));
 }
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
@@ -542,12 +613,14 @@ void MainWindow::updateMainTab() {
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*greenPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_green.png"));
         ui->onOffSlider->setChecked(true);
     }
     else if (m_serviceState == ServiceMgr::Stopped &&
              m_networkState == NetworkMgr::NotLocalhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*greyPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145.png"));
         ui->onOffSlider->setChecked(false);
     }
     else if ((m_serviceState == ServiceMgr::Running &&
@@ -559,6 +632,7 @@ void MainWindow::updateMainTab() {
         else
             ui->runningStatus->setText("Partly running...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
     }
     else if ((m_serviceState == ServiceMgr::Unknown &&
              m_networkState == NetworkMgr::Unknown) ||
@@ -566,11 +640,13 @@ void MainWindow::updateMainTab() {
              //m_networkState == NetworkMgr::Unknown) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
         ui->stubbyStatus->setPixmap(*redPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
         ui->onOffSlider->setChecked(false);
     }
     else {
         ui->runningStatus->setText("Waiting...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
+        trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
     }
 
     ui->restartButton->setEnabled(m_serviceState == ServiceMgr::Running);

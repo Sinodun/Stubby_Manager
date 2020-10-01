@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Stubby Manager</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="stubby.qrc">
+    <normaloff>:/images/stubby.ico</normaloff>:/images/stubby.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="font">
     <font>
@@ -438,6 +442,22 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
         </property>
         <property name="text">
          <string>Hide Details</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="helpButton">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>40</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(181, 213, 255);</string>
+        </property>
+        <property name="text">
+         <string>Open Help</string>
         </property>
        </widget>
       </widget>

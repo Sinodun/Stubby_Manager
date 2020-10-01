@@ -93,6 +93,11 @@ Qt::ItemFlags ProfileServersTableModel::flags(const QModelIndex& index) const
     case 0:
         res |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
         break;
+    case 1:
+        res |= Qt::ItemIsEnabled;
+    case 2:
+        res |= Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        break;
     }
     return res;
 }
