@@ -23,6 +23,7 @@ public:
                             const std::string& descripton,
                             const std::string& dns_suffix,
                             const std::string& ssid,
+                            const std::vector<std::string>& resolvers,
                             bool is_resolver_loopback,
                             bool is_running,
                             DWORD if_type,
@@ -37,6 +38,7 @@ public:
     bool is_wireless() const override;
 
     virtual std::string ssid() const override;
+    virtual std::vector<std::string> resolvers() const override;
 
 private:
     std::string name_;
@@ -44,6 +46,7 @@ private:
     std::string description_;
     std::string dns_suffix_;
     std::string ssid_;
+    std::vector<std::string> resolvers_;
     bool is_resolver_loopback_;
     bool is_running_;
     DWORD if_type_;

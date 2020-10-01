@@ -306,7 +306,7 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
         m_networkState = NotLocalhost;
         if (oldNetworkState != m_networkState  || reportNoChange == true)
             m_mainwindow->statusMsg("Status: DNS settings NOT using localhost.");
-        emit networkStateChanged(NotLocalhost);       
+        emit networkStateChanged(NotLocalhost);
     }
     return 0;
 }
@@ -358,6 +358,7 @@ void NetworkMgrWindows::reload()
 
         bool resolver_loopback = true;
         bool running = false;
+        std::vector<std::string> resolvers;
 
         // We consider the interface up if it is reported as
         // up AND there is a non-link-local address allocated.
@@ -384,7 +385,11 @@ void NetworkMgrWindows::reload()
             if ( !dns_addr.isLoopback() )
             {
                 resolver_loopback = false;
-                break;
+
+                // Resolver addresses can be duplicated.
+                std::string resolver = dns_addr.toString();
+                if ( std::find(resolvers.begin(), resolvers.end(), resolver) == resolvers.end() )
+                    resolvers.push_back(resolver);
             }
         }
 
@@ -405,6 +410,7 @@ void NetworkMgrWindows::reload()
                 description,
                 dns_suffix,
                 ssid,
+                resolvers,
                 resolver_loopback,
                 running,
                 adapter->IfType,
@@ -482,6 +488,20 @@ std::vector<std::string> NetworkMgrWindows::getNetworks()
             res.push_back(network);
         }
     }
+    return res;
+}
+
+std::vector<std::string> NetworkMgrWindows::getResolvers(const std::string& network)
+{
+    std::vector<std::string> res;
+
+    for ( const auto& i: interfaces )
+        if ( i.name() == network )
+        {
+            res = i.resolvers();
+            break;
+        }
+
     return res;
 }
 

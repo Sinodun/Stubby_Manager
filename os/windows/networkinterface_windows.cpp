@@ -17,12 +17,14 @@ NetworkInterfaceWindows::NetworkInterfaceWindows(
     const std::string& description,
     const std::string& dns_suffix,
     const std::string& ssid,
+    const std::vector<std::string>& resolvers,
     bool is_resolver_loopback,
     bool is_running,
     DWORD if_type,
     IF_OPER_STATUS oper_status)
     : name_(name), adapter_name_(adapter_name),
-      description_(description), dns_suffix_(dns_suffix), ssid_(ssid),
+      description_(description), dns_suffix_(dns_suffix),
+      ssid_(ssid), resolvers_(resolvers),
       is_resolver_loopback_(is_resolver_loopback),
       is_running_(is_running),
       if_type_(if_type),
@@ -55,8 +57,12 @@ bool NetworkInterfaceWindows::is_wireless() const
     return if_type_ == IF_TYPE_IEEE80211;
 }
 
-
 std::string NetworkInterfaceWindows::ssid() const
 {
     return ssid_;
+}
+
+std::vector<std::string> NetworkInterfaceWindows::resolvers() const
+{
+    return resolvers_;
 }

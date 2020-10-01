@@ -38,6 +38,7 @@ public:
     int getState(bool reportNoChange);
     virtual int testQuery() = 0;
     std::vector<std::string> getRunningNetworks();
+    std::vector<std::string> getNetworkResolvers(const std::string& network);
 
 signals:
     void networkConfigChanged();
@@ -49,6 +50,7 @@ protected:
     virtual int unsetLocalhostDNS() = 0;
     virtual int getStateDNS(bool reportNoChange) = 0;
     virtual std::vector<std::string> getNetworks() = 0;
+    virtual std::vector<std::string> getResolvers(const std::string& network) = 0;
 
     MainWindow *m_mainwindow;
     NetworkState m_networkState;

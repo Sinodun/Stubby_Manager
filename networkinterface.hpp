@@ -10,6 +10,7 @@
 #define NETWORKINTERFACE_HPP
 
 #include <string>
+#include <vector>
 
 class NetworkInterface
 {
@@ -24,6 +25,7 @@ public:
     virtual bool is_wireless() const = 0;
 
     virtual std::string ssid() const = 0;
+    virtual std::vector<std::string> resolvers() const = 0;
 };
 
 #endif
