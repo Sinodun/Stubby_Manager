@@ -35,7 +35,6 @@ signals:
     void globalConfigChanged();
 
 public slots:
-    void on_useAsDefaultProfile_stateChanged(int state);
     void on_alwaysAuthenticate_stateChanged(int state);
     void on_encryptAllTraffic_stateChanged(int state);
     void on_roundRobin_stateChanged(int state);

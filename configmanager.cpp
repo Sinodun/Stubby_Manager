@@ -271,7 +271,9 @@ bool ConfigMgr::profileModifiedFrom(const Config& cfg, Config::NetworkProfile ne
 
 bool ConfigMgr::networksModifiedFrom(const Config& cfg)
 {
-    return cfg.networks != displayedConfig.networks;
+    return
+        cfg.networks != displayedConfig.networks ||
+        cfg.defaultNetworkProfile != displayedConfig.defaultNetworkProfile;
 }
 
 bool ConfigMgr::modifiedFrom(const Config& cfg)
@@ -288,6 +290,7 @@ void ConfigMgr::profileRestoreFrom(const Config& cfg, Config::NetworkProfile net
 void ConfigMgr::networksRestoreFrom(const Config& cfg)
 {
     displayedConfig.networks = cfg.networks;
+    displayedConfig.defaultNetworkProfile = cfg.defaultNetworkProfile;
     emit configChanged();
 }
 
