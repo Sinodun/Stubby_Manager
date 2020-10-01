@@ -42,6 +42,7 @@ protected:
     int getStateDNS(bool reportChange);
     int testQuery() override;
     std::vector<std::string> getNetworks();
+    std::vector<std::string> getResolvers(const std::string& network);
 
 private slots:
     void on_testQuery_finished(int exitCode, QProcess::ExitStatus exitStatus);

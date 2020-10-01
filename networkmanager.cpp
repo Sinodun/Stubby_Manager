@@ -45,3 +45,7 @@ int NetworkMgr::getState(bool reportNoChange)
 std::vector<std::string> NetworkMgr::getRunningNetworks() {
     return getNetworks();
 }
+
+std::vector<std::string> NetworkMgr::getNetworkResolvers(const std::string& network) {
+    return getResolvers(network);
+}
