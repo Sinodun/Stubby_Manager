@@ -37,16 +37,6 @@ NetworkProfileWidget::~NetworkProfileWidget()
     delete m_serverTableModel;
 }
 
-void NetworkProfileWidget::on_useAsDefaultProfile_stateChanged(int state)
-{
-    if ( state == Qt::CheckState::Checked && m_configMgr.displayedConfig.defaultNetworkProfile != m_np )
-    {
-        m_configMgr.displayedConfig.defaultNetworkProfile = m_np;
-         emit globalConfigChanged();
-    }
-    setButtonStates();
-}
-
 void NetworkProfileWidget::on_alwaysAuthenticate_stateChanged(int state)
 {
     m_configMgr.displayedConfig.profiles[m_np].alwaysAuthenticate = (state == Qt::CheckState::Checked);
@@ -105,8 +95,6 @@ void NetworkProfileWidget::on_serverTableDataChanged(const QModelIndex &topLeft,
 
 void NetworkProfileWidget::setGuiState()
 {
-    ui->useAsDefaultProfile->setCheckState(m_configMgr.displayedConfig.defaultNetworkProfile == m_np ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
-
     ui->alwaysAuthenticate->setCheckState(m_configMgr.displayedConfig.profiles[m_np].alwaysAuthenticate ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->encryptAllTraffic->setCheckState(m_configMgr.displayedConfig.profiles[m_np].encryptAll ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->validateData->setCheckState(m_configMgr.displayedConfig.profiles[m_np].validateData ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -119,12 +107,10 @@ void NetworkProfileWidget::setButtonStates()
 {
     bool unsaved = m_configMgr.profileModifiedFromSaved(m_np);
     bool notdefault = m_configMgr.profileModifiedFromFactory(m_np);
-    bool not_default_profile = ( m_configMgr.displayedConfig.defaultNetworkProfile != m_np );
 
     ui->applyButton->setEnabled(unsaved);
     ui->discardButton->setEnabled(unsaved);
     ui->revertButton->setEnabled(notdefault);
-    ui->useAsDefaultProfile->setEnabled(not_default_profile);
 
     emit stateUpdated(m_np, unsaved, notdefault);
 }

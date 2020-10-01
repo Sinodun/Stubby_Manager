@@ -8,6 +8,7 @@
 
 #include <QDebug>
 
+#include "config.h"
 #include "networkprofiledelegate.h"
 #include "networks.h"
 
@@ -18,6 +19,10 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
 
 {
     ui->setupUi(this);
+
+    ui->defaultProfile->addItem(QString::fromStdString(Config::networkProfileDisplayName(Config::NetworkProfile::trusted)), QVariant(static_cast<int>(Config::NetworkProfile::trusted)));
+    ui->defaultProfile->addItem(QString::fromStdString(Config::networkProfileDisplayName(Config::NetworkProfile::untrusted)), QVariant(static_cast<int>(Config::NetworkProfile::untrusted)));
+    ui->defaultProfile->addItem(QString::fromStdString(Config::networkProfileDisplayName(Config::NetworkProfile::hostile)), QVariant(static_cast<int>(Config::NetworkProfile::hostile)));
 
     m_networkTableModel = new NetworkProfileTableModel(m_configMgr.displayedConfig);
     ui->networkTable->setModel(m_networkTableModel);
@@ -46,7 +51,21 @@ NetworkListWidget::~NetworkListWidget()
 
 void NetworkListWidget::setGuiState()
 {
+    ui->defaultProfile->setCurrentText(QString::fromStdString(Config::networkProfileDisplayName(m_configMgr.displayedConfig.defaultNetworkProfile)));
     setButtonStates();
+}
+
+void NetworkListWidget::on_defaultProfile_activated(int index)
+{
+    int i = ui->defaultProfile->itemData(index).toInt();
+    Config::NetworkProfile np = static_cast<Config::NetworkProfile>(i);
+
+    if ( m_configMgr.displayedConfig.defaultNetworkProfile != np )
+    {
+        m_configMgr.displayedConfig.defaultNetworkProfile = np;
+        setGuiState();
+        emit globalConfigChanged();
+    }
 }
 
 void NetworkListWidget::on_applyButton_clicked()

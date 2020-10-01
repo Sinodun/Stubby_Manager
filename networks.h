@@ -35,6 +35,7 @@ signals:
     void globalConfigChanged();
 
 public slots:
+    void on_defaultProfile_activated(int index);
     void on_applyButton_clicked();
     void on_discardButton_clicked();
     void on_forgetButton_clicked();

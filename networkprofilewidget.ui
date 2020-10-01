@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>527</width>
+    <width>531</width>
     <height>410</height>
    </rect>
   </property>
@@ -21,57 +21,12 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_11">
+    <layout class="QVBoxLayout" name="verticalLayout_11" stretch="3,90,1">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,15,95">
+      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10,10">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,10">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
-         <item>
-          <widget class="QCheckBox" name="useAsDefaultProfile">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Use as default profile</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>240</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="10,10,7,0">
          <item>
@@ -111,7 +66,10 @@
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,5,3">
+        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,0,1">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="Line" name="line_3">
            <property name="orientation">
