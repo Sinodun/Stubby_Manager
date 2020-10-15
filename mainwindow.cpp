@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// This is for the colored balls used to display status
 class CirclePixmap: public QPixmap {
 public:
     CirclePixmap(QColor col);

@@ -9,7 +9,7 @@
 #include "networkprofiletablemodel.h"
 
 NetworkProfileTableModel::NetworkProfileTableModel(Config& config, QObject* parent)
-    : m_config(config), QAbstractTableModel(parent)
+    : QAbstractTableModel(parent), m_config(config)
 {
 }
 
@@ -19,22 +19,25 @@ NetworkProfileTableModel::~NetworkProfileTableModel()
 
 int NetworkProfileTableModel::columnCount(const QModelIndex& parent) const
 {
-    Q_UNUSED(parent);
-    return 2;
+//    Q_UNUSED(parent);
+//    return 2;
+    return parent.isValid() ? 0 : 2;
 }
 
 int NetworkProfileTableModel::rowCount(const QModelIndex& parent) const
 {
-    Q_UNUSED(parent);
-    return static_cast<int>(m_config.networks.size());
+//    Q_UNUSED(parent);
+//    return static_cast<int>(m_config.networks.size());
+    return parent.isValid() ? 0 : static_cast<int>(m_config.networks.size());
 }
 
 QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) const
 {
     if ( !index.isValid() )
         return QVariant();
-
     int row = index.row();
+//    if ( index.row() >= static_cast<int>(m_config.networks.size()) || index.row() < 0 )
+//        return QVariant();
 
     for ( const auto& n : m_config.networks )
     {
@@ -67,16 +70,18 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
 
 Qt::ItemFlags NetworkProfileTableModel::flags(const QModelIndex& index) const
 {
-    Qt::ItemFlags res = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+//    Qt::ItemFlags res = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
-    switch ( index.column() )
-    {
-    case 1:
-        res |= Qt::ItemIsEditable;
-        break;
-    }
+//    switch ( index.column() )
+//    {
+//    case 1:
+//        res |= Qt::ItemIsEditable;
+//        break;
+//    }
 
-    return res;
+//    return res;
+    if ( index.column() == 0 ) return QAbstractTableModel::flags(index);
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }
 
 QVariant NetworkProfileTableModel::headerData(int section, Qt::Orientation orientation, int role) const

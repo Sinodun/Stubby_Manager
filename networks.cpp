@@ -25,8 +25,9 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkTable));
-
     m_selectionModel = ui->networkTable->selectionModel();
+
+
     ui->forgetButton->setEnabled(m_selectionModel->hasSelection());
 
     connect(m_networkTableModel, &NetworkProfileTableModel::dataChanged,
@@ -35,6 +36,14 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
             this, &NetworkListWidget::on_globalConfigChanged);
     connect(m_selectionModel, &QItemSelectionModel::selectionChanged,
             this, &NetworkListWidget::on_networkTableSelectionChanged);
+    connect(m_networkTableModel, &NetworkProfileTableModel::modelReset,
+             this, &NetworkListWidget::PersistentEdit);
+}
+
+void NetworkListWidget::PersistentEdit()
+{
+    for (int i=0; i<m_networkTableModel->rowCount(); ++i)
+        ui->networkTable->openPersistentEditor(m_networkTableModel->index(i, 1));
 }
 
 NetworkListWidget::~NetworkListWidget()

@@ -44,7 +44,7 @@
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgba(85, 170, 255, 40);
+       <string notr="true">background-color: rgb(88, 148, 176);
 border:none;</string>
       </property>
       <property name="title">
@@ -155,7 +155,7 @@ border:none;</string>
           <widget class="QCheckBox" name="onOffSlider">
            <property name="styleSheet">
             <string notr="true">QCheckBox::indicator {
-    background-color: transparent;
+	background-color: rgb(88, 148, 176);
      width: 100px;
      height: 60px;
  }
@@ -248,14 +248,11 @@ border:none;</string>
     </item>
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideRight</enum>
@@ -270,7 +267,7 @@ border:none;</string>
           <x>200</x>
           <y>30</y>
           <width>231</width>
-          <height>41</height>
+          <height>61</height>
          </rect>
         </property>
         <property name="font">
@@ -282,11 +279,10 @@ border:none;</string>
          <number>-1</number>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgba(85, 170, 255, 30);
-border-color: rgb(85, 85, 127);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
-         <string>Stubby Manager v0.4.0-a1</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;v0.4.0-a1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

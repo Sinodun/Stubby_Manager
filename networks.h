@@ -43,6 +43,7 @@ public slots:
 
     void on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void PersistentEdit();
 
 private:
     void setButtonStates();
