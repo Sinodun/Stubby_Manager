@@ -59,7 +59,17 @@ struct Config
     NetworkProfile defaultNewNetworkProfile;
     bool defaultNewNetworkProfileSet;
 
-    std::map<std::string, NetworkProfile> networks;
+    enum class InterfaceTypes { wifi, ethernet };
+    struct NetworkInformation
+    {
+        NetworkProfile profile;
+        InterfaceTypes interfaceType;
+        bool interfaceActive;
+
+        bool operator==(const NetworkInformation& netinfo) const;
+    };
+
+    std::map<std::string, NetworkInformation> networks;
 
     Config();
     void loadFromFile(const std::string& filePath);

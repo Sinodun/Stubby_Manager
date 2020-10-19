@@ -43,6 +43,10 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
     {
         if ( row-- > 0 )
             continue;
+//        qInfo("Testing config Interface %s InterfaceType %d", n.first.c_str(), n.second.interfaceType);
+//        qInfo("Testing InterfaceType %d", Config::InterfaceTypes::wifi );
+        if ( n.second.interfaceType != Config::InterfaceTypes::wifi )
+            continue;
 
         if ( role == Qt::DisplayRole )
         {
@@ -52,15 +56,15 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
                 return QString::fromStdString(n.first);
 
             case 1:
-                return QString::fromStdString(Config::networkProfileDisplayName(n.second));
+                return QString::fromStdString(Config::networkProfileDisplayName(n.second.profile));
             }
         }
-        else if ( role == Qt::EditRole)
+        else if ( role == Qt::EditRole )
         {
             switch (index.column())
             {
             case 1:
-                return QVariant(static_cast<int>(n.second));
+                return QVariant(static_cast<int>(n.second.profile));
             }
         }
     }
@@ -110,7 +114,7 @@ bool NetworkProfileTableModel::setData(const QModelIndex &index, const QVariant 
         if ( row-- > 0 )
             continue;
 
-        m_config.networks[n.first] = Config::NetworkProfile(value.toInt());
+        m_config.networks[n.first].profile = Config::NetworkProfile(value.toInt());
         emit dataChanged(index, index);
         return true;
     }

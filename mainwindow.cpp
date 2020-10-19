@@ -64,7 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+//    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(quitAction, &QAction::triggered, this, &MainWindow::closeFromSystray);
     openAction = new QAction(tr("&Open"), this);
     connect(openAction, SIGNAL(triggered()), this, SLOT(show()));
     trayIconMenu = new QMenu(this);
@@ -238,6 +239,12 @@ void MainWindow::probeTimerExpired() {
     statusMsg("\nProbing State");
     updateState = Probe;
     m_serviceMgr->getState();
+}
+
+void MainWindow::closeFromSystray() {
+    handleUnsavedChanges();
+    qApp->quit();
+    return;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -482,9 +489,10 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         return;
     }
     else if (updateState == Restart) {
-        if (m_serviceState == ServiceMgr::Stopped)
+        if (m_serviceState == ServiceMgr::Stopped) {
             if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
                 handleError();
+        }
         else if (m_serviceState == ServiceMgr::Running) {
             on_testButton_clicked();
             updateMainTab();

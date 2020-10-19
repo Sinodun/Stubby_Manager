@@ -301,7 +301,7 @@ void ConfigMgr::addNetwork(const std::string& name)
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() )
-        displayedConfig.networks[name] =
+        displayedConfig.networks[name].profile =
             displayedConfig.defaultNewNetworkProfileSet
             ? displayedConfig.defaultNewNetworkProfile
             : Config::NetworkProfile::untrusted;
@@ -310,5 +310,5 @@ void ConfigMgr::addNetwork(const std::string& name)
 Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
 {
     addNetwork(name);
-    return displayedConfig.networks[name];
+    return displayedConfig.networks[name].profile;
 }
