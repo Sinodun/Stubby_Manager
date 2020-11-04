@@ -37,11 +37,11 @@ public:
     virtual ~NetworkMgrWindows();
 
 protected:
-    int setLocalhostDNS();
-    int unsetLocalhostDNS();
-    int getStateDNS(bool reportChange);
+    int setLocalhostDNS() override;
+    int unsetLocalhostDNS() override;
+    int getStateDNS(bool reportChange) override;
     int testQuery() override;
-    std::vector<std::string> getNetworks();
+    std::map<std::string, interfaceInfo> getNetworks() override;
 
 private slots:
     void on_testQuery_finished(int exitCode, QProcess::ExitStatus exitStatus);

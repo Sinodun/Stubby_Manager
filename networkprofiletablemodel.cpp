@@ -21,7 +21,7 @@ int NetworkProfileTableModel::columnCount(const QModelIndex& parent) const
 {
 //    Q_UNUSED(parent);
 //    return 2;
-    return parent.isValid() ? 0 : 2;
+    return parent.isValid() ? 0 : 3;
 }
 
 int NetworkProfileTableModel::rowCount(const QModelIndex& parent) const
@@ -33,19 +33,13 @@ int NetworkProfileTableModel::rowCount(const QModelIndex& parent) const
 
 QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) const
 {
-    if ( !index.isValid() )
+    if ( !index.isValid() || ( role != Qt::DisplayRole && role != Qt::EditRole ))
         return QVariant();
     int row = index.row();
-//    if ( index.row() >= static_cast<int>(m_config.networks.size()) || index.row() < 0 )
-//        return QVariant();
 
     for ( const auto& n : m_config.networks )
     {
         if ( row-- > 0 )
-            continue;
-//        qInfo("Testing config Interface %s InterfaceType %d", n.first.c_str(), n.second.interfaceType);
-//        qInfo("Testing InterfaceType %d", Config::InterfaceTypes::wifi );
-        if ( n.second.interfaceType != Config::InterfaceTypes::wifi )
             continue;
 
         if ( role == Qt::DisplayRole )
@@ -57,6 +51,9 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
 
             case 1:
                 return QString::fromStdString(Config::networkProfileDisplayName(n.second.profile));
+
+            case 2:
+                return QString::fromStdString(Config::interfaceTypeDisplayName(n.second.interfaceType));
             }
         }
         else if ( role == Qt::EditRole )
@@ -74,17 +71,7 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
 
 Qt::ItemFlags NetworkProfileTableModel::flags(const QModelIndex& index) const
 {
-//    Qt::ItemFlags res = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-
-//    switch ( index.column() )
-//    {
-//    case 1:
-//        res |= Qt::ItemIsEditable;
-//        break;
-//    }
-
-//    return res;
-    if ( index.column() == 0 ) return QAbstractTableModel::flags(index);
+    if ( index.column() == 0 || index.column() == 2 ) return QAbstractTableModel::flags(index);
     return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }
 
@@ -95,8 +82,8 @@ QVariant NetworkProfileTableModel::headerData(int section, Qt::Orientation orien
 
     switch (section)
     {
-    case 0: return QString("Network");
-    case 1: return QString("Profile");
+    case 0: return tr("Network");
+    case 1: return tr("Profile");
     }
 
     return QVariant();

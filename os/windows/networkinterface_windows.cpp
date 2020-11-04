@@ -55,6 +55,10 @@ bool NetworkInterfaceWindows::is_wireless() const
     return if_type_ == IF_TYPE_IEEE80211;
 }
 
+bool NetworkInterfaceWindows::is_ethernet() const
+{
+    return if_type_ == IF_TYPE_ETHERNET_CSMACD;
+}
 
 std::string NetworkInterfaceWindows::ssid() const
 {

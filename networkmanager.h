@@ -33,11 +33,22 @@ public:
         Unknown
     } NetworkState;
 
+    typedef enum {
+        WiFi = 0,
+        Ethernet
+    } InterfaceTypes;
+
+    struct interfaceInfo
+    {
+        InterfaceTypes interfaceType;
+        bool interfaceActive;
+    };
+
     int setLocalhost();
     int unsetLocalhost();
     int getState(bool reportNoChange);
     virtual int testQuery() = 0;
-    std::vector<std::string> getRunningNetworks();
+    std::map<std::string, interfaceInfo>  getRunningNetworks();
 
 signals:
     void networkConfigChanged();
@@ -48,8 +59,7 @@ protected:
     virtual int setLocalhostDNS() = 0;
     virtual int unsetLocalhostDNS() = 0;
     virtual int getStateDNS(bool reportNoChange) = 0;
-    virtual std::vector<std::string> getNetworks() = 0;
-
+    virtual std::map<std::string, interfaceInfo> getNetworks() = 0;
     MainWindow *m_mainwindow;
     NetworkState m_networkState;
 

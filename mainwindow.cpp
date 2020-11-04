@@ -713,19 +713,22 @@ void MainWindow::on_revertAllButton_clicked()
 
 void MainWindow::updateCurrentNetworkInfo()
 {
-    std::vector<std::string> networks = m_networkMgr->getRunningNetworks();
+    std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();
     std::string net_text;
 
     m_currentNetworkProfile = Config::NetworkProfile::trusted;
 
-    for ( const auto& s : networks )
+    for ( const auto& net : networks )
     {
-        m_configMgr->addNetwork(s);
+        auto net_name = net.first;
+        auto net_type = net.second.interfaceType;
+        auto net_active = net.second.interfaceActive;
+        m_configMgr->addNetwork(net_name, net_type, net_active);
         if ( !net_text.empty() )
             net_text.append("\n");
-        net_text.append(s);
+        net_text.append(net_name);
 
-        Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(s);
+        Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
         if ( np > m_currentNetworkProfile )
             m_currentNetworkProfile = np;
     }

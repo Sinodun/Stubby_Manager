@@ -59,7 +59,11 @@ struct Config
     NetworkProfile defaultNewNetworkProfile;
     bool defaultNewNetworkProfileSet;
 
-    enum class InterfaceTypes { wifi, ethernet };
+    typedef enum {
+        WiFi = 0,
+        Ethernet
+    } InterfaceTypes;
+
     struct NetworkInformation
     {
         NetworkProfile profile;
@@ -84,6 +88,7 @@ struct Config
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileKey(NetworkProfile np);
     static NetworkProfile networkProfileFromKey(const std::string& key);
+    static std::string interfaceTypeDisplayName(InterfaceTypes it);
 };
 
 #endif

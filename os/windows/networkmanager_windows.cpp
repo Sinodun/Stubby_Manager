@@ -439,9 +439,9 @@ bool NetworkMgrWindows::isRunning() const
     return true;
 }
 
-std::vector<std::string> NetworkMgrWindows::getNetworks()
+std::map<std::string, NetworkMgr::interfaceInfo> NetworkMgrWindows::getNetworks()
 {
-    std::vector<std::string> res;
+    std::map<std::string, NetworkMgr::interfaceInfo> res;
     std::string network;
     std::string activeNetwork;
 
@@ -468,18 +468,23 @@ std::vector<std::string> NetworkMgrWindows::getNetworks()
         return res;
 
     for (const auto& i: interfaces) {
+        NetworkMgr::interfaceInfo info;
         if (i.is_running()) {
             network = i.name();
             if (i.is_wireless()) {
+                info.interfaceType=NetworkMgr::InterfaceTypes::WiFi;
+                info.interfaceActive=true;
                 if (!i.ssid().empty()) {
                     network.append(" (");
                     network.append(i.ssid());
                     network.append(")");
                 }
-            } else {
-                network.append(activeNetwork);
+            } else if ( i.is_ethernet() ) {
+                    info.interfaceType=NetworkMgr::InterfaceTypes::Ethernet;
+                    info.interfaceActive=true;
+                    network.append(activeNetwork);
             }
-            res.push_back(network);
+            res.emplace(network, info);
         }
     }
     return res;

@@ -297,7 +297,7 @@ void ConfigMgr::restoreFrom(const Config& cfg)
     emit configChanged();
 }
 
-void ConfigMgr::addNetwork(const std::string& name)
+void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() )
@@ -305,10 +305,12 @@ void ConfigMgr::addNetwork(const std::string& name)
             displayedConfig.defaultNewNetworkProfileSet
             ? displayedConfig.defaultNewNetworkProfile
             : Config::NetworkProfile::untrusted;
+    displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
+
 }
 
-Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
+Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
-    addNetwork(name);
+    addNetwork(name, type, active);
     return displayedConfig.networks[name].profile;
 }

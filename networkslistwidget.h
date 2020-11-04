@@ -10,6 +10,7 @@
 #define NETWORKS_H
 
 #include <QModelIndex>
+#include <QSortFilterProxyModel>
 #include <QWidget>
 
 #include "configmanager.h"
@@ -52,6 +53,8 @@ private:
 
     ConfigMgr& m_configMgr;
     NetworkProfileTableModel* m_networkTableModel;
+    QSortFilterProxyModel* m_wifiModel;
+    QSortFilterProxyModel* m_wiredModel;
     QItemSelectionModel* m_selectionModel;
 };
 

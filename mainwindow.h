@@ -20,7 +20,7 @@
 #include "servicemanager.h"
 #include "networkmanager.h"
 #include "networkprofile.h"
-#include "networks.h"
+#include "networkslistwidget.h"
 #include "logmanager.h"
 
 QT_BEGIN_NAMESPACE

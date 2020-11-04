@@ -403,3 +403,17 @@ Config::NetworkProfile Config::networkProfileFromKey(const std::string& key)
     else
         throw std::invalid_argument(key + " is not a network profile");
 }
+
+std::string Config::interfaceTypeDisplayName(Config::InterfaceTypes it)
+{
+    switch(it)
+    {
+    case Config::InterfaceTypes::WiFi:
+        return "WiFi";
+
+    case Config::InterfaceTypes::Ethernet:
+        return "Ethernet";
+    }
+    assert("Unknown interface type");
+    return "unknown";
+}

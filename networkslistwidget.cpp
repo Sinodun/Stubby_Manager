@@ -9,7 +9,8 @@
 #include <QDebug>
 
 #include "networkprofiledelegate.h"
-#include "networks.h"
+#include "networkslistwidget.h"
+#include "networklistfilterproxymodel.h"
 
 NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     : QWidget(parent),
@@ -20,13 +21,27 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->setupUi(this);
 
     m_networkTableModel = new NetworkProfileTableModel(m_configMgr.displayedConfig);
-    ui->networkTable->setModel(m_networkTableModel);
+
+    m_wifiModel = new NetworkListFilterProxyModel(this, "WiFi");
+    m_wifiModel->setSourceModel(m_networkTableModel);
+    m_wiredModel = new NetworkListFilterProxyModel(this, "Ethernet");
+    m_wiredModel->setSourceModel(m_networkTableModel);
+
+    ui->networkTable->setModel(m_wifiModel);
+    ui->networkTable->hideColumn(2);
     ui->networkTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->networkTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkTable));
     m_selectionModel = ui->networkTable->selectionModel();
 
+    ui->networkWiredTable->setModel(m_wiredModel);
+    ui->networkWiredTable->hideColumn(2);
+    ui->networkWiredTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->networkWiredTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->networkWiredTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->networkWiredTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkWiredTable));
+//    m_selectionModel = ui->networkWiredTable->selectionModel();
 
     ui->forgetButton->setEnabled(m_selectionModel->hasSelection());
 
@@ -42,8 +57,10 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
 
 void NetworkListWidget::PersistentEdit()
 {
-    for (int i=0; i<m_networkTableModel->rowCount(); ++i)
-        ui->networkTable->openPersistentEditor(m_networkTableModel->index(i, 1));
+    for (int i=0; i<m_wifiModel->rowCount(); ++i)
+        ui->networkTable->openPersistentEditor(m_wifiModel->index(i, 1));
+    for (int i=0; i<m_wiredModel->rowCount(); ++i)
+        ui->networkWiredTable->openPersistentEditor(m_wiredModel->index(i, 1));
 }
 
 NetworkListWidget::~NetworkListWidget()

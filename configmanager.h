@@ -14,6 +14,7 @@
 #include <QObject>
 
 #include "config.h"
+#include "networkmanager.h"
 
 class MainWindow;
 
@@ -54,8 +55,8 @@ public:
     void restoreSaved();
     void restoreFactory();
 
-    void addNetwork(const std::string& name);
-    Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name);
+    void addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
+    Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
 
     bool unsavedChanges(bool profile, bool network);
     bool getRestartRequired() const {return restartRequired;};
