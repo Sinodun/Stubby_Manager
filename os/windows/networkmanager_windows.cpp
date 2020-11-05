@@ -469,11 +469,12 @@ std::map<std::string, NetworkMgr::interfaceInfo> NetworkMgrWindows::getNetworks(
 
     for (const auto& i: interfaces) {
         NetworkMgr::interfaceInfo info;
-        if (i.is_running()) {
+        info.interfaceActive=false;
+   //     if (i.is_running()) {
             network = i.name();
             if (i.is_wireless()) {
                 info.interfaceType=NetworkMgr::InterfaceTypes::WiFi;
-                info.interfaceActive=true;
+                if (i.is_running()) info.interfaceActive=true;
                 if (!i.ssid().empty()) {
                     network.append(" (");
                     network.append(i.ssid());
@@ -481,11 +482,11 @@ std::map<std::string, NetworkMgr::interfaceInfo> NetworkMgrWindows::getNetworks(
                 }
             } else if ( i.is_ethernet() ) {
                     info.interfaceType=NetworkMgr::InterfaceTypes::Ethernet;
-                    info.interfaceActive=true;
+                    if (i.is_running()) info.interfaceActive=true;
                     network.append(activeNetwork);
             }
             res.emplace(network, info);
-        }
+     //   }
     }
     return res;
 }

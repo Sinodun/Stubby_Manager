@@ -89,6 +89,7 @@ QVariant NetworkProfileTableModel::headerData(int section, Qt::Orientation orien
     return QVariant();
 }
 
+
 bool NetworkProfileTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if ( !index.isValid() || role != Qt::EditRole || index.column() != 1 )
