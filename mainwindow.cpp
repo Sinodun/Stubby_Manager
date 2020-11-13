@@ -64,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
-//    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     connect(quitAction, &QAction::triggered, this, &MainWindow::closeFromSystray);
     openAction = new QAction(tr("&Open"), this);
     connect(openAction, SIGNAL(triggered()), this, SLOT(show()));
@@ -713,6 +712,7 @@ void MainWindow::on_revertAllButton_clicked()
 
 void MainWindow::updateCurrentNetworkInfo()
 {
+    qInfo("Updating Current Network Info");
     std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();
     std::string net_text;
 
@@ -723,14 +723,18 @@ void MainWindow::updateCurrentNetworkInfo()
         auto net_name = net.first;
         auto net_type = net.second.interfaceType;
         auto net_active = net.second.interfaceActive;
+        // This actually also updates the active status of the existing network.....
         m_configMgr->addNetwork(net_name, net_type, net_active);
-        if ( !net_text.empty() )
-            net_text.append("\n");
-        net_text.append(net_name);
+        // Only disply the active networks
+        if (net_active) {
+            if ( !net_text.empty())
+                net_text.append("\n");
+            net_text.append(net_name);
 
-        Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
-        if ( np > m_currentNetworkProfile )
-            m_currentNetworkProfile = np;
+            Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
+            if ( np > m_currentNetworkProfile )
+                m_currentNetworkProfile = np;
+        }
     }
 
     ui->network_name->setText(net_text.c_str());

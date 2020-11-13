@@ -19,21 +19,17 @@ NetworkProfileTableModel::~NetworkProfileTableModel()
 
 int NetworkProfileTableModel::columnCount(const QModelIndex& parent) const
 {
-//    Q_UNUSED(parent);
-//    return 2;
     return parent.isValid() ? 0 : 3;
 }
 
 int NetworkProfileTableModel::rowCount(const QModelIndex& parent) const
 {
-//    Q_UNUSED(parent);
-//    return static_cast<int>(m_config.networks.size());
     return parent.isValid() ? 0 : static_cast<int>(m_config.networks.size());
 }
 
 QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) const
 {
-    if ( !index.isValid() || ( role != Qt::DisplayRole && role != Qt::EditRole ))
+    if ( !index.isValid() || ( role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::BackgroundRole ))
         return QVariant();
     int row = index.row();
 
@@ -63,6 +59,13 @@ QVariant NetworkProfileTableModel::data(const QModelIndex& index, int role) cons
             case 1:
                 return QVariant(static_cast<int>(n.second.profile));
             }
+        }
+        else if ( role == Qt::BackgroundRole )
+        {
+            if ( n.second.interfaceActive == true )
+                return QVariant(QColor::fromRgb(222, 255, 222));
+            else
+                return QVariant();
         }
     }
 

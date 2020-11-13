@@ -39,6 +39,7 @@ public:
 
     virtual std::string ssid() const override;
 
+
 private:
     std::string name_;
     std::string adapter_name_;

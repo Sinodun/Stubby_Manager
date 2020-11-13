@@ -10,7 +10,7 @@
 #define NETWORKPROFILETABLEMODEL_H
 
 #include <QAbstractTableModel>
-
+#include <QColor>
 #include "configmanager.h"
 
 class NetworkProfileTableModel : public QAbstractTableModel
