@@ -300,6 +300,8 @@ void ConfigMgr::restoreFrom(const Config& cfg)
 void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
     // For now, since the user must have a default use this code to catch any corner case
+    //TODO sould we check network tpe every time or like below - only when we first see it?
+    //If second we need to save it
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
         displayedConfig.networks[name].profile =
             displayedConfig.defaultNewNetworkProfileSet
