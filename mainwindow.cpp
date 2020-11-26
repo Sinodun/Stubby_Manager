@@ -718,11 +718,18 @@ void MainWindow::updateCurrentNetworkInfo()
 
     m_currentNetworkProfile = Config::NetworkProfile::trusted;
 
+    // Set all networks to inactive, to ensure only active ones are set below
+    m_configMgr->resetNetworksActiveState();
+
     for ( const auto& net : networks )
     {
         auto net_name = net.first;
         auto net_type = net.second.interfaceType;
         auto net_active = net.second.interfaceActive;
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net_name.compare("Wi-Fi") == 0) {
+            continue;
+        }
         // This actually also updates the active status of the existing network.....
         m_configMgr->addNetwork(net_name, net_type, net_active);
         // Only disply the active networks
@@ -730,6 +737,8 @@ void MainWindow::updateCurrentNetworkInfo()
             if ( !net_text.empty())
                 net_text.append("\n");
             net_text.append(net_name);
+            if (net_type == Config::InterfaceTypes::WiFi)
+                net_text.append(" (Wi-Fi)");
 
             Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
             if ( np > m_currentNetworkProfile )

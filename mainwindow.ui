@@ -44,7 +44,9 @@
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(88, 148, 176);
+       <string notr="true">background-color: rgb(190, 225, 255);
+
+
 border:none;</string>
       </property>
       <property name="title">
@@ -155,7 +157,7 @@ border:none;</string>
           <widget class="QCheckBox" name="onOffSlider">
            <property name="styleSheet">
             <string notr="true">QCheckBox::indicator {
-	background-color: rgb(88, 148, 176);
+	background-color:transparent;
      width: 100px;
      height: 60px;
  }
@@ -265,7 +267,7 @@ border:none;</string>
         <property name="geometry">
          <rect>
           <x>200</x>
-          <y>30</y>
+          <y>20</y>
           <width>231</width>
           <height>61</height>
          </rect>
@@ -282,7 +284,7 @@ border:none;</string>
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;v0.4.0-a1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;br/&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;v0.4.0-a1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

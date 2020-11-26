@@ -300,23 +300,27 @@ void ConfigMgr::restoreFrom(const Config& cfg)
 void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
     // For now, since the user must have a default use this code to catch any corner case
-    //TODO sould we check network tpe every time or like below - only when we first see it?
-    //If second we need to save it
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
         displayedConfig.networks[name].profile =
             displayedConfig.defaultNewNetworkProfileSet
             ? displayedConfig.defaultNewNetworkProfile
             : Config::NetworkProfile::untrusted;
-        displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
+
         qInfo("Added Network %s", name.c_str());
     }
-    qInfo("Updated status of %s to %d", name.c_str(), active);
+    // qInfo("Updated status of %s to %d", name.c_str(), active);
     // always update the active status in case it has changed
+    displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     displayedConfig.networks[name].interfaceActive=active;
+}
+
+void ConfigMgr::resetNetworksActiveState() {
+    for ( auto& a : displayedConfig.networks) {
+        a.second.interfaceActive = false;
+    }
 }
 
 Config::NetworkProfile ConfigMgr::getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
-    //addNetwork(name, type, active);
     return displayedConfig.networks[name].profile;
 }

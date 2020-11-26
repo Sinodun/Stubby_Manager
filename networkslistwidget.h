@@ -56,6 +56,7 @@ private:
     QSortFilterProxyModel* m_wifiModel;
     QSortFilterProxyModel* m_wiredModel;
     QItemSelectionModel* m_selectionModel;
+    QItemSelectionModel* m_selectionWiredModel;
 };
 
 

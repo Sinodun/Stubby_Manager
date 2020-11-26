@@ -9,6 +9,8 @@ class NetworkListFilterProxyModel : public QSortFilterProxyModel
 public:
     explicit NetworkListFilterProxyModel(QObject *parent = nullptr, QString view = "");
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
 private:
     QString m_view;
 };

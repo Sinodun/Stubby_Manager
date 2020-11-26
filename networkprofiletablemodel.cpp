@@ -78,20 +78,6 @@ Qt::ItemFlags NetworkProfileTableModel::flags(const QModelIndex& index) const
     return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }
 
-QVariant NetworkProfileTableModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if ( role != Qt::DisplayRole || orientation != Qt::Horizontal )
-        return QVariant();
-
-    switch (section)
-    {
-    case 0: return tr("Network");
-    case 1: return tr("Profile");
-    }
-
-    return QVariant();
-}
-
 
 bool NetworkProfileTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {

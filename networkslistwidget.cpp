@@ -41,15 +41,18 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkWiredTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkWiredTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkWiredTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkWiredTable));
-//    m_selectionModel = ui->networkWiredTable->selectionModel();
+    m_selectionWiredModel = ui->networkWiredTable->selectionModel();
 
-    ui->forgetButton->setEnabled(m_selectionModel->hasSelection());
+    bool sel=(m_selectionModel->hasSelection() || m_selectionWiredModel->hasSelection());
+    ui->forgetButton->setEnabled(sel);
 
     connect(m_networkTableModel, &NetworkProfileTableModel::dataChanged,
             this, &NetworkListWidget::on_networkTableDataChanged);
     connect(&m_configMgr, &ConfigMgr::configChanged,
             this, &NetworkListWidget::on_globalConfigChanged);
     connect(m_selectionModel, &QItemSelectionModel::selectionChanged,
+            this, &NetworkListWidget::on_networkTableSelectionChanged);
+    connect(m_selectionWiredModel, &QItemSelectionModel::selectionChanged,
             this, &NetworkListWidget::on_networkTableSelectionChanged);
     connect(m_networkTableModel, &NetworkProfileTableModel::modelReset,
              this, &NetworkListWidget::PersistentEdit);
@@ -95,9 +98,17 @@ void NetworkListWidget::on_forgetButton_clicked()
 
     for ( const auto& row : m_selectionModel->selectedRows() )
     {
-        std::string name = m_networkTableModel->data(row).toString().toStdString();
+        std::string name = m_wifiModel->data(row).toString().toStdString();
         networks.erase(networks.find(name));
+        qInfo("Forgetting wireless network %s", name.c_str());
     }
+    for ( const auto& row : m_selectionWiredModel->selectedRows() )
+    {
+        std::string name = m_wiredModel->data(row).toString().toStdString();
+        networks.erase(networks.find(name));
+        qInfo("Forgetting wired network %s", name.c_str());
+    }
+    m_selectionWiredModel->reset();
     m_selectionModel->reset();
 
     setButtonStates();
@@ -126,8 +137,8 @@ void NetworkListWidget::setButtonStates()
 
     ui->applyButton->setEnabled(unsaved);
     ui->discardButton->setEnabled(unsaved);
-
-    ui->forgetButton->setEnabled(m_selectionModel->hasSelection());
+    bool sel=(m_selectionModel->hasSelection() || m_selectionWiredModel->hasSelection());
+    ui->forgetButton->setEnabled(sel);
 
     emit stateUpdated(unsaved);
 }

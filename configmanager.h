@@ -56,6 +56,7 @@ public:
     void restoreFactory();
 
     void addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
+    void resetNetworksActiveState();
     Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
 
     bool unsavedChanges(bool profile, bool network);
