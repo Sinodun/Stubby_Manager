@@ -398,7 +398,7 @@ void NetworkMgrWindows::reload()
                 ssid = search->second;
         }
 
-        qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, adaptor type is %d", name.c_str(), running, resolver_loopback, ssid.c_str(), adapter->IfType);
+        qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, adaptor type is %d, op status %d", name.c_str(), running, resolver_loopback, ssid.c_str(), adapter->IfType, adapter->OperStatus);
         interfaces.emplace_back(
                 name,
                 adapter_name,
@@ -439,9 +439,9 @@ bool NetworkMgrWindows::isRunning() const
     return true;
 }
 
-std::vector<std::string> NetworkMgrWindows::getNetworks()
+std::map<std::string, NetworkMgr::interfaceInfo> NetworkMgrWindows::getNetworks()
 {
-    std::vector<std::string> res;
+    std::map<std::string, NetworkMgr::interfaceInfo> res;
     std::string network;
     std::string activeNetwork;
 
@@ -468,19 +468,19 @@ std::vector<std::string> NetworkMgrWindows::getNetworks()
         return res;
 
     for (const auto& i: interfaces) {
-        if (i.is_running()) {
+        NetworkMgr::interfaceInfo info;
             network = i.name();
+            info.interfaceActive=i.is_running();
             if (i.is_wireless()) {
+                info.interfaceType=NetworkMgr::InterfaceTypes::WiFi;
                 if (!i.ssid().empty()) {
-                    network.append(" (");
-                    network.append(i.ssid());
-                    network.append(")");
+                    network = i.ssid();
                 }
-            } else {
-                network.append(activeNetwork);
+            } else if ( i.is_ethernet() ) {
+                    info.interfaceType=NetworkMgr::InterfaceTypes::Ethernet;
+                    network.append(activeNetwork);
             }
-            res.push_back(network);
-        }
+            res.emplace(network, info);
     }
     return res;
 }

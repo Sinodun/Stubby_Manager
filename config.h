@@ -59,7 +59,21 @@ struct Config
     NetworkProfile defaultNewNetworkProfile;
     bool defaultNewNetworkProfileSet;
 
-    std::map<std::string, NetworkProfile> networks;
+    typedef enum {
+        WiFi = 0,
+        Ethernet
+    } InterfaceTypes;
+
+    struct NetworkInformation
+    {
+        NetworkProfile profile;
+        InterfaceTypes interfaceType;
+        bool interfaceActive;
+
+        bool operator==(const NetworkInformation& netinfo) const;
+    };
+
+    std::map<std::string, NetworkInformation> networks;
 
     Config();
     void loadFromFile(const std::string& filePath);
@@ -74,6 +88,7 @@ struct Config
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileKey(NetworkProfile np);
     static NetworkProfile networkProfileFromKey(const std::string& key);
+    static std::string interfaceTypeDisplayName(InterfaceTypes it);
 };
 
 #endif

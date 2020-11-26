@@ -44,7 +44,9 @@
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgba(85, 170, 255, 40);
+       <string notr="true">background-color: rgb(190, 225, 255);
+
+
 border:none;</string>
       </property>
       <property name="title">
@@ -155,7 +157,7 @@ border:none;</string>
           <widget class="QCheckBox" name="onOffSlider">
            <property name="styleSheet">
             <string notr="true">QCheckBox::indicator {
-    background-color: transparent;
+	background-color:transparent;
      width: 100px;
      height: 60px;
  }
@@ -248,9 +250,6 @@ border:none;</string>
     </item>
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
       </property>
@@ -268,9 +267,9 @@ border:none;</string>
         <property name="geometry">
          <rect>
           <x>200</x>
-          <y>30</y>
+          <y>20</y>
           <width>231</width>
-          <height>41</height>
+          <height>61</height>
          </rect>
         </property>
         <property name="font">
@@ -282,11 +281,10 @@ border:none;</string>
          <number>-1</number>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgba(85, 170, 255, 30);
-border-color: rgb(85, 85, 127);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
-         <string>Stubby Manager v0.4.0-a1</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;br/&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;v0.4.0-a1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

@@ -10,6 +10,7 @@
 #define NETWORKS_H
 
 #include <QModelIndex>
+#include <QSortFilterProxyModel>
 #include <QWidget>
 
 #include "configmanager.h"
@@ -43,6 +44,7 @@ public slots:
 
     void on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void PersistentEdit();
 
 private:
     void setButtonStates();
@@ -51,7 +53,10 @@ private:
 
     ConfigMgr& m_configMgr;
     NetworkProfileTableModel* m_networkTableModel;
+    QSortFilterProxyModel* m_wifiModel;
+    QSortFilterProxyModel* m_wiredModel;
     QItemSelectionModel* m_selectionModel;
+    QItemSelectionModel* m_selectionWiredModel;
 };
 
 

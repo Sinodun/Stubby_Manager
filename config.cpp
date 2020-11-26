@@ -181,7 +181,7 @@ void Config::loadFromFile(const std::string& path)
     {
         std::string name = n.first.as<std::string>();
         NetworkProfile profile = networkProfileFromYaml(n.second.as<std::string>(), ymlnetworks.Mark());
-        networks[name] = profile;
+        networks[name].profile = profile;
     }
 }
 
@@ -254,7 +254,7 @@ void Config::saveToFile(const std::string& path) const
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : networks)
-        out << YAML::Key << nt.first << YAML::Value << networkProfileKey(nt.second);
+        out << YAML::Key << nt.first << YAML::Value << networkProfileKey(nt.second.profile);
     out << YAML::EndMap;
 
     fout.close();
@@ -281,6 +281,14 @@ bool Config::Profile::operator==(const Config::Profile& server) const
         validateData == server.validateData &&
         roundRobin == server.roundRobin &&
         useNetworkProvidedServer == server.useNetworkProvidedServer;
+}
+
+bool Config::NetworkInformation::operator==(const Config::NetworkInformation& netinfo) const
+{
+    return
+        profile == netinfo.profile &&
+        interfaceType == netinfo.interfaceType &&
+        interfaceActive == netinfo.interfaceActive;
 }
 
 bool Config::operator==(const Config& cfg) const
@@ -394,4 +402,18 @@ Config::NetworkProfile Config::networkProfileFromKey(const std::string& key)
         return Config::NetworkProfile::hostile;
     else
         throw std::invalid_argument(key + " is not a network profile");
+}
+
+std::string Config::interfaceTypeDisplayName(Config::InterfaceTypes it)
+{
+    switch(it)
+    {
+    case Config::InterfaceTypes::WiFi:
+        return "WiFi";
+
+    case Config::InterfaceTypes::Ethernet:
+        return "Ethernet";
+    }
+    assert("Unknown interface type");
+    return "unknown";
 }

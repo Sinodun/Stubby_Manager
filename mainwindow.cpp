@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// This is for the colored balls used to display status
 class CirclePixmap: public QPixmap {
 public:
     CirclePixmap(QColor col);
@@ -63,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set up system tray
     quitAction = new QAction(tr("&Quit"), this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(quitAction, &QAction::triggered, this, &MainWindow::closeFromSystray);
     openAction = new QAction(tr("&Open"), this);
     connect(openAction, SIGNAL(triggered()), this, SLOT(show()));
     trayIconMenu = new QMenu(this);
@@ -237,6 +238,12 @@ void MainWindow::probeTimerExpired() {
     statusMsg("\nProbing State");
     updateState = Probe;
     m_serviceMgr->getState();
+}
+
+void MainWindow::closeFromSystray() {
+    handleUnsavedChanges();
+    qApp->quit();
+    return;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -481,9 +488,10 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         return;
     }
     else if (updateState == Restart) {
-        if (m_serviceState == ServiceMgr::Stopped)
+        if (m_serviceState == ServiceMgr::Stopped) {
             if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
                 handleError();
+        }
         else if (m_serviceState == ServiceMgr::Running) {
             on_testButton_clicked();
             updateMainTab();
@@ -704,21 +712,38 @@ void MainWindow::on_revertAllButton_clicked()
 
 void MainWindow::updateCurrentNetworkInfo()
 {
-    std::vector<std::string> networks = m_networkMgr->getRunningNetworks();
+    qInfo("Updating Current Network Info");
+    std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();
     std::string net_text;
 
     m_currentNetworkProfile = Config::NetworkProfile::trusted;
 
-    for ( const auto& s : networks )
-    {
-        m_configMgr->addNetwork(s);
-        if ( !net_text.empty() )
-            net_text.append("\n");
-        net_text.append(s);
+    // Set all networks to inactive, to ensure only active ones are set below
+    m_configMgr->resetNetworksActiveState();
 
-        Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(s);
-        if ( np > m_currentNetworkProfile )
-            m_currentNetworkProfile = np;
+    for ( const auto& net : networks )
+    {
+        auto net_name = net.first;
+        auto net_type = net.second.interfaceType;
+        auto net_active = net.second.interfaceActive;
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net_name.compare("Wi-Fi") == 0) {
+            continue;
+        }
+        // This actually also updates the active status of the existing network.....
+        m_configMgr->addNetwork(net_name, net_type, net_active);
+        // Only disply the active networks
+        if (net_active) {
+            if ( !net_text.empty())
+                net_text.append("\n");
+            net_text.append(net_name);
+            if (net_type == Config::InterfaceTypes::WiFi)
+                net_text.append(" (Wi-Fi)");
+
+            Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
+            if ( np > m_currentNetworkProfile )
+                m_currentNetworkProfile = np;
+        }
     }
 
     ui->network_name->setText(net_text.c_str());

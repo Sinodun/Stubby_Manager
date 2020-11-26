@@ -16,7 +16,7 @@ NetworkProfileDelegate::NetworkProfileDelegate(QObject* parent)
 {
 }
 
-QWidget* NetworkProfileDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget* NetworkProfileDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /* option */, const QModelIndex& /* index */) const
 {
     QComboBox* cb = new QComboBox(parent);
 

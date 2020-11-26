@@ -35,8 +35,10 @@ public:
     bool is_running() const override;
     bool is_up() const override;
     bool is_wireless() const override;
+    bool is_ethernet() const override;
 
     virtual std::string ssid() const override;
+
 
 private:
     std::string name_;

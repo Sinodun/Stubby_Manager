@@ -42,6 +42,6 @@ int NetworkMgr::getState(bool reportNoChange)
     return getStateDNS(reportNoChange);
 }
 
-std::vector<std::string> NetworkMgr::getRunningNetworks() {
+std::map<std::string, NetworkMgr::interfaceInfo> NetworkMgr::getRunningNetworks() {
     return getNetworks();
 }

@@ -20,7 +20,7 @@
 #include "servicemanager.h"
 #include "networkmanager.h"
 #include "networkprofile.h"
-#include "networks.h"
+#include "networkslistwidget.h"
 #include "logmanager.h"
 
 QT_BEGIN_NAMESPACE
@@ -43,10 +43,11 @@ public:
     Config::NetworkProfile getCurrentNetworkProfile() const {return m_currentNetworkProfile;};
 
 protected:
-     void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+
 
 private slots:
-
+    void closeFromSystray();
     void on_hideDetailsCheckBox_toggled();
 
     void on_onOffSlider_stateChanged();

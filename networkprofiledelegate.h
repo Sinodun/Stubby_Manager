@@ -16,7 +16,7 @@ class NetworkProfileDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    NetworkProfileDelegate(QObject* parent = NULL);
+    NetworkProfileDelegate(QObject* parent = nullptr);
 
     QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
