@@ -40,7 +40,6 @@ NetworkProfileWidget::~NetworkProfileWidget()
     delete m_serverTableModel;
 }
 
-<<<<<<< HEAD
 void NetworkProfileWidget::on_openWebsite_clicked() {
     QItemSelectionModel *select = ui->serverTable->selectionModel();
     QModelIndexList selection = select->selectedIndexes();
@@ -73,18 +72,6 @@ void NetworkProfileWidget::on_serverTable_clicked() {
     ui->openWebsite->setEnabled(true);
 }
 
-void NetworkProfileWidget::on_useAsDefaultProfile_stateChanged(int state)
-{
-    if ( state == Qt::CheckState::Checked && m_configMgr.displayedConfig.defaultNetworkProfile != m_np )
-    {
-        m_configMgr.displayedConfig.defaultNetworkProfile = m_np;
-         emit globalConfigChanged();
-    }
-    setButtonStates();
-}
-
-=======
->>>>>>> b472f0f... Select default network profile via combo on Networks tab.
 void NetworkProfileWidget::on_alwaysAuthenticate_stateChanged(int state)
 {
     m_configMgr.displayedConfig.profiles[m_np].alwaysAuthenticate = (state == Qt::CheckState::Checked);
