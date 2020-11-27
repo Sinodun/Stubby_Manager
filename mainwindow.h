@@ -19,8 +19,8 @@
 #include "configmanager.h"
 #include "servicemanager.h"
 #include "networkmanager.h"
-#include "networkprofile.h"
-#include "networkslistwidget.h"
+#include "networkprofilewidget.h"
+#include "networkswidget.h"
 #include "logmanager.h"
 
 QT_BEGIN_NAMESPACE

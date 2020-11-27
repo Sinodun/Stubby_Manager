@@ -1,4 +1,4 @@
-#include "networklistfilterproxymodel.h"
+#include "networkswidgetfilterproxymodel.h"
 #include "networkprofiletablemodel.h"
 
 NetworkListFilterProxyModel::NetworkListFilterProxyModel(QObject *parent, QString view): QSortFilterProxyModel(parent), m_view(view) {}

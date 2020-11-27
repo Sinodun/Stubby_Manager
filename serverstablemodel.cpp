@@ -6,7 +6,7 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include "profileserverstablemodel.h"
+#include "serverstablemodel.h"
 
 ProfileServersTableModel::ProfileServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent)
     : m_config(config), m_networkProfile(networkProfile), QAbstractTableModel(parent)

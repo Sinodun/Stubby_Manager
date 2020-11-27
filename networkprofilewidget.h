@@ -13,7 +13,7 @@
 #include <QWidget>
 
 #include "configmanager.h"
-#include "profileserverstablemodel.h"
+#include "serverstablemodel.h"
 #include "ui_networkprofilewidget.h"
 
 QT_BEGIN_NAMESPACE

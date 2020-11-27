@@ -10,8 +10,8 @@
 
 #include "config.h"
 #include "networkprofiledelegate.h"
-#include "networkslistwidget.h"
-#include "networklistfilterproxymodel.h"
+#include "networkswidget.h"
+#include "networkswidgetfilterproxymodel.h"
 
 NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     : QWidget(parent),
@@ -84,18 +84,18 @@ void NetworkListWidget::setGuiState()
     setButtonStates();
 }
 
-void NetworkListWidget::on_defaultProfile_activated(int index)
-{
-    int i = ui->defaultProfile->itemData(index).toInt();
-    Config::NetworkProfile np = static_cast<Config::NetworkProfile>(i);
+//void NetworkListWidget::on_defaultProfile_activated(int index)
+//{
+//    int i = ui->defaultProfile->itemData(index).toInt();
+//    Config::NetworkProfile np = static_cast<Config::NetworkProfile>(i);
 
-    if ( m_configMgr.displayedConfig.defaultNetworkProfile != np )
-    {
-        m_configMgr.displayedConfig.defaultNetworkProfile = np;
-        setGuiState();
-        emit globalConfigChanged();
-    }
-}
+//    if ( m_configMgr.displayedConfig.defaultNetworkProfile != np )
+//    {
+//        m_configMgr.displayedConfig.defaultNetworkProfile = np;
+//        setGuiState();
+//        emit globalConfigChanged();
+//    }
+//}
 
 void NetworkListWidget::on_applyButton_clicked()
 {

@@ -12,7 +12,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-#include "networkprofile.h"
+#include "networkprofilewidget.h"
 
 NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::NetworkProfile np, QWidget* parent)
     : QWidget(parent),
