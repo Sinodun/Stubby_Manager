@@ -61,11 +61,16 @@ private slots:
     void on_discardAllButton_clicked();
     void on_revertAllButton_clicked();
 
+
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
     void on_DNSStateChanged(NetworkMgr::NetworkState state);
+
     void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
     void on_unsavedNetworksChanges();
+
     void on_networkInterfacesChanged();
+    void on_SavedConfigChanged();
+
 
     void closeFromSystray();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);

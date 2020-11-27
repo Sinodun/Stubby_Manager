@@ -56,8 +56,8 @@ public:
     void restoreFactory();
 
     void updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
-    void resetNetworksActiveState();
     Config::NetworkProfileChoice getDisplayedNetworkProfile(const std::string& name);
+    const std::map<std::string, Config::NetworkInformation> getSavedNetworks() const;
 
     bool unsavedChanges(bool profile, bool network);
     bool getRestartRequired() const {return restartRequired;};
@@ -76,6 +76,7 @@ protected:
     void saveConfig(const Config& cfg);
     void setRestartRequired(bool profile, bool network);
     void addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
+    void resetNetworksActiveState();
 
     MainWindow *m_mainwindow;
     Config factoryConfig;

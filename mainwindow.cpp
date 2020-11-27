@@ -126,6 +126,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
             this, &MainWindow::on_networkProfileStateUpdated);
 
+    connect(m_configMgr, &ConfigMgr::configChanged,
+            this, &MainWindow::on_SavedConfigChanged);
+
     // Set up service state
     m_serviceMgr = ServiceMgr::factory(this);
     if (!m_serviceMgr) {
@@ -513,7 +516,7 @@ void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
 
-    setTopPanelNetworkInfo();
+    //setTopPanelNetworkInfo();
     if (updateState == None)
         return;
 
@@ -536,8 +539,8 @@ void MainWindow::on_networkInterfacesChanged()
 {
     m_networkMgr->getDNSState(false);
     // move these?
-    setTopPanelNetworkInfo();
-    m_networksWidget->on_NWGlobalConfigChanged();
+//    setTopPanelNetworkInfo();
+//    m_networksWidget->on_NWGlobalConfigChanged();
 }
 
 /*
@@ -679,6 +682,17 @@ void MainWindow::on_networkProfileStateUpdated(Config::NetworkProfile np, bool, 
 void MainWindow::on_unsavedNetworksChanges()
 {
     setMainButtonStates();
+}
+
+void MainWindow::on_SavedConfigChanged() {
+
+    m_networksWidget->setNWGuiState();
+//    m_untrustedNetworkWidget->setNPWGuiState();
+//    m_trustedNetworkWidget->setNPWGuiState();
+//    m_hostileNetworkWidget->setNPWGuiState();
+    setMainButtonStates();
+    setTopPanelNetworkInfo();
+
 //    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
 //        updateState = Restart;
 //        m_serviceMgr->restart();
@@ -696,8 +710,8 @@ void MainWindow::setMainButtonStates()
     ui->revertAllButton->setEnabled(notdefault);
 
     // NOT needed??
-    if (unsaved == false)
-      setTopPanelNetworkInfo();
+//    if (unsaved == false)
+//      setTopPanelNetworkInfo();
 }
 
 void MainWindow::on_applyAllButton_clicked()
@@ -717,44 +731,38 @@ void MainWindow::on_revertAllButton_clicked()
 
 void MainWindow::setTopPanelNetworkInfo()
 {
-    qInfo("Updating Current Network Info");
-//    std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();
-//    std::string net_text;
+    qInfo("Updating Top Panel Network Info");
+    std::string net_text;
 
-//    m_currentNetworkProfile = Config::NetworkProfile::trusted;
+    m_currentNetworkProfile = Config::NetworkProfile::trusted;
 
-//    // Set all networks to inactive, to ensure only active ones are set below
-//    m_configMgr->resetNetworksActiveState();
+    for ( const auto& net : m_configMgr->getSavedNetworks() )
+    {
+        auto net_name = net.first;
+        auto net_type = net.second.interfaceType;
+        auto net_active = net.second.interfaceActive;
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net_name.compare("Wi-Fi") == 0) {
+            continue;
+        }
+        // Only disply the active networks
+        if (net_active) {
+            if ( !net_text.empty())
+                net_text.append("\n");
+            net_text.append(net_name);
+            if (net_type == NetworkMgr::InterfaceTypes::WiFi)
+                net_text.append(" (Wi-Fi)");
 
-//    for ( const auto& net : networks )
-//    {
-//        auto net_name = net.first;
-//        auto net_type = net.second.interfaceType;
-//        auto net_active = net.second.interfaceActive;
-//        // Ignore the wifi when it is not connected as it has no ssid
-//        if (net_name.compare("Wi-Fi") == 0) {
-//            continue;
-//        }
-//        // This actually also updates the active status of the existing network.....
-//        m_configMgr->addNetwork(net_name, net_type, net_active);
-//        // Only disply the active networks
-//        if (net_active) {
-//            if ( !net_text.empty())
-//                net_text.append("\n");
-//            net_text.append(net_name);
-//            if (net_type == NetworkMgr::InterfaceTypes::WiFi)
-//                net_text.append(" (Wi-Fi)");
+            Config::NetworkProfile np = Config::networkProfileFromChoice(m_configMgr->getDisplayedNetworkProfile(net_name), m_configMgr->displayedConfig.defaultNetworkProfile);
+            if ( np > m_currentNetworkProfile )
+                m_currentNetworkProfile = np;
+        }
+    }
 
-//            Config::NetworkProfile np = Config::networkProfileFromChoice(m_configMgr->getDisplayedNetworkProfile(net_name), m_configMgr->displayedConfig.defaultNetworkProfile);
-//            if ( np > m_currentNetworkProfile )
-//                m_currentNetworkProfile = np;
-//        }
-//    }
-
-//    ui->network_name->setText(net_text.c_str());
-//    std::string net_profile = (Config::networkProfileDisplayName(m_currentNetworkProfile));
-//    if (m_configMgr->displayedConfig.defaultNetworkProfile == m_currentNetworkProfile)
-//        net_profile.append(" (Default)");
-//    ui->network_profile->setText(net_profile.c_str());
+    ui->network_name->setText(net_text.c_str());
+    std::string net_profile = (Config::networkProfileDisplayName(m_currentNetworkProfile));
+    if (m_configMgr->displayedConfig.defaultNetworkProfile == m_currentNetworkProfile)
+        net_profile.append(" (Default)");
+    ui->network_profile->setText(net_profile.c_str());
 
 }

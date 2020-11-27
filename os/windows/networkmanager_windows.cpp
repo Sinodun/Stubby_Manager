@@ -313,9 +313,8 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
      }
      if (networksChanged) {
          qInfo("Networks have changed");
+         m_mainwindow->refreshNetworks(running_networks);
      }
-     m_mainwindow->refreshNetworks(running_networks);
-
 
     if (isResolverLoopback()) {
       m_networkState = Localhost;

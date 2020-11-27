@@ -28,8 +28,8 @@ NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::Network
     ui->serverTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(m_serverTableModel, &ServersTableModel::dataChanged,
             this, &NetworkProfileWidget::on_serverTableDataChanged);
-    connect(&m_configMgr, &ConfigMgr::configChanged,
-            this, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(&m_configMgr, &ConfigMgr::configChanged,
+//            this, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
     setNPWButtonStates();
 }
 

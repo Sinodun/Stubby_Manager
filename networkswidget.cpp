@@ -60,8 +60,8 @@ NetworksWidget::NetworksWidget(ConfigMgr& configMgr, QWidget* parent)
     connect(m_networkTableModel, &NetworkProfileTableModel::modelReset,
              this, &NetworksWidget::PersistentEdit);
 
-    connect(&m_configMgr, &ConfigMgr::configChanged,
-            this, &NetworksWidget::on_NWGlobalConfigChanged);
+//    connect(&m_configMgr, &ConfigMgr::configChanged,
+//            this, &NetworksWidget::on_NWGlobalConfigChanged);
 
 }
 
