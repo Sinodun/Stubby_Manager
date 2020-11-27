@@ -36,7 +36,6 @@ NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::Network
 NetworkProfileWidget::~NetworkProfileWidget()
 {
     delete ui;
-
     delete m_serverTableModel;
 }
 
@@ -99,8 +98,8 @@ void NetworkProfileWidget::on_validateData_stateChanged(int state)
 void NetworkProfileWidget::on_applyButton_clicked()
 {
     m_configMgr.saveProfile(m_networkProfile);
-    setNPWButtonStates();
-    m_serverTableModel->STPConfigChanged();
+//    setNPWButtonStates();
+//    m_serverTableModel->STPConfigChanged();
 }
 
 void NetworkProfileWidget::on_discardButton_clicked()

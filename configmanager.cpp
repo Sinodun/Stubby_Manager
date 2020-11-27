@@ -313,6 +313,25 @@ void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes t
     displayedConfig.networks[name].interfaceActive=active;
 }
 
+void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks) {
+
+    // Set all networks to inactive, to ensure only active ones are set below
+    resetNetworksActiveState();
+
+    for ( const auto& net : running_networks ) {
+        auto net_name = net.first;
+        auto net_type = net.second.interfaceType;
+        auto net_active = net.second.interfaceActive;
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net_name.compare("Wi-Fi") == 0) {
+            continue;
+        }
+        // This actually also updates the active status of the existing network.....
+        addNetwork(net_name, net_type, net_active);
+    }
+    emit configChanged();
+}
+
 void ConfigMgr::resetNetworksActiveState() {
     for ( auto& a : displayedConfig.networks) {
         a.second.interfaceActive = false;

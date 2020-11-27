@@ -45,7 +45,7 @@ protected:
 
 private slots:
     void on_testQuery_finished(int exitCode, QProcess::ExitStatus exitStatus);
-    void on_networkConfig_changed(const QNetworkConfiguration& cfg);
+    void on_networkInferfaces_changed(const QNetworkConfiguration& cfg);
 
 private:
     std::vector<std::unique_ptr<NetworkInterfaceWindows>> getInterfaces();

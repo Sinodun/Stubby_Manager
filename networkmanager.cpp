@@ -37,7 +37,7 @@ int NetworkMgr::unsetLocalhost()
     return unsetLocalhostDNS();
 }
 
-int NetworkMgr::getState(bool reportNoChange)
+int NetworkMgr::getDNSState(bool reportNoChange)
 {
     return getStateDNS(reportNoChange);
 }

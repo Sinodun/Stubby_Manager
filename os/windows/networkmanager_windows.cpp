@@ -258,11 +258,11 @@ NetworkMgrWindows::NetworkMgrWindows(MainWindow *parent) :
     connect(m_testQuery, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_testQuery_finished(int, QProcess::ExitStatus)));
 
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationAdded,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationChanged,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationRemoved,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
 }
 
 NetworkMgrWindows::~NetworkMgrWindows()
@@ -295,7 +295,28 @@ int NetworkMgrWindows::unsetLocalhostDNS()
 int NetworkMgrWindows::getStateDNS(bool reportNoChange)
 {
     int oldNetworkState = m_networkState;
+    std::map<std::string, NetworkMgr::interfaceInfo> previous_networks = getNetworks();
     reload();
+    std::map<std::string, NetworkMgr::interfaceInfo> running_networks = getNetworks();
+
+    bool networksChanged = false;
+    if (previous_networks.size() != running_networks.size())
+        networksChanged = true;
+    std::map<std::string, NetworkMgr::interfaceInfo>::const_iterator i,j;
+    for(i = previous_networks.begin(), j = running_networks.begin(); i != previous_networks.end(); ++i, ++j) {
+            if ( i->first.compare(j->first) != 0 ||
+                 i->second.interfaceType != j->second.interfaceType ||
+                 i->second.interfaceActive != j->second.interfaceActive) {
+                   networksChanged = true;
+                   break;
+                }
+     }
+     if (networksChanged) {
+         qInfo("Networks have changed");
+     }
+     m_mainwindow->refreshNetworks(running_networks);
+
+
     if (isResolverLoopback()) {
       m_networkState = Localhost;
       if (oldNetworkState != m_networkState || reportNoChange == true) {
@@ -509,10 +530,10 @@ void NetworkMgrWindows::on_testQuery_finished(int, QProcess::ExitStatus)
     }
 }
 
-void NetworkMgrWindows::on_networkConfig_changed(const QNetworkConfiguration&)
+void NetworkMgrWindows::on_networkInferfaces_changed(const QNetworkConfiguration&)
 {
     //qDebug("Network configuration changed");
-    emit networkConfigChanged();
+    emit networkInterfacesChanged();
 }
 
 NetworkMgr *NetworkMgr::factory(MainWindow *parent) {
