@@ -155,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent)
         qFatal("Could not initialise Service Mgr");
         abort();
     }
-    connect(m_networkMgr, SIGNAL(networkStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_networkStateChanged(NetworkMgr::NetworkState)));
+    connect(m_networkMgr, SIGNAL(DNSStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_DNSStateChanged(NetworkMgr::NetworkState)));
     connect(m_networkMgr, SIGNAL(testQueryResult(bool)), this, SLOT(on_testQueryResult(bool)));
     connect(m_networkMgr, &NetworkMgr::networkConfigChanged,
             this, &MainWindow::on_networkConfigChanged);
@@ -505,7 +505,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     setTopPanelStatus();
 }
 
-void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
+void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
 
     qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
     m_networkState = state;

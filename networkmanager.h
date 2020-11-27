@@ -52,7 +52,7 @@ public:
 
 signals:
     void networkConfigChanged();
-    void networkStateChanged(NetworkMgr::NetworkState state);
+    void DNSStateChanged(NetworkMgr::NetworkState state);
     void testQueryResult(bool result);
 
 protected:

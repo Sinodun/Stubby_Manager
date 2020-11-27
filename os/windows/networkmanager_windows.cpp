@@ -301,12 +301,12 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
       if (oldNetworkState != m_networkState || reportNoChange == true) {
         m_mainwindow->statusMsg("Status: DNS settings using localhost.");
       }
-      emit networkStateChanged(Localhost);
+      emit DNSStateChanged(Localhost);
     } else {
         m_networkState = NotLocalhost;
         if (oldNetworkState != m_networkState  || reportNoChange == true)
             m_mainwindow->statusMsg("Status: DNS settings NOT using localhost.");
-        emit networkStateChanged(NotLocalhost);       
+        emit DNSStateChanged(NotLocalhost);
     }
     return 0;
 }

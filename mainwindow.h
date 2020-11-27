@@ -61,7 +61,7 @@ private slots:
     void on_revertAllButton_clicked();
 
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
-    void on_networkStateChanged(NetworkMgr::NetworkState state);
+    void on_DNSStateChanged(NetworkMgr::NetworkState state);
     void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
     void on_networksStateUpdated(bool unsaved);
     void on_networkConfigChanged();
