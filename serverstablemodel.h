@@ -13,13 +13,13 @@
 
 #include "configmanager.h"
 
-class ProfileServersTableModel : public QAbstractTableModel
+class ServersTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    ProfileServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent = NULL);
-    virtual ~ProfileServersTableModel();
+    ServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent = NULL);
+    virtual ~ServersTableModel();
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     int columnCount(const QModelIndex& parent = QModelIndex()) const;
@@ -29,7 +29,7 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-    void configChanged();
+    void STPConfigChanged();
 
 private:
     void serverFromRow(int row, int& serverIndex, int& addressIndex) const;

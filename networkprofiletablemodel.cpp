@@ -98,7 +98,7 @@ bool NetworkProfileTableModel::setData(const QModelIndex &index, const QVariant 
     return false;
 }
 
-void NetworkProfileTableModel::configChanged()
+void NetworkProfileTableModel::NPTMConfigChanged()
 {
     beginResetModel();
     endResetModel();

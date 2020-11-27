@@ -8,23 +8,23 @@
 
 #include "serverstablemodel.h"
 
-ProfileServersTableModel::ProfileServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent)
+ServersTableModel::ServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent)
     : m_config(config), m_networkProfile(networkProfile), QAbstractTableModel(parent)
 {
 
 }
 
-ProfileServersTableModel::~ProfileServersTableModel()
+ServersTableModel::~ServersTableModel()
 {
 }
 
-int ProfileServersTableModel::columnCount(const QModelIndex& parent) const
+int ServersTableModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 6;
 }
 
-int ProfileServersTableModel::rowCount(const QModelIndex& parent) const
+int ServersTableModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -37,7 +37,7 @@ int ProfileServersTableModel::rowCount(const QModelIndex& parent) const
     return static_cast<int>(res);
 }
 
-QVariant ProfileServersTableModel::data(const QModelIndex& index, int role) const
+QVariant ServersTableModel::data(const QModelIndex& index, int role) const
 {
     if ( !index.isValid() )
         return QVariant();
@@ -84,7 +84,7 @@ QVariant ProfileServersTableModel::data(const QModelIndex& index, int role) cons
     return QVariant();
 }
 
-Qt::ItemFlags ProfileServersTableModel::flags(const QModelIndex& index) const
+Qt::ItemFlags ServersTableModel::flags(const QModelIndex& index) const
 {
     Qt::ItemFlags res = Qt::NoItemFlags;
 
@@ -102,7 +102,7 @@ Qt::ItemFlags ProfileServersTableModel::flags(const QModelIndex& index) const
     return res;
 }
 
-QVariant ProfileServersTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ServersTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if ( role != Qt::DisplayRole || orientation != Qt::Horizontal )
         return QVariant();
@@ -120,7 +120,7 @@ QVariant ProfileServersTableModel::headerData(int section, Qt::Orientation orien
     return QVariant("");
 }
 
-bool ProfileServersTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool ServersTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if ( !index.isValid() )
         return false;
@@ -149,13 +149,13 @@ bool ProfileServersTableModel::setData(const QModelIndex &index, const QVariant 
     return false;
 }
 
-void ProfileServersTableModel::configChanged()
+void ServersTableModel::STPConfigChanged()
 {
     beginResetModel();
     endResetModel();
 }
 
-void ProfileServersTableModel::serverFromRow(int row, int& serverIndex, int& addressIndex) const
+void ServersTableModel::serverFromRow(int row, int& serverIndex, int& addressIndex) const
 {
     serverIndex = 0;
     addressIndex = 0;

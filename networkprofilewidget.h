@@ -28,11 +28,11 @@ public:
     explicit NetworkProfileWidget(ConfigMgr& configMsg, Config::NetworkProfile np, QWidget* parent = nullptr);
     virtual ~NetworkProfileWidget();
 
-    void setGuiState();
+    void setNPWGuiState();
 
 signals:
-    void stateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
-    void globalConfigChanged();
+    void NPWstateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
+    void NPWGlobalConfigChanged();
 
 public slots:
     void on_alwaysAuthenticate_stateChanged(int state);
@@ -46,18 +46,18 @@ public slots:
     void on_openWebsite_clicked();
     void on_serverTable_clicked();
 
-    void on_globalConfigChanged();
+    void on_NPWGlobalConfigChanged();
 
     void on_serverTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 private:
-    void setButtonStates();
+    void setNPWButtonStates();
 
     Ui::NetworkProfileWidget* ui;
 
     ConfigMgr& m_configMgr;
-    Config::NetworkProfile m_np;
-    ProfileServersTableModel* m_serverTableModel;
+    Config::NetworkProfile m_networkProfile;
+    ServersTableModel* m_serverTableModel;
 };
 
 #endif

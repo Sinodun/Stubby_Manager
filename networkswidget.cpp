@@ -13,7 +13,7 @@
 #include "networkswidget.h"
 #include "networkswidgetfilterproxymodel.h"
 
-NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
+NetworksWidget::NetworksWidget(ConfigMgr& configMgr, QWidget* parent)
     : QWidget(parent),
       ui(new Ui::NetworkList),
       m_configMgr(configMgr)
@@ -27,9 +27,9 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
 
     m_networkTableModel = new NetworkProfileTableModel(m_configMgr.displayedConfig);
 
-    m_wifiModel = new NetworkListFilterProxyModel(this, "WiFi");
+    m_wifiModel = new NetworksWidgetFilterProxyModel(this, "WiFi");
     m_wifiModel->setSourceModel(m_networkTableModel);
-    m_wiredModel = new NetworkListFilterProxyModel(this, "Ethernet");
+    m_wiredModel = new NetworksWidgetFilterProxyModel(this, "Ethernet");
     m_wiredModel->setSourceModel(m_networkTableModel);
 
     ui->networkTable->setModel(m_wifiModel);
@@ -38,7 +38,7 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkTable));
-    m_selectionModel = ui->networkTable->selectionModel();
+    m_selectionWifiModel = ui->networkTable->selectionModel();
 
     ui->networkWiredTable->setModel(m_wiredModel);
     ui->networkWiredTable->hideColumn(2);
@@ -48,22 +48,22 @@ NetworkListWidget::NetworkListWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkWiredTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkWiredTable));
     m_selectionWiredModel = ui->networkWiredTable->selectionModel();
 
-    bool sel=(m_selectionModel->hasSelection() || m_selectionWiredModel->hasSelection());
+    bool sel=(m_selectionWifiModel->hasSelection() || m_selectionWiredModel->hasSelection());
     ui->forgetButton->setEnabled(sel);
 
     connect(m_networkTableModel, &NetworkProfileTableModel::dataChanged,
-            this, &NetworkListWidget::on_networkTableDataChanged);
+            this, &NetworksWidget::on_networkTableDataChanged);
     connect(&m_configMgr, &ConfigMgr::configChanged,
-            this, &NetworkListWidget::on_globalConfigChanged);
-    connect(m_selectionModel, &QItemSelectionModel::selectionChanged,
-            this, &NetworkListWidget::on_networkTableSelectionChanged);
+            this, &NetworksWidget::on_NWGlobalConfigChanged);
+    connect(m_selectionWifiModel, &QItemSelectionModel::selectionChanged,
+            this, &NetworksWidget::on_networkTableSelectionChanged);
     connect(m_selectionWiredModel, &QItemSelectionModel::selectionChanged,
-            this, &NetworkListWidget::on_networkTableSelectionChanged);
+            this, &NetworksWidget::on_networkTableSelectionChanged);
     connect(m_networkTableModel, &NetworkProfileTableModel::modelReset,
-             this, &NetworkListWidget::PersistentEdit);
+             this, &NetworksWidget::PersistentEdit);
 }
 
-void NetworkListWidget::PersistentEdit()
+void NetworksWidget::PersistentEdit()
 {
     for (int i=0; i<m_wifiModel->rowCount(); ++i)
         ui->networkTable->openPersistentEditor(m_wifiModel->index(i, 1));
@@ -71,17 +71,17 @@ void NetworkListWidget::PersistentEdit()
         ui->networkWiredTable->openPersistentEditor(m_wiredModel->index(i, 1));
 }
 
-NetworkListWidget::~NetworkListWidget()
+NetworksWidget::~NetworksWidget()
 {
     delete ui;
 
     delete m_networkTableModel;
 }
 
-void NetworkListWidget::setGuiState()
+void NetworksWidget::setNWGuiState()
 {
     ui->defaultProfile->setCurrentText(QString::fromStdString(Config::networkProfileDisplayName(m_configMgr.displayedConfig.defaultNetworkProfile)));
-    setButtonStates();
+    setNWButtonStates();
 }
 
 //void NetworkListWidget::on_defaultProfile_activated(int index)
@@ -97,25 +97,25 @@ void NetworkListWidget::setGuiState()
 //    }
 //}
 
-void NetworkListWidget::on_applyButton_clicked()
+void NetworksWidget::on_applyButton_clicked()
 {
     m_configMgr.saveNetworks();
-    setButtonStates();
-    m_networkTableModel->configChanged();
+    setNWButtonStates();
+    m_networkTableModel->NPTMConfigChanged();
 }
 
-void NetworkListWidget::on_discardButton_clicked()
+void NetworksWidget::on_discardButton_clicked()
 {
     m_configMgr.networksRestoreSaved();
-    setButtonStates();
-    m_networkTableModel->configChanged();
+    setNWButtonStates();
+    m_networkTableModel->NPTMConfigChanged();
 }
 
-void NetworkListWidget::on_forgetButton_clicked()
+void NetworksWidget::on_forgetButton_clicked()
 {
     auto& networks = m_configMgr.displayedConfig.networks;
 
-    for ( const auto& row : m_selectionModel->selectedRows() )
+    for ( const auto& row : m_selectionWifiModel->selectedRows() )
     {
         std::string name = m_wifiModel->data(row).toString().toStdString();
         networks.erase(networks.find(name));
@@ -128,36 +128,36 @@ void NetworkListWidget::on_forgetButton_clicked()
         qInfo("Forgetting wired network %s", name.c_str());
     }
     m_selectionWiredModel->reset();
-    m_selectionModel->reset();
+    m_selectionWifiModel->reset();
 
-    setButtonStates();
-    m_networkTableModel->configChanged();
+    setNWButtonStates();
+    m_networkTableModel->NPTMConfigChanged();
 }
 
-void NetworkListWidget::on_globalConfigChanged()
+void NetworksWidget::on_NWGlobalConfigChanged()
 {
-    setGuiState();
-    m_networkTableModel->configChanged();
+    setNWGuiState();
+    m_networkTableModel->NPTMConfigChanged();
 }
 
-void NetworkListWidget::on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void NetworksWidget::on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    setButtonStates();
+    setNWButtonStates();
 }
 
-void NetworkListWidget::on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void NetworksWidget::on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     ui->forgetButton->setEnabled(!selected.empty());
 }
 
-void NetworkListWidget::setButtonStates()
+void NetworksWidget::setNWButtonStates()
 {
     bool unsaved = m_configMgr.networksModifiedFromSaved();
 
     ui->applyButton->setEnabled(unsaved);
     ui->discardButton->setEnabled(unsaved);
-    bool sel=(m_selectionModel->hasSelection() || m_selectionWiredModel->hasSelection());
+    bool sel=(m_selectionWifiModel->hasSelection() || m_selectionWiredModel->hasSelection());
     ui->forgetButton->setEnabled(sel);
 
-    emit stateUpdated(unsaved);
+    emit NWStateUpdated(unsaved);
 }

@@ -21,19 +21,19 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class NetworkList; }
 QT_END_NAMESPACE
 
-class NetworkListWidget : public QWidget
+class NetworksWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit NetworkListWidget(ConfigMgr& configMgr, QWidget* parent = nullptr);
-    virtual ~NetworkListWidget();
+    explicit NetworksWidget(ConfigMgr& configMgr, QWidget* parent = nullptr);
+    virtual ~NetworksWidget();
 
-    void setGuiState();
+    void setNWGuiState();
 
 signals:
-    void stateUpdated(bool unsaved);
-    void globalConfigChanged();
+    void NWStateUpdated(bool unsaved);
+    void NWGlobalConfigChanged();
 
 public slots:
     //void on_defaultProfile_activated(int index);
@@ -41,14 +41,14 @@ public slots:
     void on_discardButton_clicked();
     void on_forgetButton_clicked();
 
-    void on_globalConfigChanged();
+    void on_NWGlobalConfigChanged();
 
     void on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void PersistentEdit();
 
 private:
-    void setButtonStates();
+    void setNWButtonStates();
 
     Ui::NetworkList* ui;
 
@@ -56,7 +56,7 @@ private:
     NetworkProfileTableModel* m_networkTableModel;
     QSortFilterProxyModel* m_wifiModel;
     QSortFilterProxyModel* m_wiredModel;
-    QItemSelectionModel* m_selectionModel;
+    QItemSelectionModel* m_selectionWifiModel;
     QItemSelectionModel* m_selectionWiredModel;
 };
 

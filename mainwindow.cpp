@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_currentNetworkProfile(Config::NetworkProfile::untrusted)
     , m_configMgr(), m_serviceMgr(), m_networkMgr()
     , m_untrustedNetworkWidget(), m_trustedNetworkWidget()
-    , m_hostileNetworkWidget(), m_networkListWidget(), m_logMgr()
+    , m_hostileNetworkWidget(), m_networksWidget(), m_logMgr()
     , timer(), probeTimer(), quitAction(), trayIcon()
     , trayIconMenu(), greenPixmap(), yellowPixmap()
     , redPixmap(), greyPixmap()
@@ -106,39 +106,39 @@ MainWindow::MainWindow(QWidget *parent)
     ui->networkProfileConfig->addTab(m_trustedNetworkWidget, QString::fromUtf8("Trusted"));
     ui->networkProfileConfig->addTab(m_hostileNetworkWidget, QString::fromUtf8("Hostile"));
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
+    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::stateUpdated,
+    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
             this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::stateUpdated,
+    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
             this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::stateUpdated,
+    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
             this, &MainWindow::on_networkProfileStateUpdated);
 
-    m_untrustedNetworkWidget->setGuiState();
-    m_trustedNetworkWidget->setGuiState();
-    m_hostileNetworkWidget->setGuiState();
+    m_untrustedNetworkWidget->setNPWGuiState();
+    m_trustedNetworkWidget->setNPWGuiState();
+    m_hostileNetworkWidget->setNPWGuiState();
 
     // Set up networks tab.
-    m_networkListWidget = new NetworkListWidget(*m_configMgr);
+    m_networksWidget = new NetworksWidget(*m_configMgr);
     ui->mainTabWidget->removeTab(2);
-    ui->mainTabWidget->insertTab(2, m_networkListWidget, "Networks");
+    ui->mainTabWidget->insertTab(2, m_networksWidget, "Networks");
 
-    connect(m_networkListWidget, &NetworkListWidget::stateUpdated,
+    connect(m_networksWidget, &NetworksWidget::NWStateUpdated,
             this, &MainWindow::on_networksStateUpdated);
 
-    m_networkListWidget->setGuiState();
+    m_networksWidget->setNWGuiState();
 
     // Set up service state
     m_serviceMgr = ServiceMgr::factory(this);
@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_networkMgr, &NetworkMgr::networkConfigChanged,
             this, &MainWindow::on_networkConfigChanged);
     m_networkMgr->getState(true);
-    updateCurrentNetworkInfo();
+    setTopPanelNetworkInfo();
 
     // create a log manager
     m_logMgr = ILogMgr::factory(this);
@@ -197,7 +197,7 @@ MainWindow::~MainWindow()
     delete m_untrustedNetworkWidget;
     delete m_trustedNetworkWidget;
     delete m_hostileNetworkWidget;
-    delete m_networkListWidget;
+    delete m_networksWidget;
     delete timer;
     delete probeTimer;
     delete quitAction;
@@ -228,7 +228,7 @@ void MainWindow::timerExpired() {
     if (updateState == None)
         return;
     statusMsg("Stubby timed out trying to complete an action");
-    updateMainTab();
+    setTopPanelStatus();
     updateState = None;
 }
 
@@ -348,7 +348,7 @@ void MainWindow::on_onOffSlider_stateChanged()
         }
         else {
             // Nothing to do.... possilby recovering from error?
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
         }
     }
@@ -367,7 +367,7 @@ void MainWindow::on_onOffSlider_stateChanged()
         }
         else {
             // Nothing to do.... possilby recovering from error?
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
         }
     }
@@ -459,7 +459,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         case ServiceMgr::Error:
             ui->serviceStatus->setPixmap(*redPixmap);
             if (updateState == Start || updateState == Stop || updateState == Restart) {
-                updateMainTab();
+                setTopPanelStatus();
                 updateState = None;
             }
             return;
@@ -483,7 +483,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         }
     }
     else if (updateState == Stop && m_serviceState == ServiceMgr::Stopped) {
-        updateMainTab();
+        setTopPanelStatus();
         updateState = None;
         return;
     }
@@ -494,7 +494,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         }
         else if (m_serviceState == ServiceMgr::Running) {
             on_testButton_clicked();
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
             return;
         }
@@ -502,7 +502,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     else if (updateState == Probe)
         m_networkMgr->getState(true);
 
-    updateMainTab();
+    setTopPanelStatus();
 }
 
 void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
@@ -513,17 +513,17 @@ void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
 
-    updateCurrentNetworkInfo();
+    setTopPanelNetworkInfo();
     if (updateState == None)
         return;
 
     if (updateState == Stop && (m_serviceState == ServiceMgr::Running || m_serviceState == ServiceMgr::Starting)) {
         if (m_serviceMgr->stop())
             handleError();
-        updateMainTab();
+        setTopPanelStatus();
         return;
     }
-    updateMainTab();
+    setTopPanelStatus();
     on_testButton_clicked();
     updateState = None;
 }
@@ -531,8 +531,8 @@ void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
 void MainWindow::on_networkConfigChanged()
 {
     m_networkMgr->getState(false);
-    updateCurrentNetworkInfo();
-    m_networkListWidget->on_globalConfigChanged();
+    setTopPanelNetworkInfo();
+    m_networksWidget->on_NWGlobalConfigChanged();
 }
 
 /*
@@ -573,7 +573,7 @@ void MainWindow::handleError() {
 
 void MainWindow::handleCancel() {
     statusMsg("The action was cancelled");
-    updateMainTab();
+    setTopPanelStatus();
     updateState = None;
     timer->stop();
 }
@@ -611,7 +611,7 @@ int MainWindow::handleUnsavedChanges() {
 }
 
 
-void MainWindow::updateMainTab() {
+void MainWindow::setTopPanelStatus() {
 
     if (updateState == None)
         return;
@@ -663,7 +663,7 @@ void MainWindow::updateMainTab() {
 
 void MainWindow::on_networkProfileStateUpdated(Config::NetworkProfile np, bool, bool)
 {
-    setButtonStates();
+    setMainButtonStates();
     if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
         updateState = Restart;
         m_serviceMgr->restart();
@@ -673,7 +673,7 @@ void MainWindow::on_networkProfileStateUpdated(Config::NetworkProfile np, bool, 
 
 void MainWindow::on_networksStateUpdated(bool)
 {
-    setButtonStates();
+    setMainButtonStates();
     if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
         updateState = Restart;
         m_serviceMgr->restart();
@@ -681,7 +681,7 @@ void MainWindow::on_networksStateUpdated(bool)
     m_configMgr->restartDone();
 }
 
-void MainWindow::setButtonStates()
+void MainWindow::setMainButtonStates()
 {
     bool unsaved = m_configMgr->modifiedFromSavedConfig();
     bool notdefault = m_configMgr->modifiedFromFactoryDefaults();
@@ -691,7 +691,7 @@ void MainWindow::setButtonStates()
     ui->revertAllButton->setEnabled(notdefault);
 
     if (m_networkMgr)
-      updateCurrentNetworkInfo();
+      setTopPanelNetworkInfo();
 
 }
 
@@ -710,7 +710,7 @@ void MainWindow::on_revertAllButton_clicked()
     m_configMgr->restoreFactory();
 }
 
-void MainWindow::updateCurrentNetworkInfo()
+void MainWindow::setTopPanelNetworkInfo()
 {
     qInfo("Updating Current Network Info");
     std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();

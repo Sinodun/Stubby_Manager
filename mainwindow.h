@@ -47,40 +47,39 @@ protected:
 
 
 private slots:
-    void closeFromSystray();
+
     void on_hideDetailsCheckBox_toggled();
-
     void on_onOffSlider_stateChanged();
-
     void on_restartButton_clicked();
-
     void on_probeButton_clicked();
-
     void on_testButton_clicked();
-
-    void on_serviceStateChanged(ServiceMgr::ServiceState state);
-
-    void on_networkStateChanged(NetworkMgr::NetworkState state);
-
     void on_testQueryResult(bool result);
-
     void on_showLogButton_toggled();
-
     void on_helpButton_clicked();
-
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
-
-    void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
-    void on_networksStateUpdated(bool unsaved);
     void on_applyAllButton_clicked();
     void on_discardAllButton_clicked();
     void on_revertAllButton_clicked();
+
+    void on_serviceStateChanged(ServiceMgr::ServiceState state);
+    void on_networkStateChanged(NetworkMgr::NetworkState state);
+    void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
+    void on_networksStateUpdated(bool unsaved);
     void on_networkConfigChanged();
 
+    void closeFromSystray();
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
 private:
-    void setButtonStates();
-    void updateCurrentNetworkInfo();
+    void setMainButtonStates();
+    void setTopPanelStatus();
+    void setTopPanelNetworkInfo();
     void firstRunPopUp();
+
+    void timerExpired();
+    void probeTimerExpired();
+    void handleError();
+    void handleCancel();
+    int  handleUnsavedChanges();
 
 
     Ui::MainWindow *ui;
@@ -98,21 +97,16 @@ private:
     NetworkProfileWidget *m_trustedNetworkWidget;
     NetworkProfileWidget *m_hostileNetworkWidget;
 
-    NetworkListWidget *m_networkListWidget;
+    NetworksWidget *m_networksWidget;
 
     ILogMgr *m_logMgr;
 
     Config::NetworkProfile m_currentNetworkProfile;
 
     UpdateState updateState;
-    void updateMainTab();
+
     QTimer *timer;
-    void timerExpired();
     QTimer *probeTimer;
-    void probeTimerExpired();
-    void handleError();
-    void handleCancel();
-    int handleUnsavedChanges();
 
     QAction *quitAction;
     QAction *openAction;
