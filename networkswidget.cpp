@@ -91,11 +91,6 @@ void NetworksWidget::on_discardButton_clicked()
     setNWGuiState();
 }
 
-void NetworksWidget::on_NWGlobalConfigChanged()
-{
-    setNWGuiState();
-}
-
 void NetworksWidget::on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     setNWButtonStates();
@@ -119,7 +114,7 @@ void NetworksWidget::setNWButtonStates()
     //ui->forgetButton->setEnabled(sel);
 
     if (unsaved)
-        emit unsavedNetworksChanges();
+        emit userNetworksEditInProgress();
 }
 
 //void NetworksWidget::on_forgetButton_clicked()

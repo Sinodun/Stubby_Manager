@@ -106,25 +106,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->networkProfileConfig->addTab(m_trustedNetworkWidget, QString::fromUtf8("Trusted"));
     ui->networkProfileConfig->addTab(m_hostileNetworkWidget, QString::fromUtf8("Hostile"));
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+//    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
+//            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWstateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
+    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
+    connect(m_trustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
+    connect(m_hostileNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
 
     connect(m_configMgr, &ConfigMgr::configChanged,
             this, &MainWindow::on_SavedConfigChanged);
@@ -145,16 +145,16 @@ MainWindow::MainWindow(QWidget *parent)
     }
     connect(m_networkMgr, SIGNAL(DNSStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_DNSStateChanged(NetworkMgr::NetworkState)));
     connect(m_networkMgr, SIGNAL(testQueryResult(bool)), this, SLOT(on_testQueryResult(bool)));
-    connect(m_networkMgr, &NetworkMgr::networkInterfacesChanged,
-            this, &MainWindow::on_networkInterfacesChanged);
+//    connect(m_networkMgr, &NetworkMgr::networkInterfacesChanged,
+//            this, &MainWindow::on_networkInterfacesChanged);
 
     // Set up networks tab.
     m_networksWidget = new NetworksWidget(*m_configMgr);
     ui->mainTabWidget->removeTab(2);
     ui->mainTabWidget->insertTab(2, m_networksWidget, "Networks");
 
-    connect(m_networksWidget, &NetworksWidget::unsavedNetworksChanges,
-            this, &MainWindow::on_unsavedNetworksChanges);
+    connect(m_networksWidget, &NetworksWidget::userNetworksEditInProgress,
+            this, &MainWindow::on_userNetworksEditInProgress);
 
     // Create a log manager
     m_logMgr = ILogMgr::factory(this);
@@ -535,13 +535,13 @@ void MainWindow::refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo
     m_configMgr->updateNetworks(running_networks);
 }
 
-void MainWindow::on_networkInterfacesChanged()
-{
-    m_networkMgr->getDNSState(false);
-    // move these?
-//    setTopPanelNetworkInfo();
-//    m_networksWidget->on_NWGlobalConfigChanged();
-}
+//void MainWindow::on_networkInterfacesChanged()
+//{
+//    m_networkMgr->getDNSState(false);
+//    // move these?
+////    setTopPanelNetworkInfo();
+////    m_networksWidget->on_NWGlobalConfigChanged();
+//}
 
 /*
  * Private functions
@@ -669,17 +669,12 @@ void MainWindow::setTopPanelStatus() {
 
 }
 
-void MainWindow::on_networkProfileStateUpdated(Config::NetworkProfile np, bool, bool)
+void MainWindow::on_userProfileEditInProgress()
 {
     setMainButtonStates();
-    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
-        updateState = Restart;
-        m_serviceMgr->restart();
-    }
-    m_configMgr->restartDone();
 }
 
-void MainWindow::on_unsavedNetworksChanges()
+void MainWindow::on_userNetworksEditInProgress()
 {
     setMainButtonStates();
 }
@@ -687,9 +682,9 @@ void MainWindow::on_unsavedNetworksChanges()
 void MainWindow::on_SavedConfigChanged() {
 
     m_networksWidget->setNWGuiState();
-//    m_untrustedNetworkWidget->setNPWGuiState();
-//    m_trustedNetworkWidget->setNPWGuiState();
-//    m_hostileNetworkWidget->setNPWGuiState();
+    m_untrustedNetworkWidget->setNPWGuiState();
+    m_trustedNetworkWidget->setNPWGuiState();
+    m_hostileNetworkWidget->setNPWGuiState();
     setMainButtonStates();
     setTopPanelNetworkInfo();
 
@@ -708,10 +703,6 @@ void MainWindow::setMainButtonStates()
     ui->applyAllButton->setEnabled(unsaved);
     ui->discardAllButton->setEnabled(unsaved);
     ui->revertAllButton->setEnabled(notdefault);
-
-    // NOT needed??
-//    if (unsaved == false)
-//      setTopPanelNetworkInfo();
 }
 
 void MainWindow::on_applyAllButton_clicked()
@@ -732,37 +723,6 @@ void MainWindow::on_revertAllButton_clicked()
 void MainWindow::setTopPanelNetworkInfo()
 {
     qInfo("Updating Top Panel Network Info");
-    std::string net_text;
-
-    m_currentNetworkProfile = Config::NetworkProfile::trusted;
-
-    for ( const auto& net : m_configMgr->getSavedNetworks() )
-    {
-        auto net_name = net.first;
-        auto net_type = net.second.interfaceType;
-        auto net_active = net.second.interfaceActive;
-        // Ignore the wifi when it is not connected as it has no ssid
-        if (net_name.compare("Wi-Fi") == 0) {
-            continue;
-        }
-        // Only disply the active networks
-        if (net_active) {
-            if ( !net_text.empty())
-                net_text.append("\n");
-            net_text.append(net_name);
-            if (net_type == NetworkMgr::InterfaceTypes::WiFi)
-                net_text.append(" (Wi-Fi)");
-
-            Config::NetworkProfile np = Config::networkProfileFromChoice(m_configMgr->getDisplayedNetworkProfile(net_name), m_configMgr->displayedConfig.defaultNetworkProfile);
-            if ( np > m_currentNetworkProfile )
-                m_currentNetworkProfile = np;
-        }
-    }
-
-    ui->network_name->setText(net_text.c_str());
-    std::string net_profile = (Config::networkProfileDisplayName(m_currentNetworkProfile));
-    if (m_configMgr->displayedConfig.defaultNetworkProfile == m_currentNetworkProfile)
-        net_profile.append(" (Default)");
-    ui->network_profile->setText(net_profile.c_str());
-
+    ui->network_profile->setText(m_configMgr->getCurrentProfileString().c_str());
+    ui->network_name->setText(m_configMgr->getCurrentNetworksString().c_str());
 }

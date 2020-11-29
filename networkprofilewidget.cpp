@@ -98,8 +98,6 @@ void NetworkProfileWidget::on_validateData_stateChanged(int state)
 void NetworkProfileWidget::on_applyButton_clicked()
 {
     m_configMgr.saveProfile(m_networkProfile);
-//    setNPWButtonStates();
-//    m_serverTableModel->STPConfigChanged();
 }
 
 void NetworkProfileWidget::on_discardButton_clicked()
@@ -116,12 +114,6 @@ void NetworkProfileWidget::on_revertButton_clicked()
     m_serverTableModel->STPConfigChanged();
 }
 
-void NetworkProfileWidget::on_NPWGlobalConfigChanged()
-{
-    setNPWGuiState();
-    m_serverTableModel->STPConfigChanged();
-}
-
 void NetworkProfileWidget::on_serverTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     setNPWButtonStates();
@@ -134,6 +126,7 @@ void NetworkProfileWidget::setNPWGuiState()
     ui->validateData->setCheckState(m_configMgr.displayedConfig.profiles[m_networkProfile].validateData ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->roundRobin->setCheckState(m_configMgr.displayedConfig.profiles[m_networkProfile].roundRobin ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
+    m_serverTableModel->STPConfigChanged();
     setNPWButtonStates();
 }
 
@@ -146,5 +139,6 @@ void NetworkProfileWidget::setNPWButtonStates()
     ui->discardButton->setEnabled(unsaved);
     ui->revertButton->setEnabled(notdefault);
 
-    emit NPWstateUpdated(m_networkProfile, unsaved, notdefault);
+    if (unsaved)
+        emit userProfileEditInProgress();
 }

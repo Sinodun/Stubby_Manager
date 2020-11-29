@@ -65,10 +65,10 @@ private slots:
     void on_serviceStateChanged(ServiceMgr::ServiceState state);
     void on_DNSStateChanged(NetworkMgr::NetworkState state);
 
-    void on_networkProfileStateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
-    void on_unsavedNetworksChanges();
+    void on_userProfileEditInProgress();
+    void on_userNetworksEditInProgress();
 
-    void on_networkInterfacesChanged();
+    // void on_networkInterfacesChanged();
     void on_SavedConfigChanged();
 
 

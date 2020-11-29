@@ -31,8 +31,7 @@ public:
     void setNPWGuiState();
 
 signals:
-    void NPWstateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
-    void NPWGlobalConfigChanged();
+    void userProfileEditInProgress();
 
 public slots:
     void on_alwaysAuthenticate_stateChanged(int state);
@@ -45,8 +44,6 @@ public slots:
     void on_revertButton_clicked();
     void on_openWebsite_clicked();
     void on_serverTable_clicked();
-
-    void on_NPWGlobalConfigChanged();
 
     void on_serverTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 

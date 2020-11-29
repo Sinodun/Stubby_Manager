@@ -51,7 +51,6 @@ public:
     std::map<std::string, interfaceInfo>  getRunningNetworks();
 
 signals:
-    void networkInterfacesChanged();
     void DNSStateChanged(NetworkMgr::NetworkState state);
     void testQueryResult(bool result);
 

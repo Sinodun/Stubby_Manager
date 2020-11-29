@@ -77,13 +77,13 @@ bool ConfigMgr::unsavedChanges(bool profile, bool network) {
     // For simplicity, always do a restart if the network profiles have changed
     // (working out if only the running/updated newtworks have changed is hard)
     if (networksModifiedFromSaved() && network) {
-        qInfo("Network config modified");
+        qInfo("Checking unsaved changes: Network config modified");
         return true;
     }
     // If the active profile is being modified the service should be restarted
     // Let the main window do the check on the service state
     if (profileModifiedFromSaved(m_mainwindow->getCurrentNetworkProfile())) {
-        qInfo("Running config modifed");
+        qInfo("Checking unsaved changes: Running config modifed");
         return true;
     }
     return false;
@@ -98,6 +98,17 @@ void ConfigMgr::setRestartRequired(bool profile, bool network) {
 
 void ConfigMgr::restartDone() {
     restartRequired = false;
+}
+
+std::string ConfigMgr::getCurrentProfileString() const {
+    std::string profile_string = Config::networkProfileDisplayName(m_current_profile);
+    if (m_current_profile == savedConfig.defaultNetworkProfile)
+        profile_string.append(" (Default)");
+    return profile_string;
+}
+
+std::string ConfigMgr::getCurrentNetworksString() const {
+    return m_current_networks_string;
 }
 
 void ConfigMgr::save(bool restart)
@@ -124,6 +135,30 @@ void ConfigMgr::saveNetworks()
 
 void ConfigMgr::saveConfig(const Config& config)
 {
+
+    m_current_networks_string="";
+    m_current_profile=Config::NetworkProfile::trusted;
+    for ( const auto& net : config.networks ) {
+        auto net_name = net.first;
+        auto net_type = net.second.interfaceType;
+        auto net_active = net.second.interfaceActive;
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net_name.compare("Wi-Fi") == 0) {
+            continue;
+        }
+        //TODO: this is wrong!!!
+        Config::NetworkProfile profile = Config::networkProfileFromChoice(net.second.profile, Config::NetworkProfile::untrusted);
+        // Only disply the active networks
+        if (net_active) {
+            if ( !m_current_networks_string.empty())
+                m_current_networks_string.append("\n");
+            m_current_networks_string.append(net_name);
+            qInfo("Saving: network %s has profile %d", net_name.c_str(), profile);
+            if ( profile > m_current_profile )
+                m_current_profile = profile;
+        }
+    }
+
     QDir customDir(QString::fromStdString(appDataDir()));
     QFileInfo customConfig(customDir, QString::fromStdString(NETPROFILENAME));
     QDir::root().mkpath(customDir.absolutePath());
@@ -300,17 +335,28 @@ void ConfigMgr::restoreFrom(const Config& cfg)
     emit configChanged();
 }
 
-void ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
+Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
         displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default;
-        qInfo("Added Network %s", name.c_str());
+        qInfo("Added Network to displayed profile %s", name.c_str());
     }
     // qInfo("Updated status of %s to %d", name.c_str(), active);
     // always update the active status in case it has changed
     displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     displayedConfig.networks[name].interfaceActive=active;
+
+    // For now, since the user must have a default use this code to catch any corner case
+    if ( savedConfig.networks.find(name) == savedConfig.networks.end() ) {
+        savedConfig.networks[name].profile = Config::NetworkProfileChoice::default;
+        qInfo("Added Network to saved profile %s", name.c_str());
+    }
+    // qInfo("Updated status of %s to %d", name.c_str(), active);
+    // always update the active status in case it has changed
+    savedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
+    savedConfig.networks[name].interfaceActive=active;
+    return Config::networkProfileFromChoice(savedConfig.networks[name].profile, savedConfig.defaultNetworkProfile);
 }
 
 void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks) {
@@ -318,6 +364,8 @@ void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> 
     // Set all networks to inactive, to ensure only active ones are set below
     resetNetworksActiveState();
 
+    m_current_networks_string="";
+    m_current_profile=Config::NetworkProfile::trusted;
     for ( const auto& net : running_networks ) {
         auto net_name = net.first;
         auto net_type = net.second.interfaceType;
@@ -327,12 +375,25 @@ void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> 
             continue;
         }
         // This actually also updates the active status of the existing network.....
-        addNetwork(net_name, net_type, net_active);
+        Config::NetworkProfile profile = addNetwork(net_name, net_type, net_active);
+        // Only disply the active networks
+        if (net_active) {
+            if ( !m_current_networks_string.empty())
+                m_current_networks_string.append("\n");
+            m_current_networks_string.append(net_name);
+            qInfo("network %s has profile %d", net_name.c_str(), (int)profile);
+            if ( profile > m_current_profile )
+                m_current_profile = profile;
+        }
     }
+
     emit configChanged();
 }
 
 void ConfigMgr::resetNetworksActiveState() {
+    for ( auto& a : savedConfig.networks) {
+        a.second.interfaceActive = false;
+    }
     for ( auto& a : displayedConfig.networks) {
         a.second.interfaceActive = false;
     }
