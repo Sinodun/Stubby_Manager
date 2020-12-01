@@ -18,7 +18,7 @@
 struct Config
 {
     enum class NetworkProfile { trusted, untrusted, hostile };
-    enum class NetworkProfileChoice { default, trusted, untrusted, hostile };
+    enum class NetworkProfileChoice { default_profile, trusted, untrusted, hostile };
 
     enum class UseNetworkProvidedServer { exclude, include, use_only };
 
@@ -87,15 +87,16 @@ struct Config
     bool networksModifiedFrom(const std::map<std::string, NetworkInformation>& from) const;
 
     static std::string networkProfileDisplayName(NetworkProfile np);
-    static std::string networkProfileKey(NetworkProfile np);
-    static NetworkProfile networkProfileFromKey(const std::string& key);
+    static std::string networkProfileChoiceDisplayName(NetworkProfileChoice npc);
     static std::string interfaceTypeDisplayName(InterfaceTypes it);
 
-    static std::string              networkProfileChoiceDisplayName(NetworkProfileChoice npc);
-    static std::string              networkProfileChoiceKey(NetworkProfileChoice npc);
-    static NetworkProfileChoice     networkProfileChoiceFromKey(const std::string& key);
-    static NetworkProfile           networkProfileFromChoice(NetworkProfileChoice npc, NetworkProfile default);
+    static NetworkProfile           networkProfileFromChoice(NetworkProfileChoice npc, NetworkProfile default_profile);
     static NetworkProfileChoice     networkChoiceFromProfile(NetworkProfile np);
+
+    static std::string              networkProfileYamlKey(NetworkProfile np);
+    static NetworkProfile           networkProfileFromYamlKey(const std::string& key);
+    static std::string              networkProfileChoiceYamlKey(NetworkProfileChoice npc);
+    static NetworkProfileChoice     networkProfileChoiceFromYamlKey(const std::string& key);
 };
 
 #endif

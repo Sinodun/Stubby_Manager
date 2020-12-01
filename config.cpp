@@ -80,7 +80,7 @@ static Config::NetworkProfile networkProfileFromYaml(const std::string& key, con
 {
     try
     {
-        return Config::networkProfileFromKey(key);
+        return Config::networkProfileFromYamlKey(key);
     }
     catch (const std::invalid_argument& ie)
     {
@@ -92,7 +92,7 @@ static Config::NetworkProfileChoice networkProfileChoiceFromYaml(const std::stri
 {
     try
     {
-        return Config::networkProfileChoiceFromKey(key);
+        return Config::networkProfileChoiceFromYamlKey(key);
     }
     catch (const std::invalid_argument& ie)
     {
@@ -197,7 +197,7 @@ static void yamlOutputNetworkProfileSet(YAML::Emitter& out, const std::unordered
 {
     out << YAML::BeginSeq;
     for ( const auto& np : set )
-        out << Config::networkProfileKey(np);
+        out << Config::networkProfileYamlKey(np);
     out << YAML::EndSeq;
 }
 
@@ -232,7 +232,7 @@ void Config::saveToFile(const std::string& path) const
     out << YAML::Key << "profiles" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : profiles)
     {
-        out << YAML::Key << networkProfileKey(nt.first) << YAML::Value
+        out << YAML::Key << networkProfileYamlKey(nt.first) << YAML::Value
             << YAML::BeginMap
             << YAML::Key << "encrypt_all" << YAML::Value << nt.second.encryptAll
             << YAML::Key << "always_authenticate" << YAML::Value << nt.second.alwaysAuthenticate
@@ -257,11 +257,11 @@ void Config::saveToFile(const std::string& path) const
     }
     out << YAML::EndMap;
 
-    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileKey(defaultNetworkProfile);
+    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileYamlKey(defaultNetworkProfile);
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : networks)
-        out << YAML::Key << nt.first << YAML::Value << networkProfileChoiceKey(nt.second.profile);
+        out << YAML::Key << nt.first << YAML::Value << networkProfileChoiceYamlKey(nt.second.profile);
     out << YAML::EndMap;
 
     fout.close();
@@ -375,12 +375,12 @@ bool Config::networksModifiedFrom(const std::map<std::string, NetworkInformation
     std::copy_if(networks.begin(), networks.end(),
                  std::inserter(nodef_nets, nodef_nets.end()),
                  [](auto const& p) {
-                     return p.second.profile != NetworkProfileChoice::default;
+                     return p.second.profile != NetworkProfileChoice::default_profile;
                  });
     std::copy_if(from.begin(), from.end(),
                  std::inserter(from_nodef_nets, from_nodef_nets.end()),
                  [](auto const& p) {
-                     return p.second.profile != NetworkProfileChoice::default;
+                     return p.second.profile != NetworkProfileChoice::default_profile;
                  });
     return nodef_nets != from_nodef_nets;
 }
@@ -402,7 +402,7 @@ std::string Config::networkProfileDisplayName(Config::NetworkProfile np)
     return "Unknown";
 }
 
-std::string Config::networkProfileKey(Config::NetworkProfile np)
+std::string Config::networkProfileYamlKey(Config::NetworkProfile np)
 {
     switch(np)
     {
@@ -419,7 +419,7 @@ std::string Config::networkProfileKey(Config::NetworkProfile np)
     return "unknown";
 }
 
-Config::NetworkProfile Config::networkProfileFromKey(const std::string& key)
+Config::NetworkProfile Config::networkProfileFromYamlKey(const std::string& key)
 {
     if ( key == "trusted" )
         return Config::NetworkProfile::trusted;
@@ -447,33 +447,33 @@ std::string Config::interfaceTypeDisplayName(Config::InterfaceTypes it)
 
 std::string Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice npc)
 {
-    if ( npc == Config::NetworkProfileChoice::default )
+    if ( npc == Config::NetworkProfileChoice::default_profile )
         return "Default";
 
     return networkProfileDisplayName(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
 }
 
-std::string Config::networkProfileChoiceKey(Config::NetworkProfileChoice npc)
+std::string Config::networkProfileChoiceYamlKey(Config::NetworkProfileChoice npc)
 {
-    if ( npc == Config::NetworkProfileChoice::default )
+    if ( npc == Config::NetworkProfileChoice::default_profile )
         return "default";
 
-    return networkProfileKey(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
+    return networkProfileYamlKey(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
 }
 
-Config::NetworkProfileChoice Config::networkProfileChoiceFromKey(const std::string& key)
+Config::NetworkProfileChoice Config::networkProfileChoiceFromYamlKey(const std::string& key)
 {
     if ( key == "default" )
-        return Config::NetworkProfileChoice::default;
-    else return networkChoiceFromProfile(networkProfileFromKey(key));
+        return Config::NetworkProfileChoice::default_profile;
+    else return networkChoiceFromProfile(networkProfileFromYamlKey(key));
 }
 
-Config::NetworkProfile Config::networkProfileFromChoice(Config::NetworkProfileChoice npc, Config::NetworkProfile default)
+Config::NetworkProfile Config::networkProfileFromChoice(Config::NetworkProfileChoice npc, Config::NetworkProfile default_profile)
 {
     switch(npc)
     {
-    case Config::NetworkProfileChoice::default:
-        return default;
+    case Config::NetworkProfileChoice::default_profile:
+        return default_profile;
 
     case Config::NetworkProfileChoice::trusted:
         return Config::NetworkProfile::trusted;

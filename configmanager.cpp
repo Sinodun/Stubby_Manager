@@ -140,14 +140,12 @@ void ConfigMgr::saveConfig(const Config& config)
     m_current_profile=Config::NetworkProfile::trusted;
     for ( const auto& net : config.networks ) {
         auto net_name = net.first;
-        auto net_type = net.second.interfaceType;
         auto net_active = net.second.interfaceActive;
         // Ignore the wifi when it is not connected as it has no ssid
         if (net_name.compare("Wi-Fi") == 0) {
             continue;
         }
-        //TODO: this is wrong!!!
-        Config::NetworkProfile profile = Config::networkProfileFromChoice(net.second.profile, Config::NetworkProfile::untrusted);
+        Config::NetworkProfile profile = Config::networkProfileFromChoice(net.second.profile, config.defaultNetworkProfile);
         // Only disply the active networks
         if (net_active) {
             if ( !m_current_networks_string.empty())
@@ -339,20 +337,17 @@ Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr
 {
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
-        displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default;
+        displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
         qInfo("Added Network to displayed profile %s", name.c_str());
     }
-    // qInfo("Updated status of %s to %d", name.c_str(), active);
     // always update the active status in case it has changed
     displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     displayedConfig.networks[name].interfaceActive=active;
 
-    // For now, since the user must have a default use this code to catch any corner case
     if ( savedConfig.networks.find(name) == savedConfig.networks.end() ) {
-        savedConfig.networks[name].profile = Config::NetworkProfileChoice::default;
+        savedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
         qInfo("Added Network to saved profile %s", name.c_str());
     }
-    // qInfo("Updated status of %s to %d", name.c_str(), active);
     // always update the active status in case it has changed
     savedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     savedConfig.networks[name].interfaceActive=active;

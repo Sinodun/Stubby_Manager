@@ -20,7 +20,7 @@ QWidget* NetworkProfileDelegate::createEditor(QWidget* parent, const QStyleOptio
 {
     QComboBox* cb = new QComboBox(parent);
 
-    cb->addItem(QString::fromStdString(Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice::default)));
+    cb->addItem(QString::fromStdString(Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice::default_profile)));
     cb->addItem(QString::fromStdString(Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice::trusted)));
     cb->addItem(QString::fromStdString(Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice::untrusted)));
     cb->addItem(QString::fromStdString(Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice::hostile)));
