@@ -399,12 +399,4 @@ void ConfigMgr::resetNetworksActiveState() {
     }
 }
 
-Config::NetworkProfileChoice ConfigMgr::getDisplayedNetworkProfile(const std::string& name)
-{
-    return displayedConfig.networks[name].profile;
-}
-
-const std::map<std::string, Config::NetworkInformation> ConfigMgr::getSavedNetworks() const {
-    return displayedConfig.networks;
-}
 

@@ -106,19 +106,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->networkProfileConfig->addTab(m_trustedNetworkWidget, QString::fromUtf8("Trusted"));
     ui->networkProfileConfig->addTab(m_hostileNetworkWidget, QString::fromUtf8("Hostile"));
 
-//    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-//    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-//    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-//    connect(m_trustedNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_hostileNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-//    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_untrustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-//    connect(m_hostileNetworkWidget, &NetworkProfileWidget::NPWGlobalConfigChanged,
-//            m_trustedNetworkWidget, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
-
     connect(m_untrustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
             this, &MainWindow::on_userProfileEditInProgress);
     connect(m_trustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
@@ -145,8 +132,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
     connect(m_networkMgr, SIGNAL(DNSStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_DNSStateChanged(NetworkMgr::NetworkState)));
     connect(m_networkMgr, SIGNAL(testQueryResult(bool)), this, SLOT(on_testQueryResult(bool)));
-//    connect(m_networkMgr, &NetworkMgr::networkInterfacesChanged,
-//            this, &MainWindow::on_networkInterfacesChanged);
 
     // Set up networks tab.
     m_networksWidget = new NetworksWidget(*m_configMgr);
@@ -535,13 +520,6 @@ void MainWindow::refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo
     m_configMgr->updateNetworks(running_networks);
 }
 
-//void MainWindow::on_networkInterfacesChanged()
-//{
-//    m_networkMgr->getDNSState(false);
-//    // move these?
-////    setTopPanelNetworkInfo();
-////    m_networksWidget->on_NWGlobalConfigChanged();
-//}
 
 /*
  * Private functions
