@@ -581,7 +581,7 @@ int MainWindow::handleUnsavedChanges() {
     int result = 0;
     switch (ret) {
       case QMessageBox::Save:
-         m_configMgr->save(false);
+         m_configMgr->saveAll(true);
          break;
       case QMessageBox::Discard:
          m_configMgr->restoreSaved();
@@ -659,6 +659,7 @@ void MainWindow::on_userNetworksEditInProgress()
 
 void MainWindow::on_SavedConfigChanged() {
 
+    qInfo("Refreshing displayed Config and Current Info");
     m_networksWidget->setNWGuiState();
     m_untrustedNetworkWidget->setNPWGuiState();
     m_trustedNetworkWidget->setNPWGuiState();
@@ -666,11 +667,11 @@ void MainWindow::on_SavedConfigChanged() {
     setMainButtonStates();
     setTopPanelNetworkInfo();
 
-//    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
-//        updateState = Restart;
-//        m_serviceMgr->restart();
-//    }
-//    m_configMgr->restartDone();
+    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
+        updateState = Restart;
+        m_serviceMgr->restart();
+    }
+    m_configMgr->restartDone();
 }
 
 void MainWindow::setMainButtonStates()
@@ -685,7 +686,7 @@ void MainWindow::setMainButtonStates()
 
 void MainWindow::on_applyAllButton_clicked()
 {
-    m_configMgr->save(true);
+    m_configMgr->saveAll(true);
 }
 
 void MainWindow::on_discardAllButton_clicked()
@@ -700,7 +701,6 @@ void MainWindow::on_revertAllButton_clicked()
 
 void MainWindow::setTopPanelNetworkInfo()
 {
-    qInfo("Updating Top Panel Network Info");
     ui->network_profile->setText(m_configMgr->getCurrentProfileString().c_str());
     ui->network_name->setText(m_configMgr->getCurrentNetworksString().c_str());
 }

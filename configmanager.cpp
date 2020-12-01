@@ -68,7 +68,7 @@ void ConfigMgr::load()
         return;
     }
     else
-        save(false);
+        saveAll(false);
 
     qWarning("No readable custom configuration file");
 }
@@ -111,7 +111,7 @@ std::string ConfigMgr::getCurrentNetworksString() const {
     return m_current_networks_string;
 }
 
-void ConfigMgr::save(bool restart)
+void ConfigMgr::saveAll(bool restart)
 {
     if (restart)
         setRestartRequired(true, true);
@@ -130,6 +130,13 @@ void ConfigMgr::saveNetworks()
 {
     setRestartRequired(false, true);
     savedConfig.networks = displayedConfig.networks;
+    savedConfig.defaultNetworkProfile = displayedConfig.defaultNetworkProfile;
+    saveConfig(savedConfig);
+}
+
+void ConfigMgr::saveUpdatedNetworks()
+{
+    setRestartRequired(false, true);
     saveConfig(savedConfig);
 }
 
@@ -141,10 +148,6 @@ void ConfigMgr::saveConfig(const Config& config)
     for ( const auto& net : config.networks ) {
         auto net_name = net.first;
         auto net_active = net.second.interfaceActive;
-        // Ignore the wifi when it is not connected as it has no ssid
-        if (net_name.compare("Wi-Fi") == 0) {
-            continue;
-        }
         Config::NetworkProfile profile = Config::networkProfileFromChoice(net.second.profile, config.defaultNetworkProfile);
         // Only disply the active networks
         if (net_active) {
@@ -338,7 +341,7 @@ Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
         displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
-        qInfo("Added Network to displayed profile %s", name.c_str());
+        //qInfo("Added Network to displayed profile %s", name.c_str());
     }
     // always update the active status in case it has changed
     displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
@@ -346,9 +349,8 @@ Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr
 
     if ( savedConfig.networks.find(name) == savedConfig.networks.end() ) {
         savedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
-        qInfo("Added Network to saved profile %s", name.c_str());
+        //qInfo("Added Network to saved profile %s", name.c_str());
     }
-    // always update the active status in case it has changed
     savedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     savedConfig.networks[name].interfaceActive=active;
     return Config::networkProfileFromChoice(savedConfig.networks[name].profile, savedConfig.defaultNetworkProfile);
@@ -357,41 +359,23 @@ Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr
 void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks) {
 
     // Set all networks to inactive, to ensure only active ones are set below
-    resetNetworksActiveState();
-
-    m_current_networks_string="";
-    m_current_profile=Config::NetworkProfile::trusted;
-    for ( const auto& net : running_networks ) {
-        auto net_name = net.first;
-        auto net_type = net.second.interfaceType;
-        auto net_active = net.second.interfaceActive;
-        // Ignore the wifi when it is not connected as it has no ssid
-        if (net_name.compare("Wi-Fi") == 0) {
-            continue;
-        }
-        // This actually also updates the active status of the existing network.....
-        Config::NetworkProfile profile = addNetwork(net_name, net_type, net_active);
-        // Only disply the active networks
-        if (net_active) {
-            if ( !m_current_networks_string.empty())
-                m_current_networks_string.append("\n");
-            m_current_networks_string.append(net_name);
-            qInfo("network %s has profile %d", net_name.c_str(), (int)profile);
-            if ( profile > m_current_profile )
-                m_current_profile = profile;
-        }
-    }
-
-    emit configChanged();
-}
-
-void ConfigMgr::resetNetworksActiveState() {
     for ( auto& a : savedConfig.networks) {
         a.second.interfaceActive = false;
     }
     for ( auto& a : displayedConfig.networks) {
         a.second.interfaceActive = false;
     }
-}
 
+    m_current_networks_string="";
+    m_current_profile=Config::NetworkProfile::trusted;
+    for ( const auto& net : running_networks ) {
+        // Ignore the wifi when it is not connected as it has no ssid
+        if (net.first.compare("Wi-Fi") == 0) {
+            continue;
+        }
+        // This actually also updates the active status of the existing network.....
+        Config::NetworkProfile profile = addNetwork(net.first, net.second.interfaceType, net.second.interfaceActive);
+    }
+    saveUpdatedNetworks();
+}
 

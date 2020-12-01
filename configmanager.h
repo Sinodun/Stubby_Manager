@@ -37,9 +37,10 @@ public:
 
     void init();
     void load();
-    void save(bool restart);
+    void saveAll(bool restart);
     void saveProfile(Config::NetworkProfile networkProfile);
     void saveNetworks();
+    void saveUpdatedNetworks();
 
     std::string generateStubbyConfig(Config::NetworkProfile networkProfile);
 
@@ -76,7 +77,6 @@ protected:
     void saveConfig(const Config& cfg);
     void setRestartRequired(bool profile, bool network);
     Config::NetworkProfile addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
-    void resetNetworksActiveState();
 
     MainWindow *m_mainwindow;
     Config factoryConfig;

@@ -88,6 +88,11 @@ void NetworksWidget::on_discardButton_clicked()
     setNWGuiState();
 }
 
+void NetworksWidget::on_defaultProfile_activated(int /*index*/) {
+    m_configMgr.displayedConfig.defaultNetworkProfile = Config::networkProfileFromYamlKey(ui->defaultProfile->currentText().toLower().toUtf8().constData());
+    setNWButtonStates();
+}
+
 void NetworksWidget::on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     setNWButtonStates();
