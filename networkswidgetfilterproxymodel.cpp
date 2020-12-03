@@ -28,3 +28,21 @@ QVariant NetworksWidgetFilterProxyModel::headerData(int section, Qt::Orientation
     }
     return QVariant();
 }
+
+
+bool NetworksWidgetFilterProxyModel::lessThan(const QModelIndex &left,
+                                              const QModelIndex &right) const {
+    QVariant leftData  = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+    QColor leftColour  = sourceModel()->data(left, Qt::BackgroundRole).value<QColor>();
+    QColor rightColour = sourceModel()->data(right, Qt::BackgroundRole).value<QColor>();
+
+    if (leftColour != rightColour) {
+        if (leftColour == QColor::fromRgb(222, 255, 222))
+            return false;
+        else
+            return true;
+    }
+    else if (leftData.userType() == QMetaType::QString)
+         return QString::localeAwareCompare(leftData.toString(), rightData.toString()) > 0;
+}

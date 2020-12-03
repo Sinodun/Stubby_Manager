@@ -10,6 +10,7 @@ public:
     explicit NetworksWidgetFilterProxyModel(QObject *parent = nullptr, QString view = "");
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 
 private:
     QString m_view;
