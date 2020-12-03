@@ -44,7 +44,7 @@ void ConfigMgr::init()
     {
         factoryConfig.loadFromFile(factoryConfigFile.filePath().toStdString());
         qInfo("Read default config file.");
-        emit configChanged();
+        emit configChanged(false);
         return;
     }
 
@@ -64,40 +64,13 @@ void ConfigMgr::load()
         savedConfig.loadFromFile(customConfigFile.filePath().toStdString());
         displayedConfig = savedConfig;
         qInfo("Read custom config file.");
-        emit configChanged();
+        emit configChanged(false);
         return;
     }
     else
         saveAll(false);
 
     qWarning("No readable custom configuration file");
-}
-
-bool ConfigMgr::unsavedChanges(bool profile, bool network) {
-    // For simplicity, always do a restart if the network profiles have changed
-    // (working out if only the running/updated newtworks have changed is hard)
-    if (networksModifiedFromSaved() && network) {
-        qInfo("Checking unsaved changes: Network config modified");
-        return true;
-    }
-    // If the active profile is being modified the service should be restarted
-    // Let the main window do the check on the service state
-    if (profileModifiedFromSaved(m_mainwindow->getCurrentNetworkProfile())) {
-        qInfo("Checking unsaved changes: Running config modifed");
-        return true;
-    }
-    return false;
-}
-
-void ConfigMgr::setRestartRequired(bool profile, bool network) {
-    if (!unsavedChanges(profile, network))
-        return;
-    qInfo("Restart required");
-    restartRequired = true;
-}
-
-void ConfigMgr::restartDone() {
-    restartRequired = false;
 }
 
 std::string ConfigMgr::getCurrentProfileString() const {
@@ -113,22 +86,21 @@ std::string ConfigMgr::getCurrentNetworksString() const {
 
 void ConfigMgr::saveAll(bool restart)
 {
-    if (restart)
-        setRestartRequired(true, true);
+    tempConfig = savedConfig;
     savedConfig = displayedConfig;
     saveConfig(savedConfig);
 }
 
 void ConfigMgr::saveProfile(Config::NetworkProfile networkProfile)
 {
-    setRestartRequired(true, false);
+    tempConfig = savedConfig;
     savedConfig.copyProfile(displayedConfig, networkProfile);
     saveConfig(savedConfig);
 }
 
 void ConfigMgr::saveNetworks()
 {
-    setRestartRequired(false, true);
+    tempConfig = savedConfig;
     savedConfig.networks = displayedConfig.networks;
     savedConfig.defaultNetworkProfile = displayedConfig.defaultNetworkProfile;
     saveConfig(savedConfig);
@@ -136,15 +108,15 @@ void ConfigMgr::saveNetworks()
 
 void ConfigMgr::saveUpdatedNetworks()
 {
-    setRestartRequired(false, true);
-    saveConfig(savedConfig);
-    //if (restartRequired)
+    tempConfig = savedConfig;
+    if (saveConfig(savedConfig))
         m_mainwindow->alertOnNetworksUpdatedRestart();
 }
 
-void ConfigMgr::saveConfig(const Config& config)
+bool ConfigMgr::saveConfig(const Config& config)
 {
 
+    Config::NetworkProfile temp_current_profile = m_current_profile;
     m_current_networks_string="";
     m_current_profile=Config::NetworkProfile::trusted;
     for ( const auto& net : config.networks ) {
@@ -166,7 +138,20 @@ void ConfigMgr::saveConfig(const Config& config)
     QFileInfo customConfig(customDir, QString::fromStdString(NETPROFILENAME));
     QDir::root().mkpath(customDir.absolutePath());
     config.saveToFile(customConfig.filePath().toStdString());
-    emit configChanged();
+
+    // is restart needed?
+    int restart = false;
+    if (temp_current_profile != m_current_profile) {
+        qInfo("Restart required - active profile changed from %s to %s",
+               Config::networkProfileDisplayName(temp_current_profile).c_str(),
+               Config::networkProfileDisplayName(m_current_profile).c_str());
+        restart = true;
+    }
+    else if (!savedConfig.equalProfile(tempConfig, m_current_profile))
+        restart = true;
+
+    emit configChanged(restart);
+    return restart;
 }
 
 std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfile)
@@ -322,20 +307,20 @@ bool ConfigMgr::modifiedFrom(const Config& cfg)
 void ConfigMgr::profileRestoreFrom(const Config& cfg, Config::NetworkProfile networkProfile)
 {
     displayedConfig.copyProfile(cfg, networkProfile);
-    emit configChanged();
+    emit configChanged(false);
 }
 
 void ConfigMgr::networksRestoreFrom(const Config& cfg)
 {
     displayedConfig.networks = cfg.networks;
     displayedConfig.defaultNetworkProfile = cfg.defaultNetworkProfile;
-    emit configChanged();
+    emit configChanged(false);
 }
 
 void ConfigMgr::restoreFrom(const Config& cfg)
 {
     displayedConfig = cfg;
-    emit configChanged();
+    emit configChanged(false);
 }
 
 Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active)

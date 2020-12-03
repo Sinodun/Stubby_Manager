@@ -41,6 +41,7 @@ public:
     enum UpdateState{Init, Start, Stop, Restart, Probe, None};
     int getUpdateState() const {return updateState;};
     Config::NetworkProfile getCurrentNetworkProfile() const {return m_currentNetworkProfile;};
+    bool isServiceRunning() const;
     void refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
     void alertOnNetworksUpdatedRestart();
     void alertOnNewNetwork(std::string network, Config::NetworkProfile profile);
@@ -68,7 +69,7 @@ private slots:
 
     void on_userProfileEditInProgress();
     void on_userNetworksEditInProgress();
-    void on_SavedConfigChanged();
+    void on_SavedConfigChanged(bool restart);
 
     void closeFromSystray();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);

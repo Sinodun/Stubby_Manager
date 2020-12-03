@@ -60,12 +60,8 @@ public:
     std::string getCurrentProfileString() const;
     std::string getCurrentNetworksString() const;
 
-    bool unsavedChanges(bool profile, bool network);
-    bool getRestartRequired() const {return restartRequired;};
-    void restartDone();
-
 signals:
-    void configChanged();
+    void configChanged(bool restart);
 
 protected:
     bool profileModifiedFrom(const Config& cfg, Config::NetworkProfile networkProfile);
@@ -74,13 +70,13 @@ protected:
     void profileRestoreFrom(const Config& cfg, Config::NetworkProfile networkProfile);
     void networksRestoreFrom(const Config& cfg);
     void restoreFrom(const Config& cfg);
-    void saveConfig(const Config& cfg);
-    void setRestartRequired(bool profile, bool network);
+    bool saveConfig(const Config& cfg);
     Config::NetworkProfile addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
 
     MainWindow *m_mainwindow;
     Config factoryConfig;
     Config savedConfig;
+    Config tempConfig; // used to determine if restart needed
     bool restartRequired;
     Config::NetworkProfile m_current_profile;
     std::string m_current_networks_string;

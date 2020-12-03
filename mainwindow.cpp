@@ -230,7 +230,8 @@ void MainWindow::probeTimerExpired() {
 }
 
 void MainWindow::closeFromSystray() {
-    handleUnsavedChanges();
+    if (handleUnsavedChanges() == 1 )
+        return;
     qApp->quit();
     return;
 }
@@ -243,7 +244,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 #endif
 
-    handleUnsavedChanges();
+    if (handleUnsavedChanges() == 1) {
+        event->ignore();
+        return;
+    }
 
     if (trayIcon->isVisible()) {
        QVariant exitMessage = stubbySettings->value("app/exitMessage");
@@ -587,10 +591,14 @@ void MainWindow::handleCancel() {
     timer->stop();
 }
 
+bool MainWindow::isServiceRunning() const {
+    return (m_serviceState == ServiceMgr::Running);
+}
+
 int MainWindow::handleUnsavedChanges() {
 
     // Are there unsaved changes to any config?
-    if (!m_configMgr->unsavedChanges(true, true))
+    if (!ui->applyAllButton->isEnabled())
         return 0;
 
     //TODO: We should be able to offer saving just the bits that matter...
@@ -680,7 +688,7 @@ void MainWindow::on_userNetworksEditInProgress()
     setMainButtonStates();
 }
 
-void MainWindow::on_SavedConfigChanged() {
+void MainWindow::on_SavedConfigChanged(bool restart) {
 
     qInfo("Refreshing displayed Config and Current Info");
     m_networksWidget->setNWGuiState();
@@ -690,11 +698,10 @@ void MainWindow::on_SavedConfigChanged() {
     setMainButtonStates();
     setTopPanelNetworkInfo();
 
-    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
+    if (m_serviceState == ServiceMgr::Running && restart) {
         updateState = Restart;
         m_serviceMgr->restart();
     }
-    m_configMgr->restartDone();
 }
 
 void MainWindow::setMainButtonStates()
