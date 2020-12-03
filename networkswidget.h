@@ -37,11 +37,11 @@ signals:
 public slots:
     void on_applyButton_clicked();
     void on_discardButton_clicked();
-    //void on_forgetButton_clicked();
+    void on_forgetButton_clicked();
     void on_defaultProfile_activated(int index);
 
     void on_networkTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-    //void on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+    void on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void PersistentEdit();
 
 private:

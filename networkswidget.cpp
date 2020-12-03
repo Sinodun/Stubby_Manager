@@ -38,6 +38,7 @@ NetworksWidget::NetworksWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkTable));
+    ui->networkTable->setSortingEnabled(true);
     m_selectionWifiModel = ui->networkTable->selectionModel();
 
     ui->networkWiredTable->setModel(m_wiredModel);
@@ -46,6 +47,7 @@ NetworksWidget::NetworksWidget(ConfigMgr& configMgr, QWidget* parent)
     ui->networkWiredTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->networkWiredTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->networkWiredTable->setItemDelegateForColumn(1, new NetworkProfileDelegate(ui->networkWiredTable));
+    ui->networkWiredTable->setSortingEnabled(true);
     m_selectionWiredModel = ui->networkWiredTable->selectionModel();
 
     bool sel=(m_selectionWifiModel->hasSelection() || m_selectionWiredModel->hasSelection());
@@ -53,10 +55,10 @@ NetworksWidget::NetworksWidget(ConfigMgr& configMgr, QWidget* parent)
 
     connect(m_networkTableModel, &NetworkProfileTableModel::dataChanged,
             this, &NetworksWidget::on_networkTableDataChanged);
-//    connect(m_selectionWifiModel, &QItemSelectionModel::selectionChanged,
-//            this, &NetworksWidget::on_networkTableSelectionChanged);
-//    connect(m_selectionWiredModel, &QItemSelectionModel::selectionChanged,
-//            this, &NetworksWidget::on_networkTableSelectionChanged);
+    connect(m_selectionWifiModel, &QItemSelectionModel::selectionChanged,
+            this, &NetworksWidget::on_networkTableSelectionChanged);
+    connect(m_selectionWiredModel, &QItemSelectionModel::selectionChanged,
+            this, &NetworksWidget::on_networkTableSelectionChanged);
     connect(m_networkTableModel, &NetworkProfileTableModel::modelReset,
              this, &NetworksWidget::PersistentEdit);
 
@@ -112,37 +114,45 @@ void NetworksWidget::setNWButtonStates()
 
     ui->applyButton->setEnabled(unsaved);
     ui->discardButton->setEnabled(unsaved);
-    //bool sel=(m_selectionWifiModel->hasSelection() || m_selectionWiredModel->hasSelection());
-    //ui->forgetButton->setEnabled(sel);
+    bool sel=(m_selectionWifiModel->hasSelection() || m_selectionWiredModel->hasSelection());
+    ui->forgetButton->setEnabled(sel);
 
     if (unsaved)
         emit userNetworksEditInProgress();
 }
 
-//void NetworksWidget::on_forgetButton_clicked()
-//{
-//    auto& networks = m_configMgr.displayedConfig.networks;
+void NetworksWidget::on_forgetButton_clicked()
+{
+    auto& networks = m_configMgr.displayedConfig.networks;
 
-//    for ( const auto& row : m_selectionWifiModel->selectedRows() )
-//    {
-//        std::string name = m_wifiModel->data(row).toString().toStdString();
-//        networks.erase(networks.find(name));
-//        qInfo("Forgetting wireless network %s", name.c_str());
-//    }
-//    for ( const auto& row : m_selectionWiredModel->selectedRows() )
-//    {
-//        std::string name = m_wiredModel->data(row).toString().toStdString();
-//        networks.erase(networks.find(name));
-//        qInfo("Forgetting wired network %s", name.c_str());
-//    }
-//    m_selectionWiredModel->reset();
-//    m_selectionWifiModel->reset();
+    for ( const auto& row : m_selectionWifiModel->selectedRows() )
+    {
+        std::string name = m_wifiModel->data(row).toString().toStdString();
+        if (m_wifiModel->data(row, Qt::BackgroundRole).value<QColor>() == QColor::fromRgb(222, 255, 222)) {
+           qInfo("Ignoring active network %s ", name.c_str());
+           continue;
+        }
+        networks.erase(networks.find(name));
+        qInfo("Forgetting wireless network %s", name.c_str());
+    }
+    for ( const auto& row : m_selectionWiredModel->selectedRows() )
+    {
+        std::string name = m_wiredModel->data(row).toString().toStdString();
+        if (m_wiredModel->data(row, Qt::BackgroundRole).value<QColor>() == QColor::fromRgb(222, 255, 222)) {
+           qInfo("Ignoring active network %s ", name.c_str());
+           continue;
+        }
+        networks.erase(networks.find(name));
+        qInfo("Forgetting wired network %s", name.c_str());
+    }
+    m_selectionWiredModel->reset();
+    m_selectionWifiModel->reset();
 
-//    setNWButtonStates();
-//    m_networkTableModel->NPTMConfigChanged();
-//}
+    setNWButtonStates();
+    m_networkTableModel->NPTMConfigChanged();
+}
 
-//void NetworksWidget::on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
-//{
-//    ui->forgetButton->setEnabled(!selected.empty());
-//}
+void NetworksWidget::on_networkTableSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+    ui->forgetButton->setEnabled(!selected.empty());
+}

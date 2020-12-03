@@ -53,6 +53,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="forgetButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Forget</string>
        </property>

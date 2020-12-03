@@ -84,7 +84,6 @@ struct Config
     bool operator==(const Config& cfg) const;
     bool operator!=(const Config& cfg) const;
     bool equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const;
-    bool networksModifiedFrom(const std::map<std::string, NetworkInformation>& from) const;
 
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileChoiceDisplayName(NetworkProfileChoice npc);

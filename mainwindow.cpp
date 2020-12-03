@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->statusOutput->setFont(f);
 //#endif
 
+    // For now, make the Revert all button disapear
+    ui->revertAllButton->setVisible(false);
+
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
     ui->runningStatus->setText("Checking status...");
@@ -408,7 +411,7 @@ void MainWindow::on_testQueryResult(bool result) {
         statusMsg("Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
         trayIcon->showMessage("Connection Test Failed",
-        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 20000);
+        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60*1000);
     }
 }
 
@@ -698,7 +701,7 @@ void MainWindow::on_SavedConfigChanged(bool restart) {
     setMainButtonStates();
     setTopPanelNetworkInfo();
 
-    if (m_serviceState == ServiceMgr::Running && restart) {
+    if (m_serviceState == ServiceMgr::Running && restart && updateState != Init) {
         updateState = Restart;
         m_serviceMgr->restart();
     }
