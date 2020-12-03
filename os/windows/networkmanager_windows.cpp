@@ -532,7 +532,7 @@ void NetworkMgrWindows::on_testQuery_finished(int, QProcess::ExitStatus)
 void NetworkMgrWindows::on_networkInferfaces_changed(const QNetworkConfiguration&)
 {
     //qDebug("Network configuration changed");
-    getStateDNS(true);
+    getStateDNS(false);
 }
 
 NetworkMgr *NetworkMgr::factory(MainWindow *parent) {

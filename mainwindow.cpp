@@ -173,6 +173,7 @@ MainWindow::MainWindow(QWidget *parent)
     QVariant details = stubbySettings->value("info/hideDetails");
     if (!details.isNull())
         ui->hideDetailsCheckBox->setChecked(details.toBool());
+    updateState = None;
 
 }
 
@@ -403,8 +404,30 @@ void MainWindow::on_testQueryResult(bool result) {
         statusMsg("Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
         trayIcon->showMessage("Connection Test Failed",
-        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60);
+        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 20000);
     }
+}
+
+void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile profile) {
+    if (updateState == Init)
+        return;
+    QString message = "A new network was joined which will use the default ";
+    message.append(Config::networkProfileDisplayName(profile).c_str());
+    message.append(" network profile. If you want to change the profile for this network go to the Networks tab.");
+    trayIcon->showMessage("New network joined",
+    message, QSystemTrayIcon::Information, 60*1000);
+    statusMsg(message);
+}
+
+void MainWindow::alertOnNetworksUpdatedRestart() {
+    if (updateState == Init)
+        return;
+    QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
+    message.append(Config::networkProfileDisplayName(m_currentNetworkProfile).c_str());
+    message.append(" network profile.");
+    trayIcon->showMessage("Stubby is restarting",
+    message, QSystemTrayIcon::Information, 60*1000);
+    statusMsg(message);
 }
 
 void MainWindow::on_showLogButton_toggled() {

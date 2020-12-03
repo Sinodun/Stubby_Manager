@@ -42,7 +42,7 @@ int ServiceMgr::start(ConfigMgr& configMgr, Config::NetworkProfile networkProfil
             m_mainwindow->statusMsg("Configuration for active profile was invalid. Please check there is at least one server active.");
             return 1;
         }
-        m_mainwindow->statusMsg("Configuration generated.");
+        m_mainwindow->statusMsg("Status: Stubby service configuration generated.");
         m_serviceState = Starting;
         return startService(QString::fromStdString(stubby_yml));
     }

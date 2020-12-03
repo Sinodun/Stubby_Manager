@@ -42,6 +42,8 @@ public:
     int getUpdateState() const {return updateState;};
     Config::NetworkProfile getCurrentNetworkProfile() const {return m_currentNetworkProfile;};
     void refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
+    void alertOnNetworksUpdatedRestart();
+    void alertOnNewNetwork(std::string network, Config::NetworkProfile profile);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
