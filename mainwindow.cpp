@@ -137,7 +137,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_networkMgr, SIGNAL(testQueryResult(bool)), this, SLOT(on_testQueryResult(bool)));
 
     // Set up networks tab.
-    m_networksWidget = new NetworksWidget(*m_configMgr);
+    m_networksWidget = new NetworksWidget(*m_configMgr, this);
     ui->mainTabWidget->removeTab(2);
     ui->mainTabWidget->insertTab(2, m_networksWidget, "Networks");
 
@@ -290,6 +290,11 @@ void MainWindow::statusMsg(QString statusMsg) {
     ui->statusOutput->insertPlainText (statusMsg);
     ui->statusOutput->insertPlainText ("\n");
     ui->statusOutput->moveCursor (QTextCursor::End);
+}
+
+void MainWindow::systrayMsg(QString status_msg) {
+    trayIcon->showMessage("Stubby message",
+    status_msg, QSystemTrayIcon::Information, 60*1000);
 }
 
 void MainWindow::logMsg(QString logMsg) {

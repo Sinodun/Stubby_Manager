@@ -142,7 +142,7 @@ bool ConfigMgr::saveConfig(const Config& config)
     // is restart needed?
     int restart = false;
     if (temp_current_profile != m_current_profile) {
-        qInfo("Restart required - active profile changed from %s to %s",
+        qInfo("Restart would be required if running - active profile changed from %s to %s",
                Config::networkProfileDisplayName(temp_current_profile).c_str(),
                Config::networkProfileDisplayName(m_current_profile).c_str());
         restart = true;

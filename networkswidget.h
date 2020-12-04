@@ -26,7 +26,7 @@ class NetworksWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit NetworksWidget(ConfigMgr& configMgr, QWidget* parent = nullptr);
+    explicit NetworksWidget(ConfigMgr& configMgr, MainWindow* main, QWidget* parent = nullptr);
     virtual ~NetworksWidget();
 
     void setNWGuiState();
@@ -50,6 +50,7 @@ private:
     Ui::NetworkList* ui;
 
     ConfigMgr& m_configMgr;
+    MainWindow* m_mainWindow;
     NetworkProfileTableModel* m_networkTableModel;
     QSortFilterProxyModel* m_wifiModel;
     QSortFilterProxyModel* m_wiredModel;
