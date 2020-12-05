@@ -42,11 +42,10 @@ public slots:
     void on_applyButton_clicked();
     void on_discardButton_clicked();
     void on_revertButton_clicked();
-    void on_openWebsite_clicked();
-    void on_serverTable_clicked();
+    //void on_serverTable_clicked();
 
     void on_serverTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-
+    void onTableClicked(const QModelIndex &index);
 private:
     void setNPWButtonStates();
 

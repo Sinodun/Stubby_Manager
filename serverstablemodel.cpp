@@ -6,6 +6,9 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include <QColor>
+#include <QFont>
+
 #include "serverstablemodel.h"
 
 ServersTableModel::ServersTableModel(Config& config, Config::NetworkProfile networkProfile, QObject* parent)
@@ -79,6 +82,13 @@ QVariant ServersTableModel::data(const QModelIndex& index, int role) const
             else
                 return Qt::Unchecked;
         }
+    }
+    else if (role == Qt::FontRole && index.column() == 2) {
+            QFont font;
+            font.setUnderline(true);
+            return font;
+    } else if (role == Qt::ForegroundRole && index.column() == 2) {
+            return QColor(Qt::darkBlue);
     }
 
     return QVariant();
