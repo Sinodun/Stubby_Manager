@@ -328,16 +328,16 @@ Config::NetworkProfile ConfigMgr::addNetwork(const std::string& name, NetworkMgr
     // For now, since the user must have a default use this code to catch any corner case
     if ( displayedConfig.networks.find(name) == displayedConfig.networks.end() ) {
         displayedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
+        displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     }
     // always update the active status in case it has changed
-    displayedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     displayedConfig.networks[name].interfaceActive=active;
 
     if ( savedConfig.networks.find(name) == savedConfig.networks.end() ) {
         savedConfig.networks[name].profile = Config::NetworkProfileChoice::default_profile;
+        savedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
         m_mainwindow->alertOnNewNetwork(name, savedConfig.defaultNetworkProfile);
     }
-    savedConfig.networks[name].interfaceType=Config::InterfaceTypes(type);
     savedConfig.networks[name].interfaceActive=active;
     return Config::networkProfileFromChoice(savedConfig.networks[name].profile, savedConfig.defaultNetworkProfile);
 }

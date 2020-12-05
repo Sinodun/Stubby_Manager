@@ -188,8 +188,10 @@ void Config::loadFromFile(const std::string& path)
     for ( const auto& n : ymlnetworks )
     {
         std::string name = n.first.as<std::string>();
-        NetworkProfileChoice profile = networkProfileChoiceFromYaml(n.second.as<std::string>(), ymlnetworks.Mark());
+        NetworkProfileChoice profile = networkProfileChoiceFromYaml(n.second["profile"].as<std::string>(), ymlnetworks.Mark());
         networks[name].profile = profile;
+        std::string type = n.second["type"].as<std::string>();
+        networks[name].interfaceType = (InterfaceTypes)std::atoi(type.c_str());
     }
 }
 
@@ -260,8 +262,13 @@ void Config::saveToFile(const std::string& path) const
     out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileYamlKey(defaultNetworkProfile);
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
-    for (const auto& nt : networks)
-        out << YAML::Key << nt.first << YAML::Value << networkProfileChoiceYamlKey(nt.second.profile);
+    for (const auto& nt : networks) {
+        out << YAML::Key << nt.first << YAML::Value;
+        out << YAML::BeginMap;
+        out << YAML::Key << "profile" << YAML::Value << networkProfileChoiceYamlKey(nt.second.profile);
+        out << YAML::Key << "type" << YAML::Value << nt.second.interfaceType;
+        out << YAML::EndMap;
+    }
     out << YAML::EndMap;
 
     fout.close();
