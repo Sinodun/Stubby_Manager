@@ -214,8 +214,8 @@ int ServiceMgrWindows::stopService()
 int ServiceMgrWindows::restartService()
 {
     // Service start is triggered later from main windown
+    qInfo("restart service");
     return stopService();
-    //return startService();
 }
 
 ServiceMgr *ServiceMgr::factory(MainWindow *parent)

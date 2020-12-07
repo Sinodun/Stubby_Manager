@@ -37,7 +37,7 @@ public:
     } ServiceState;
 
     int getState();
-    int start(ConfigMgr& config, Config::NetworkProfile networkProfile);
+    int start(ConfigMgr& config);
     int stop();
     int restart();
 

@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QSettings>
 #include <QDesktopServices>
+#include <QDateTime>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -41,7 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
     , m_serviceState(ServiceMgr::Unknown)
     , m_networkState(NetworkMgr::Unknown)
     , updateState(Init)
-    , m_currentNetworkProfile(Config::NetworkProfile::untrusted)
     , m_configMgr(), m_serviceMgr(), m_networkMgr()
     , m_untrustedNetworkWidget(), m_trustedNetworkWidget()
     , m_hostileNetworkWidget(), m_networksWidget(), m_logMgr()
@@ -287,6 +287,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::statusMsg(QString statusMsg) {
     ui->statusOutput->moveCursor (QTextCursor::End);
+    ui->statusOutput->insertPlainText (QDateTime::currentDateTime().toString());
+    ui->statusOutput->insertPlainText (":  ");
     ui->statusOutput->insertPlainText (statusMsg);
     ui->statusOutput->insertPlainText ("\n");
     ui->statusOutput->moveCursor (QTextCursor::End);
@@ -340,7 +342,7 @@ void MainWindow::on_onOffSlider_stateChanged()
                 handleCancel();
                 return;
             }
-            if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
+            if (m_serviceMgr->start(*m_configMgr))
                handleError();
         }
         else if (m_networkState != NetworkMgr::Localhost) {
@@ -435,7 +437,7 @@ void MainWindow::alertOnNetworksUpdatedRestart() {
     if (updateState == Init)
         return;
     QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
-    message.append(Config::networkProfileDisplayName(m_currentNetworkProfile).c_str());
+    message.append(m_configMgr->getCurrentNetworksString().c_str());
     message.append(" network profile.");
     trayIcon->showMessage("Stubby is restarting",
     message, QSystemTrayIcon::Information, 60*1000);
@@ -512,7 +514,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
     }
     else if (updateState == Restart) {
         if (m_serviceState == ServiceMgr::Stopped) {
-            if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
+            if (m_serviceMgr->start(*m_configMgr))
                 handleError();
         }
         else if (m_serviceState == ServiceMgr::Running) {

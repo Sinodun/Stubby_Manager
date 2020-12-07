@@ -104,7 +104,6 @@ void NetworksWidget::on_networkTableDataChanged(const QModelIndex &topLeft, cons
 
 void NetworksWidget::setNWGuiState()
 {
-    qInfo("Setting Network Widget State");
     ui->defaultProfile->setCurrentText(QString::fromStdString(Config::networkProfileDisplayName(m_configMgr.displayedConfig.defaultNetworkProfile)));
     setNWButtonStates();
     m_networkTableModel->NPTMConfigChanged();

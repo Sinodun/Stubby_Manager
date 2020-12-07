@@ -33,13 +33,16 @@ int ServiceMgr::getState() {
     return getStateofService();
 }
 
-int ServiceMgr::start(ConfigMgr& configMgr, Config::NetworkProfile networkProfile)
+int ServiceMgr::start(ConfigMgr& configMgr)
 {
-    m_mainwindow->statusMsg("Starting Stubby service...");
+    QString message = "Starting Stubby service wtih ";
+    message.append(configMgr.getCurrentProfileString().c_str());
+    message.append(" profile...");
+    m_mainwindow->statusMsg(message);
     try {
-        std::string stubby_yml = configMgr.generateStubbyConfig(networkProfile);
+        std::string stubby_yml = configMgr.generateStubbyConfig();
         if (stubby_yml.empty()) {
-            m_mainwindow->statusMsg("Configuration for active profile was invalid. Please check there is at least one server active.");
+            m_mainwindow->statusMsg("Error: Configuration generated for the active profile was invalid. Stubby has not been restarted.");
             return 1;
         }
         m_mainwindow->statusMsg("Status: Stubby service configuration generated.");

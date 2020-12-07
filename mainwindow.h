@@ -41,7 +41,6 @@ public:
     void logMsg(QString log_msg);
     enum UpdateState{Init, Start, Stop, Restart, Probe, None};
     int getUpdateState() const {return updateState;};
-    Config::NetworkProfile getCurrentNetworkProfile() const {return m_currentNetworkProfile;};
     bool isServiceRunning() const;
     void refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
     void alertOnNetworksUpdatedRestart();
@@ -106,8 +105,6 @@ private:
     NetworksWidget *m_networksWidget;
 
     ILogMgr *m_logMgr;
-
-    Config::NetworkProfile m_currentNetworkProfile;
 
     UpdateState updateState;
 

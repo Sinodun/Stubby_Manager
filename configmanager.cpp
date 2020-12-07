@@ -20,6 +20,27 @@
 #include "configmanager.h"
 #include "mainwindow.h"
 
+
+bool check_config(std::string file) {
+    QProcess check;
+    // getdns_query.exe is in the same directory as this executable.
+    QFileInfo getdns_query = QFileInfo(QDir(QCoreApplication::applicationDirPath()), "stubby.exe");
+    QStringList arguments;
+    arguments << "-i" << "-C" << file.c_str();
+    check.setProgram(getdns_query.filePath());
+    check.setArguments(arguments);
+    check.start();
+    if (!check.waitForStarted())
+        return false;
+    if (!check.waitForFinished())
+        return false;
+    QByteArray stdoutData;
+    int exitcode = check.exitCode();
+    qInfo("check_config result is %d", exitcode);
+    //qDebug() << __FILE__ << ":" << __FUNCTION__ << stdoutData;
+    return exitcode;
+}
+
 ConfigMgr::ConfigMgr(MainWindow *parent)
     : QObject(parent), m_mainwindow(parent), restartRequired(false)
 {
@@ -84,6 +105,10 @@ std::string ConfigMgr::getCurrentNetworksString() const {
     return m_current_networks_string;
 }
 
+Config::NetworkProfile ConfigMgr::getCurrentNetworkProfile() const {
+    return m_current_profile;
+}
+
 void ConfigMgr::saveAll(bool restart)
 {
     tempConfig = savedConfig;
@@ -142,7 +167,7 @@ bool ConfigMgr::saveConfig(const Config& config)
     // is restart needed?
     int restart = false;
     if (temp_current_profile != m_current_profile) {
-        qInfo("Restart would be required if running - active profile changed from %s to %s",
+        qInfo("Restart required if running - active profile changed from %s to %s",
                Config::networkProfileDisplayName(temp_current_profile).c_str(),
                Config::networkProfileDisplayName(m_current_profile).c_str());
         restart = true;
@@ -154,7 +179,7 @@ bool ConfigMgr::saveConfig(const Config& config)
     return restart;
 }
 
-std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfile)
+std::string ConfigMgr::generateStubbyConfig()
 {
 
     // Look for template file in factory dir and current dir.
@@ -171,22 +196,23 @@ std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfil
     QDir tmpdir(QString::fromStdString(appDir()));
     if ( !QDir::root().mkpath(tmpdir.absolutePath()) )
         throw std::runtime_error("Can't make application temporary directory");
-    QFileInfo stubby_yml(tmpdir, "stubbyservice.yml");
+    QFileInfo stubby_yml(tmpdir, "stubbyservice_tmp.yml");
+    QFileInfo stubby_yml_real(tmpdir, "stubbyservice.yml");
 
     ctemplate::TemplateDictionary dict("STUBBY_CONFIG");
-    if ( savedConfig.profiles[networkProfile].encryptAll )
+    if ( savedConfig.profiles[m_current_profile].encryptAll )
         dict.SetValue("TRANSPORT_LIST", "[GETDNS_TRANSPORT_TLS]");
     else
         dict.SetValue("TRANSPORT_LIST", "[GETDNS_TRANSPORT_UDP, GETDNS_TRANSPORT_TCP, GETDNS_TRANSPORT_TLS]");
-    if ( savedConfig.profiles[networkProfile].alwaysAuthenticate )
+    if ( savedConfig.profiles[m_current_profile].alwaysAuthenticate )
         dict.SetValue("AUTHENTICATION", "GETDNS_AUTHENTICATION_REQUIRED");
     else
         dict.SetValue("AUTHENTICATION", "GETDNS_AUTHENTICATION_NONE");
-    if ( savedConfig.profiles[networkProfile].validateData )
+    if ( savedConfig.profiles[m_current_profile].validateData )
         dict.SetValue("DNSSEC", "GETDNS_EXTENSION_TRUE");
     else
         dict.SetValue("DNSSEC", "GETDNS_EXTENSION_FALSE");
-    if ( savedConfig.profiles[networkProfile].roundRobin )
+    if ( savedConfig.profiles[m_current_profile].roundRobin )
         dict.SetValue("ROUND_ROBIN", "1");
     else
         dict.SetValue("ROUND_ROBIN", "0");
@@ -194,8 +220,8 @@ std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfil
     int server_count=0;
     for ( const auto& s : savedConfig.servers )
     {
-        if ( s.hidden.find(networkProfile) != s.hidden.end() ||
-             s.inactive.find(networkProfile) != s.inactive.end() )
+        if ( s.hidden.find(m_current_profile) != s.hidden.end() ||
+             s.inactive.find(m_current_profile) != s.inactive.end() )
             continue;
 
         server_count++;
@@ -229,6 +255,16 @@ std::string ConfigMgr::generateStubbyConfig(Config::NetworkProfile networkProfil
     fout.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     fout << expansion;
     fout.close();
+
+    // now check the file is valid
+    if (check_config(res) != 0) {
+        return "";
+    }
+
+    // copy to real location, leave tmp file for potential debugging
+    std::ifstream  src(res, std::ios::binary);
+    std::ofstream  dst(stubby_yml_real.filePath().toStdString(),   std::ios::binary);
+    dst << src.rdbuf();
     return res;
 }
 

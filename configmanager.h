@@ -12,6 +12,7 @@
 #include <string>
 
 #include <QObject>
+#include <QProcess>
 
 #include "config.h"
 #include "networkmanager.h"
@@ -42,7 +43,7 @@ public:
     void saveNetworks();
     void saveUpdatedNetworks();
 
-    std::string generateStubbyConfig(Config::NetworkProfile networkProfile);
+    std::string generateStubbyConfig();
 
     bool profileModifiedFromFactory(Config::NetworkProfile networkProfile);
     bool profileModifiedFromSaved(Config::NetworkProfile networkProfile);
@@ -58,6 +59,7 @@ public:
 
     void updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
     std::string getCurrentProfileString() const;
+    Config::NetworkProfile getCurrentNetworkProfile() const;
     std::string getCurrentNetworksString() const;
 
 signals:
