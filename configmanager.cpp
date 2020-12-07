@@ -259,7 +259,7 @@ std::string ConfigMgr::generateStubbyConfig()
     if ( savedConfig.profiles[m_current_profile].encryptAll )
         dict.SetValue("TRANSPORT_LIST", "[GETDNS_TRANSPORT_TLS]");
     else
-        dict.SetValue("TRANSPORT_LIST", "[GETDNS_TRANSPORT_UDP, GETDNS_TRANSPORT_TCP, GETDNS_TRANSPORT_TLS]");
+        dict.SetValue("TRANSPORT_LIST", "[GETDNS_TRANSPORT_TLS, GETDNS_TRANSPORT_UDP, GETDNS_TRANSPORT_TCP]");
     if ( savedConfig.profiles[m_current_profile].alwaysAuthenticate )
         dict.SetValue("AUTHENTICATION", "GETDNS_AUTHENTICATION_REQUIRED");
     else

@@ -80,6 +80,9 @@ void NetworkProfileWidget::on_alwaysAuthenticate_stateChanged(int state)
 void NetworkProfileWidget::on_encryptAllTraffic_stateChanged(int state)
 {
     m_configMgr.displayedConfig.profiles[m_networkProfile].encryptAll = (state == Qt::CheckState::Checked);
+    // If encryption is not enabled, authentication has no meaning
+    ui->alwaysAuthenticate->setCheckState((Qt::CheckState)state);
+    ui->alwaysAuthenticate->setEnabled(state == Qt::CheckState::Checked);
     setNPWButtonStates();
 }
 
