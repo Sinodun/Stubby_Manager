@@ -38,8 +38,8 @@ public:
 
     void init();
     void load();
-    void saveAll(bool restart);
-    void saveProfile(Config::NetworkProfile networkProfile);
+    bool saveAll(bool restart);
+    bool saveProfile(Config::NetworkProfile networkProfile);
     void saveNetworks();
     void saveUpdatedNetworks();
 
@@ -59,7 +59,6 @@ public:
 
     void updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
     std::string getCurrentProfileString() const;
-    Config::NetworkProfile getCurrentNetworkProfile() const;
     std::string getCurrentNetworksString() const;
 
 signals:
@@ -73,6 +72,7 @@ protected:
     void networksRestoreFrom(const Config& cfg);
     void restoreFrom(const Config& cfg);
     bool saveConfig(const Config& cfg);
+    bool profilesValid(Config::NetworkProfile profile, bool check_all);
     Config::NetworkProfile addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
 
     MainWindow *m_mainwindow;

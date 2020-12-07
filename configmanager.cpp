@@ -105,19 +105,75 @@ std::string ConfigMgr::getCurrentNetworksString() const {
     return m_current_networks_string;
 }
 
-Config::NetworkProfile ConfigMgr::getCurrentNetworkProfile() const {
-    return m_current_profile;
+bool ConfigMgr::profilesValid(Config::NetworkProfile check_profile, bool check_all) {
+    std::unordered_map<Config::NetworkProfile, Config::Profile> profiles = displayedConfig.profiles;
+    for (const auto& profile : profiles) {
+        Config::NetworkProfile prof_type = profile.first;
+        if (!check_all && prof_type != check_profile)
+            continue;
+        int server_count=0;
+        int server_auth=0;
+        int server_cleartext=0;
+        for ( const auto& s : displayedConfig.servers )
+        {
+            if ( s.hidden.find(prof_type) != s.hidden.end() ||
+                 s.inactive.find(prof_type) != s.inactive.end() )
+                continue;
+
+            server_count++;
+            for ( const auto& a : s.addresses )
+            {
+                if (!s.tlsAuthName.empty() || !s.pubKeyDigestValue.empty())
+                    server_auth++;
+                if (a.compare("1.1.1.1") == 0 || a.compare("9.9.9.9") == 0 ||
+                    a.compare("8.8.8.8") == 0 || a.compare("176.103.130.130") == 0 || a.compare("89.233.43.71") == 0) {
+                    server_cleartext++;
+                }
+            }
+        }
+        // 1) must be at least one server
+        if (server_count == 0) {
+            QString message = "ERROR: The ";
+            message.append(Config::networkProfileDisplayName(prof_type).c_str());
+            message.append(" profile cannot be saved: there must be at least one server in a profile.");
+            m_mainwindow->systrayMsg(message);
+            return false;
+        }
+        // 2) If authenticate then must be at least one server with auth creds
+        if (profile.second.encryptAll && profile.second.alwaysAuthenticate && server_auth == 0) {
+            QString message = "ERROR: The ";
+            message.append(Config::networkProfileDisplayName(prof_type).c_str());
+            message.append(" profile cannot be saved: there must be at least one server with either an authentication name or a pinset in a profile that requires authentication.");
+            m_mainwindow->systrayMsg(message);
+            return false;
+        }
+        // 3) Warn if not encryption and none of the shipped servers that do cleartext are included
+        if (!profile.second.encryptAll && server_cleartext == 0 ){
+            //&&
+             //profile.second.useNetworkProvidedServer == Config::UseNetworkProvidedServer::exclude) {
+            QString message = "WARNING: The ";
+            message.append(Config::networkProfileDisplayName(prof_type).c_str());
+            message.append(" profile is set not to encrypt traffic, but none of the shipped servers known to support cleartext are included.");
+            m_mainwindow->systrayMsg(message);
+            return false;
+        }
+    }
 }
 
-void ConfigMgr::saveAll(bool restart)
+
+bool ConfigMgr::saveAll(bool restart)
 {
+    if (!profilesValid(Config::NetworkProfile::untrusted, true))
+        return false;
     tempConfig = savedConfig;
     savedConfig = displayedConfig;
     saveConfig(savedConfig);
 }
 
-void ConfigMgr::saveProfile(Config::NetworkProfile networkProfile)
+bool ConfigMgr::saveProfile(Config::NetworkProfile networkProfile)
 {
+    if (!profilesValid(networkProfile, false))
+        return false;
     tempConfig = savedConfig;
     savedConfig.copyProfile(displayedConfig, networkProfile);
     saveConfig(savedConfig);

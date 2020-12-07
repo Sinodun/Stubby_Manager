@@ -296,7 +296,7 @@ void MainWindow::statusMsg(QString statusMsg) {
 
 void MainWindow::systrayMsg(QString status_msg) {
     trayIcon->showMessage("Stubby message",
-    status_msg, QSystemTrayIcon::Information, 60*1000);
+    status_msg, QSystemTrayIcon::Information, 600*1000);
 }
 
 void MainWindow::logMsg(QString logMsg) {
@@ -622,7 +622,7 @@ int MainWindow::handleUnsavedChanges() {
     int result = 0;
     switch (ret) {
       case QMessageBox::Save:
-         m_configMgr->saveAll(true);
+         result = m_configMgr->saveAll(true);
          break;
       case QMessageBox::Discard:
          m_configMgr->restoreSaved();

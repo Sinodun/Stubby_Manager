@@ -107,7 +107,7 @@ servers:
   - name: CleanBrownsing
     link: cleanbrowsing.org/privacy
     addresses:
-      - 85.228.168.9:853
+      - 85.228.168.9
     tls_auth_name: family-filter-dns.cleanbrowsing.org
     tls_pubkey_pinset:
       digest: sha256
@@ -135,7 +135,7 @@ servers:
   - name: UncensoredDNS
     link: blog.uncensoreddns.org/
     addresses:
-      - "89.233.43.71 "
+      - 89.233.43.71
     tls_auth_name: unicast.censurfridns.dk
     tls_pubkey_pinset:
       digest: sha256
