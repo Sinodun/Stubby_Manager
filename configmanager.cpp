@@ -158,6 +158,7 @@ bool ConfigMgr::profilesValid(Config::NetworkProfile check_profile, bool check_a
             return false;
         }
     }
+    return true;
 }
 
 
@@ -168,6 +169,7 @@ bool ConfigMgr::saveAll(bool restart)
     tempConfig = savedConfig;
     savedConfig = displayedConfig;
     saveConfig(savedConfig);
+    return true;
 }
 
 bool ConfigMgr::saveProfile(Config::NetworkProfile networkProfile)
@@ -177,6 +179,7 @@ bool ConfigMgr::saveProfile(Config::NetworkProfile networkProfile)
     tempConfig = savedConfig;
     savedConfig.copyProfile(displayedConfig, networkProfile);
     saveConfig(savedConfig);
+    return true;
 }
 
 void ConfigMgr::saveNetworks()

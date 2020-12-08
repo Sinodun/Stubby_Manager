@@ -227,7 +227,7 @@ void MainWindow::timerExpired() {
 void MainWindow::probeTimerExpired() {
     if (updateState != None)
         return;
-    statusMsg("\nProbing State");
+    statusMsg("Probing State");
     updateState = Probe;
     m_serviceMgr->getState();
 }
@@ -394,7 +394,7 @@ void MainWindow::on_restartButton_clicked() {
 }
 
 void MainWindow::on_probeButton_clicked() {
-    statusMsg("\nProbing State");
+    statusMsg("Probing State");
     updateState = Probe;
     m_serviceMgr->getState();
 }

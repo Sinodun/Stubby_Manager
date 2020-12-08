@@ -287,6 +287,53 @@ bool Config::Server::operator==(const Config::Server& server) const
         inactive == server.inactive;
 }
 
+bool Config::serverDataIsEqual(const Config::Server& server1, const Config::Server& server2) const
+{
+    return
+        server1.name == server2.name &&
+        server1.link == server2.link &&
+        server1.addresses == server2.addresses &&
+        server1.tlsAuthName == server2.tlsAuthName &&
+        server1.pubKeyDigestType == server2.pubKeyDigestType &&
+        server1.pubKeyDigestValue == server2.pubKeyDigestValue;
+}
+
+bool Config::serverActiveIsEqualForProfile(const Config::Server& server1, const Config::Server& server2, Config::NetworkProfile profile) const
+{
+    if (server1.inactive.find(profile) != server1.inactive.end() &&
+        server2.inactive.find(profile) != server2.inactive.end())
+        return true;
+    if (server1.inactive.find(profile) == server1.inactive.end() &&
+        server2.inactive.find(profile) == server2.inactive.end())
+        return true;
+    return false;
+}
+
+void Config::Server::setServerDataEqual(const Config::Server& server)
+{
+   name = server.name;
+   link = server.link;
+   addresses = server.addresses;
+   tlsAuthName = server.tlsAuthName;
+   pubKeyDigestType = server.pubKeyDigestType;
+   pubKeyDigestValue = server.pubKeyDigestValue;
+}
+
+void Config::Server::setServerActiveEqualForProfile(const Config::Server& server, Config::NetworkProfile profile)
+{
+    if (server.inactive.find(profile) != server.inactive.end()) {
+        // profile is in inactive list
+        if (inactive.find(profile) == inactive.end()) {
+            inactive.insert(profile);
+        }
+    } else if (server.inactive.find(profile) == server.inactive.end()) {
+        // profile is NOT in inactive list
+        if (inactive.find(profile) != inactive.end()) {
+            inactive.erase(profile);
+        }
+    }
+}
+
 bool Config::Profile::operator==(const Config::Profile& server) const
 {
     return
@@ -313,7 +360,6 @@ bool Config::operator==(const Config& cfg) const
         servers == cfg.servers &&
         networks == cfg.networks &&
         defaultNetworkProfile == cfg.defaultNetworkProfile;
-//      !networksModifiedFrom(cfg.networks);
 }
 
 bool Config::operator!=(const Config& cfg) const
@@ -323,51 +369,28 @@ bool Config::operator!=(const Config& cfg) const
 
 void Config::copyProfile(const Config& cfg, Config::NetworkProfile networkProfile)
 {
-    defaultNetworkProfile = cfg.defaultNetworkProfile;
     profiles[networkProfile] = cfg.profiles.at(networkProfile);
-
-    for ( auto& s : servers )
-    {
-        s.hidden.erase(networkProfile);
-        s.inactive.erase(networkProfile);
-
-        for ( const auto& s2 : cfg.servers )
-            if ( s.name == s2.name )
-            {
-                if ( s2.hidden.find(networkProfile) != s2.hidden.end() )
-                    s.hidden.insert(networkProfile);
-                if ( s2.inactive.find(networkProfile) != s2.inactive.end() )
-                    s.inactive.insert(networkProfile);
-                break;
-            }
+    // At the moment we cannot delete servers or re-order
+    for (std::size_t i = 0; i < servers.size(); ++i) {
+        servers[i].setServerDataEqual(cfg.servers[i]);
+        servers[i].setServerActiveEqualForProfile(cfg.servers[i], networkProfile);
     }
 }
 
 bool Config::equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const
 {
-    // TODO: strictly need to check if either of the default new profiles match the one we are interested in...
-    if ( defaultNetworkProfile != cfg.defaultNetworkProfile ||
-         !(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
+
+    if (!(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
         return false;
-
-    for ( auto& s : servers )
-    {
-        bool found = false;
-
-        for ( const auto& s2 : cfg.servers )
-            if ( s.name == s2.name )
-            {
-                if ( s.hidden.count(networkProfile) != s2.hidden.count(networkProfile) ||
-                     s.inactive.count(networkProfile) != s2.inactive.count(networkProfile) )
-                     return false;
-                found = true;
-                break;
-            }
-
-        if ( !found )
+    if (servers.size() != cfg.servers.size())
+        return false;
+    // At the moment we cannot delete servers or re-order
+    for (std::size_t i = 0; i < servers.size(); ++i) {
+        if (!serverDataIsEqual(servers[i], cfg.servers[i]))
+            return false;
+        if (!serverActiveIsEqualForProfile(servers[i], cfg.servers[i], networkProfile))
             return false;
     }
-
     return true;
 }
 

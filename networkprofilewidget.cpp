@@ -13,6 +13,7 @@
 #include <QUrl>
 
 #include "networkprofilewidget.h"
+#include "serverdatadialog.h"
 
 NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::NetworkProfile np, QWidget* parent)
     : QWidget(parent),
@@ -26,11 +27,12 @@ NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::Network
     m_serverTableModel = new ServersTableModel(m_configMgr.displayedConfig, m_networkProfile);
     ui->serverTable->setModel(m_serverTableModel);
     ui->serverTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->serverTable->hideColumn(5);
     connect(ui->serverTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(onTableClicked(const QModelIndex &)));
     connect(m_serverTableModel, &ServersTableModel::dataChanged,
             this, &NetworkProfileWidget::on_serverTableDataChanged);
-//    connect(&m_configMgr, &ConfigMgr::configChanged,
-//            this, &NetworkProfileWidget::on_NPWGlobalConfigChanged);
+    ui->editServerButton->setEnabled(false);
+    ui->deleteServerButton->setVisible(false);
     setNPWButtonStates();
 }
 
@@ -48,28 +50,41 @@ void NetworkProfileWidget::onTableClicked(const QModelIndex &index) {
     QDesktopServices::openUrl (QUrl(url));
 }
 
-//void NetworkProfileWidget::on_serverTable_clicked() {
-//    // Enable button if one and only one row is selected
-//    QItemSelectionModel *select = ui->serverTable->selectionModel();
-//    QModelIndexList selection = select->selectedIndexes();
-//    if (selection.count() == 0) {
-//        ui->openWebsite->setEnabled(false);
-//        return;
-//    }
-//    int count = 0, row;
-//    foreach (QModelIndex index, selection) {
-//        if (count == 0) {
-//         row = index.row();
-//         count++;
-//         continue;
-//        }
-//        if (row != index.row()) {
-//            ui->openWebsite->setEnabled(false);
-//            return;
-//        }
-//    }
-//    ui->openWebsite->setEnabled(true);
-//}
+void NetworkProfileWidget::on_serverTable_clicked() {
+    // Enable buttons if one and only one row is selected
+    QItemSelectionModel *select = ui->serverTable->selectionModel();
+    QModelIndexList selection = select->selectedIndexes();
+    if (selection.count() == 0) {
+        ui->editServerButton->setEnabled(false);
+        return;
+    }
+    int count = 0, row;
+    foreach (QModelIndex index, selection) {
+        if (count == 0) {
+         row = index.row();
+         count++;
+         continue;
+        }
+        if (row != index.row()) {
+            ui->editServerButton->setEnabled(false);
+            return;
+        }
+    }
+    ui->editServerButton->setEnabled(true);
+}
+
+void NetworkProfileWidget::on_editServerButton_clicked() {
+    QItemSelectionModel *select = ui->serverTable->selectionModel();
+    QModelIndexList selection = select->selectedIndexes();
+    if (selection.count() == 0)
+        return;
+    int row = selection.begin()->row();
+    Config::Server& server = m_configMgr.displayedConfig.servers[row];
+    ServerDataDialog dialog(server, this);
+    dialog.exec();
+    ui->editServerButton->setEnabled(false);
+    setNPWGuiState();
+}
 
 void NetworkProfileWidget::on_alwaysAuthenticate_stateChanged(int state)
 {

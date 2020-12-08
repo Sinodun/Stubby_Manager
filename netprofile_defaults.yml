@@ -11,6 +11,7 @@ servers:
       []
     inactive:
       - hostile
+      - trusted
   - name: Stubby server (Sinodun1)
     link: dnsprivacy.org
     addresses:
@@ -23,6 +24,7 @@ servers:
       []
     inactive:
       - hostile
+      - trusted
   - name: Stubby server (getdnsapi.net)
     link: dnsprivacy.org
     addresses:
@@ -35,6 +37,7 @@ servers:
       []
     inactive:
       - hostile
+      - trusted
   - name: Quad9 (9.9.9.9)
     link: quad9.net
     addresses:
@@ -46,7 +49,6 @@ servers:
     hidden:
       []
     inactive:
-      - trusted
       - untrusted
   - name: Comcast
     link: corporate.comcast.com/privacy

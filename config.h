@@ -38,6 +38,8 @@ struct Config
         std::unordered_set<NetworkProfile> inactive;
 
         bool operator==(const Server& server) const;
+        void setServerDataEqual(const Config::Server& server);
+        void setServerActiveEqualForProfile(const Config::Server& server, Config::NetworkProfile);
     };
 
     struct Profile
@@ -84,6 +86,9 @@ struct Config
     bool operator==(const Config& cfg) const;
     bool operator!=(const Config& cfg) const;
     bool equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const;
+
+    bool serverDataIsEqual(const Config::Server& server1, const Config::Server& server2) const;
+    bool serverActiveIsEqualForProfile(const Config::Server& server1, const Config::Server& server2, Config::NetworkProfile) const;
 
     static std::string networkProfileDisplayName(NetworkProfile np);
     static std::string networkProfileChoiceDisplayName(NetworkProfileChoice npc);

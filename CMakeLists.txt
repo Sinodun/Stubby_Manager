@@ -115,6 +115,8 @@ add_executable( stubby_gui ${PLAFORM_BUILD}
   configmanager.cpp
   networkprofiletablemodel.cpp
   serverstablemodel.cpp
+  serverdatadialog.cpp
+  serverdatadialog.ui
   servicemanager.cpp
   networkmanager.cpp
   stubby.qrc

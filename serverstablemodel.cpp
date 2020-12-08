@@ -24,7 +24,7 @@ ServersTableModel::~ServersTableModel()
 int ServersTableModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
-    return 6;
+    return 5;
 }
 
 int ServersTableModel::rowCount(const QModelIndex& parent) const
@@ -123,8 +123,8 @@ QVariant ServersTableModel::headerData(int section, Qt::Orientation orientation,
     case 1: return QString("Name");
     case 2: return QString("Website");
     case 3: return QString("Main Address");
-    case 4: return QString("TLS auth name");
-    case 5: return QString("Key digest value");
+    case 4: return QString("TLS Auth Name");
+    case 5: return QString("Pin (Key Digest Value)");
     }
 
     return QVariant("");
