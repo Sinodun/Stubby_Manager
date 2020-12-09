@@ -219,7 +219,7 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::timerExpired() {
     if (updateState == None)
         return;
-    statusMsg("Stubby timed out trying to complete an action");
+    statusMsg("WARNING: Stubby timed out trying to complete an action");
     setTopPanelStatus();
     updateState = None;
 }
@@ -227,7 +227,7 @@ void MainWindow::timerExpired() {
 void MainWindow::probeTimerExpired() {
     if (updateState != None)
         return;
-    statusMsg("Probing State");
+    statusMsg("Action: Checking Stubby status...");
     updateState = Probe;
     m_serviceMgr->getState();
 }
@@ -394,30 +394,30 @@ void MainWindow::on_restartButton_clicked() {
 }
 
 void MainWindow::on_probeButton_clicked() {
-    statusMsg("Probing State");
+    statusMsg("Action: Checking Stubby status...");
     updateState = Probe;
     m_serviceMgr->getState();
 }
 
 void MainWindow::on_testButton_clicked() {
     if (!(m_serviceState == ServiceMgr::Running && m_networkState == NetworkMgr::Localhost)) {
-        statusMsg("Stubby not running - no connection test performed");
+        statusMsg("Status: Stubby not running - no connection test performed");
         return;
     }
-    statusMsg("Testing connection");
+    statusMsg("Action: Testing connection");
     ui->connectStatus->setPixmap(*yellowPixmap);
     m_networkMgr->testQuery();
 }
 
 void MainWindow::on_testQueryResult(bool result) {
     if (result) {
-        statusMsg("Connection test was a success");
+        statusMsg("Status: Connection test was a success");
         ui->connectStatus->setPixmap(*greenPixmap);
     }
     else {
-        statusMsg("Connection test failed");
+        statusMsg("Status: Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
-        trayIcon->showMessage("Connection Test Failed",
+        trayIcon->showMessage("WARNING: Connection Test Failed",
         "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60*1000);
     }
 }
@@ -430,6 +430,7 @@ void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile p
     message.append(" network profile. If you want to change the profile for this network go to the Networks tab.");
     trayIcon->showMessage("New network joined",
     message, QSystemTrayIcon::Information, 60*1000);
+    message.prepend("Status: ");
     statusMsg(message);
 }
 
@@ -441,6 +442,7 @@ void MainWindow::alertOnNetworksUpdatedRestart() {
     message.append(" network profile.");
     trayIcon->showMessage("Stubby is restarting",
     message, QSystemTrayIcon::Information, 60*1000);
+    message.prepend("Status: ");
     statusMsg(message);
 }
 
@@ -588,14 +590,14 @@ QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
 
 void MainWindow::handleError() {
     ui->runningStatus->setText("An error occurred");
-    statusMsg("An Error occurred while stubby was starting or stopping");
+    statusMsg("ERROR: An Error occurred while stubby was starting or stopping");
     ui->stubbyStatus->setPixmap(*redPixmap);
     updateState = None;
     timer->stop();
 }
 
 void MainWindow::handleCancel() {
-    statusMsg("The action was cancelled");
+    statusMsg("Status: The action was cancelled");
     setTopPanelStatus();
     updateState = None;
     timer->stop();

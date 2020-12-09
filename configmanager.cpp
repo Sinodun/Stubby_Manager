@@ -63,14 +63,21 @@ void ConfigMgr::init()
 
     if ( factoryConfigFile.isFile() && factoryConfigFile.isReadable() )
     {
-        factoryConfig.loadFromFile(factoryConfigFile.filePath().toStdString());
-        qInfo("Read default config file.");
+        try {
+            factoryConfig.loadFromFile(factoryConfigFile.filePath().toStdString());
+            qInfo("Read default config file.");
+        } catch (...) {
+            m_mainwindow->statusMsg("ERROR: Unable to load default configuration file, using built-in defaults");
+            qWarning("No readable default configuration file, using built-in defaults");
+            factoryConfig.reset();
+        }
         emit configChanged(false);
         return;
     }
-
-    //TODO: This should probably be a user message
+    m_mainwindow->statusMsg("WARNING: No default configuration file available, using built-in defaults");
     qWarning("No readable default configuration file, using built-in defaults");
+    factoryConfig.reset();
+    return;
 }
 
 void ConfigMgr::load()
@@ -82,15 +89,19 @@ void ConfigMgr::load()
 
     if ( customConfigFile.isFile() && customConfigFile.isReadable() )
     {
-        savedConfig.loadFromFile(customConfigFile.filePath().toStdString());
-        displayedConfig = savedConfig;
-        qInfo("Read custom config file.");
-        emit configChanged(false);
-        return;
+        try {
+            savedConfig.loadFromFile(customConfigFile.filePath().toStdString());
+            displayedConfig = savedConfig;
+            qInfo("Read custom config file.");
+        } catch (...) {
+            m_mainwindow->statusMsg("ERROR: Unable to load user configuration file, using default conifguration instead.");
+            m_mainwindow->systrayMsg("ERROR: Unable to load user configuration file, using default conifguration instead.");
+            // TODO: we should think about renaming the broken config file for later inspection, we need to overwrite
+            // it so a saved config isgenreatedand the GUI doesn't break on an empty one....
+        }
     }
-    else
-        saveAll(false);
-
+    saveAll(false);
+    emit configChanged(false);
     qWarning("No readable custom configuration file");
 }
 

@@ -27,13 +27,13 @@ NetworkMgr::~NetworkMgr()
 
 int NetworkMgr::setLocalhost()
 {
-    m_mainwindow->statusMsg("Setting DNS to localhost...");
+    m_mainwindow->statusMsg("Action: Setting system to use Stubby service (setting DNS to localhost...)");
     return setLocalhostDNS();
 }
 
 int NetworkMgr::unsetLocalhost()
 {
-    m_mainwindow->statusMsg("Setting DNS back to system settings...");
+    m_mainwindow->statusMsg("Action: Setting system NOT to use Stubby service (setting DNS back to system settings...");
     return unsetLocalhostDNS();
 }
 

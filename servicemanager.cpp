@@ -35,14 +35,14 @@ int ServiceMgr::getState() {
 
 int ServiceMgr::start(ConfigMgr& configMgr)
 {
-    QString message = "Starting Stubby service wtih ";
+    QString message = "Action: Starting Stubby service wtih ";
     message.append(configMgr.getCurrentProfileString().c_str());
     message.append(" profile...");
     m_mainwindow->statusMsg(message);
     try {
         std::string stubby_yml = configMgr.generateStubbyConfig();
         if (stubby_yml.empty()) {
-            m_mainwindow->statusMsg("Error: Configuration generated for the active profile was invalid. Stubby has not been restarted.");
+            m_mainwindow->statusMsg("ERROR: Configuration generated for the active profile was invalid. Stubby has not been restarted.");
             return 1;
         }
         m_mainwindow->statusMsg("Status: Stubby service configuration generated.");
@@ -58,14 +58,14 @@ int ServiceMgr::start(ConfigMgr& configMgr)
 
 int ServiceMgr::stop()
 {
-    m_mainwindow->statusMsg("Stopping Stubby service...");
+    m_mainwindow->statusMsg("Action: Stopping Stubby service...");
     m_serviceState = Stopping;
     return stopService();
 }
 
 int ServiceMgr::restart()
 {
-    m_mainwindow->statusMsg("Re-starting Stubby service...");
+    m_mainwindow->statusMsg("Action: Re-starting Stubby service...");
     m_serviceState = Restarting;
     return restartService();
 }

@@ -275,7 +275,7 @@ int NetworkMgrWindows::setLocalhostDNS()
     try {
         run_dns_process("-Loopback");
     } catch (const std::runtime_error& e) {
-        m_mainwindow->statusMsg(QString("*Error* when trying to update system DNS settings: %1").arg(QString(e.what())));
+        m_mainwindow->statusMsg(QString("ERROR: when trying to update system DNS settings: %1").arg(QString(e.what())));
     }
     getStateDNS(true);
     return 0;
@@ -286,7 +286,7 @@ int NetworkMgrWindows::unsetLocalhostDNS()
     try {
         run_dns_process("");
     } catch (const std::runtime_error& e) {
-        m_mainwindow->statusMsg(QString("*Error* when trying to update system DNS settings: %1").arg(QString(e.what())));
+        m_mainwindow->statusMsg(QString("ERROR: when trying to update system DNS settings: %1").arg(QString(e.what())));
     }
     getStateDNS(true);
     return 0;
@@ -296,7 +296,11 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
 {
     int oldNetworkState = m_networkState;
     std::map<std::string, NetworkMgr::interfaceInfo> previous_networks = getNetworks();
-    reload();
+    try {
+        reload();
+    } catch (const std::runtime_error& e) {
+        m_mainwindow->statusMsg(QString("ERROR: when trying to get system network interfaces: %1").arg(QString(e.what())));
+    }
     std::map<std::string, NetworkMgr::interfaceInfo> running_networks = getNetworks();
 
     bool networksChanged = false;
@@ -322,13 +326,13 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
     if (isResolverLoopback()) {
       m_networkState = Localhost;
       if (oldNetworkState != m_networkState || reportNoChange == true) {
-        m_mainwindow->statusMsg("Status: DNS settings using localhost.");
+        m_mainwindow->statusMsg("Status: Stubby service in use by system (DNS settings using localhost).");
       }
       emit DNSStateChanged(Localhost);
     } else {
         m_networkState = NotLocalhost;
         if (oldNetworkState != m_networkState  || reportNoChange == true)
-            m_mainwindow->statusMsg("Status: DNS settings NOT using localhost.");
+            m_mainwindow->statusMsg("Status: Stubby service NOT in use by system (DNS settings NOT using localhost).");
         emit DNSStateChanged(NotLocalhost);
     }
     return 0;

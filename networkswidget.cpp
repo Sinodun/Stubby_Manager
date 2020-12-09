@@ -133,6 +133,7 @@ void NetworksWidget::on_forgetButton_clicked()
             QString message = "Ignoring 'Forget' for active Wifi network ";
            message.append(name.c_str());
            m_mainWindow->systrayMsg(message);
+           message.prepend("Status: ");
            m_mainWindow->statusMsg(message);
            continue;
         }
