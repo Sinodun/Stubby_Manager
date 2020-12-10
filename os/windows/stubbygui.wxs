@@ -24,13 +24,6 @@
         <Directory Id="FACTORYDATAFOLDER" Name="Stubby" />
       </Directory>
     </Directory>
-
-    <InstallExecuteSequence>
-      <Custom Action="CreateScheduledTask" After="InstallFiles">NOT Installed</Custom>
-      <Custom Action="CreateScheduledTaskId" After="CostFinalize">NOT Installed </Custom>
-      <Custom Action="DeleteScheduledTaskId" After="CostFinalize">Installed</Custom>
-      <Custom Action="DeleteScheduledTask" Before="RemoveFiles">Installed </Custom>
-    </InstallExecuteSequence>
     <FeatureRef Id="StubbyFeature" />
     <FeatureRef Id="StubbyManangerFeature" />
   </Product>
