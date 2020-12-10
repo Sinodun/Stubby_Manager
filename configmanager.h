@@ -12,6 +12,7 @@
 #include <string>
 
 #include <QObject>
+#include <QProcess>
 
 #include "config.h"
 #include "networkmanager.h"
@@ -37,11 +38,12 @@ public:
 
     void init();
     void load();
-    void save(bool restart);
-    void saveProfile(Config::NetworkProfile networkProfile);
+    bool saveAll(bool restart);
+    bool saveProfile(Config::NetworkProfile networkProfile);
     void saveNetworks();
+    void saveUpdatedNetworks();
 
-    std::string generateStubbyConfig(Config::NetworkProfile networkProfile);
+    std::string generateStubbyConfig();
 
     bool profileModifiedFromFactory(Config::NetworkProfile networkProfile);
     bool profileModifiedFromSaved(Config::NetworkProfile networkProfile);
@@ -55,16 +57,12 @@ public:
     void restoreSaved();
     void restoreFactory();
 
-    void addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
-    void resetNetworksActiveState();
-    Config::NetworkProfile getDisplayedNetworkProfile(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
-
-    bool unsavedChanges(bool profile, bool network);
-    bool getRestartRequired() const {return restartRequired;};
-    void restartDone();
+    void updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks);
+    std::string getCurrentProfileString() const;
+    std::string getCurrentNetworksString() const;
 
 signals:
-    void configChanged();
+    void configChanged(bool restart);
 
 protected:
     bool profileModifiedFrom(const Config& cfg, Config::NetworkProfile networkProfile);
@@ -73,13 +71,17 @@ protected:
     void profileRestoreFrom(const Config& cfg, Config::NetworkProfile networkProfile);
     void networksRestoreFrom(const Config& cfg);
     void restoreFrom(const Config& cfg);
-    void saveConfig(const Config& cfg);
-    void setRestartRequired(bool profile, bool network);
+    bool saveConfig(const Config& cfg);
+    bool profilesValid(Config::NetworkProfile profile, bool check_all);
+    Config::NetworkProfile addNetwork(const std::string& name, NetworkMgr::InterfaceTypes type, bool active);
 
     MainWindow *m_mainwindow;
     Config factoryConfig;
     Config savedConfig;
+    Config tempConfig; // used to determine if restart needed
     bool restartRequired;
+    Config::NetworkProfile m_current_profile;
+    std::string m_current_networks_string;
 
     virtual std::string appDataDir() = 0;
     virtual std::string appDir();

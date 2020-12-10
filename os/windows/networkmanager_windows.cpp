@@ -258,11 +258,11 @@ NetworkMgrWindows::NetworkMgrWindows(MainWindow *parent) :
     connect(m_testQuery, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_testQuery_finished(int, QProcess::ExitStatus)));
 
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationAdded,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationChanged,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
     connect(&m_networkConfig, &QNetworkConfigurationManager::configurationRemoved,
-            this, &NetworkMgrWindows::on_networkConfig_changed);
+            this, &NetworkMgrWindows::on_networkInferfaces_changed);
 }
 
 NetworkMgrWindows::~NetworkMgrWindows()
@@ -275,7 +275,7 @@ int NetworkMgrWindows::setLocalhostDNS()
     try {
         run_dns_process("-Loopback");
     } catch (const std::runtime_error& e) {
-        m_mainwindow->statusMsg(QString("*Error* when trying to update system DNS settings: %1").arg(QString(e.what())));
+        m_mainwindow->statusMsg(QString("ERROR: when trying to update system DNS settings: %1").arg(QString(e.what())));
     }
     getStateDNS(true);
     return 0;
@@ -286,7 +286,7 @@ int NetworkMgrWindows::unsetLocalhostDNS()
     try {
         run_dns_process("");
     } catch (const std::runtime_error& e) {
-        m_mainwindow->statusMsg(QString("*Error* when trying to update system DNS settings: %1").arg(QString(e.what())));
+        m_mainwindow->statusMsg(QString("ERROR: when trying to update system DNS settings: %1").arg(QString(e.what())));
     }
     getStateDNS(true);
     return 0;
@@ -295,18 +295,45 @@ int NetworkMgrWindows::unsetLocalhostDNS()
 int NetworkMgrWindows::getStateDNS(bool reportNoChange)
 {
     int oldNetworkState = m_networkState;
-    reload();
+    std::map<std::string, NetworkMgr::interfaceInfo> previous_networks = getNetworks();
+    try {
+        reload();
+    } catch (const std::runtime_error& e) {
+        m_mainwindow->statusMsg(QString("ERROR: when trying to get system network interfaces: %1").arg(QString(e.what())));
+    }
+    std::map<std::string, NetworkMgr::interfaceInfo> running_networks = getNetworks();
+
+    bool networksChanged = false;
+    if (previous_networks.size() != running_networks.size())
+        networksChanged = true;
+    std::map<std::string, NetworkMgr::interfaceInfo>::const_iterator i,j;
+    for(i = previous_networks.begin(), j = running_networks.begin(); i != previous_networks.end(); ++i, ++j) {
+            if ( i->first.compare(j->first) != 0 ||
+                 i->second.interfaceType != j->second.interfaceType ||
+                 i->second.interfaceActive != j->second.interfaceActive) {
+                   networksChanged = true;
+                   break;
+                }
+     }
+     if (networksChanged) {
+         qInfo("Networks have changed");
+         for (const auto& i: interfaces) {
+            qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, is ethernet %s, op status %d", i.name().c_str(), i.is_running(), i.is_resolver_loopback(), i.ssid().c_str(), i.is_ethernet()? "yes":"no", i.is_up());
+         }
+         m_mainwindow->refreshNetworks(running_networks);
+     }
+
     if (isResolverLoopback()) {
       m_networkState = Localhost;
       if (oldNetworkState != m_networkState || reportNoChange == true) {
-        m_mainwindow->statusMsg("Status: DNS settings using localhost.");
+        m_mainwindow->statusMsg("Status: Stubby service in use by system (DNS settings using localhost).");
       }
-      emit networkStateChanged(Localhost);
+      emit DNSStateChanged(Localhost);
     } else {
         m_networkState = NotLocalhost;
         if (oldNetworkState != m_networkState  || reportNoChange == true)
-            m_mainwindow->statusMsg("Status: DNS settings NOT using localhost.");
-        emit networkStateChanged(NotLocalhost);       
+            m_mainwindow->statusMsg("Status: Stubby service NOT in use by system (DNS settings NOT using localhost).");
+        emit DNSStateChanged(NotLocalhost);
     }
     return 0;
 }
@@ -398,7 +425,7 @@ void NetworkMgrWindows::reload()
                 ssid = search->second;
         }
 
-        qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, adaptor type is %d, op status %d", name.c_str(), running, resolver_loopback, ssid.c_str(), adapter->IfType, adapter->OperStatus);
+        //qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, adaptor type is %d, op status %d", name.c_str(), running, resolver_loopback, ssid.c_str(), adapter->IfType, adapter->OperStatus);
         interfaces.emplace_back(
                 name,
                 adapter_name,
@@ -509,10 +536,10 @@ void NetworkMgrWindows::on_testQuery_finished(int, QProcess::ExitStatus)
     }
 }
 
-void NetworkMgrWindows::on_networkConfig_changed(const QNetworkConfiguration&)
+void NetworkMgrWindows::on_networkInferfaces_changed(const QNetworkConfiguration&)
 {
     //qDebug("Network configuration changed");
-    emit networkConfigChanged();
+    getStateDNS(false);
 }
 
 NetworkMgr *NetworkMgr::factory(MainWindow *parent) {

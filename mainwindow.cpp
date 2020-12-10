@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QSettings>
 #include <QDesktopServices>
+#include <QDateTime>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -41,10 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
     , m_serviceState(ServiceMgr::Unknown)
     , m_networkState(NetworkMgr::Unknown)
     , updateState(Init)
-    , m_currentNetworkProfile(Config::NetworkProfile::untrusted)
     , m_configMgr(), m_serviceMgr(), m_networkMgr()
     , m_untrustedNetworkWidget(), m_trustedNetworkWidget()
-    , m_hostileNetworkWidget(), m_networkListWidget(), m_logMgr()
+    , m_hostileNetworkWidget(), m_networksWidget(), m_logMgr()
     , timer(), probeTimer(), quitAction(), trayIcon()
     , trayIconMenu(), greenPixmap(), yellowPixmap()
     , redPixmap(), greyPixmap()
@@ -57,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->tabWidget->setFont(f);
 //    ui->statusOutput->setFont(f);
 //#endif
+
+    // For now, make the Revert all button disapear
+    ui->revertAllButton->setVisible(false);
 
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
@@ -106,39 +109,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->networkProfileConfig->addTab(m_trustedNetworkWidget, QString::fromUtf8("Trusted"));
     ui->networkProfileConfig->addTab(m_hostileNetworkWidget, QString::fromUtf8("Hostile"));
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_hostileNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_untrustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::globalConfigChanged,
-            m_trustedNetworkWidget, &NetworkProfileWidget::on_globalConfigChanged);
+    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
+    connect(m_trustedNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
+    connect(m_hostileNetworkWidget, &NetworkProfileWidget::userProfileEditInProgress,
+            this, &MainWindow::on_userProfileEditInProgress);
 
-    connect(m_untrustedNetworkWidget, &NetworkProfileWidget::stateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_trustedNetworkWidget, &NetworkProfileWidget::stateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
-    connect(m_hostileNetworkWidget, &NetworkProfileWidget::stateUpdated,
-            this, &MainWindow::on_networkProfileStateUpdated);
-
-    m_untrustedNetworkWidget->setGuiState();
-    m_trustedNetworkWidget->setGuiState();
-    m_hostileNetworkWidget->setGuiState();
-
-    // Set up networks tab.
-    m_networkListWidget = new NetworkListWidget(*m_configMgr);
-    ui->mainTabWidget->removeTab(2);
-    ui->mainTabWidget->insertTab(2, m_networkListWidget, "Networks");
-
-    connect(m_networkListWidget, &NetworkListWidget::stateUpdated,
-            this, &MainWindow::on_networksStateUpdated);
-
-    m_networkListWidget->setGuiState();
+    connect(m_configMgr, &ConfigMgr::configChanged,
+            this, &MainWindow::on_SavedConfigChanged);
 
     // Set up service state
     m_serviceMgr = ServiceMgr::factory(this);
@@ -147,7 +126,6 @@ MainWindow::MainWindow(QWidget *parent)
         abort();
     }
     connect(m_serviceMgr, SIGNAL(serviceStateChanged(ServiceMgr::ServiceState)), this, SLOT(on_serviceStateChanged(ServiceMgr::ServiceState)));
-    m_serviceMgr->getState();
 
     // Set up network manager
     m_networkMgr = NetworkMgr::factory(this);
@@ -155,37 +133,51 @@ MainWindow::MainWindow(QWidget *parent)
         qFatal("Could not initialise Service Mgr");
         abort();
     }
-    connect(m_networkMgr, SIGNAL(networkStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_networkStateChanged(NetworkMgr::NetworkState)));
+    connect(m_networkMgr, SIGNAL(DNSStateChanged(NetworkMgr::NetworkState)), this, SLOT(on_DNSStateChanged(NetworkMgr::NetworkState)));
     connect(m_networkMgr, SIGNAL(testQueryResult(bool)), this, SLOT(on_testQueryResult(bool)));
-    connect(m_networkMgr, &NetworkMgr::networkConfigChanged,
-            this, &MainWindow::on_networkConfigChanged);
-    m_networkMgr->getState(true);
-    updateCurrentNetworkInfo();
 
-    // create a log manager
+    // Set up networks tab.
+    m_networksWidget = new NetworksWidget(*m_configMgr, this);
+    ui->mainTabWidget->removeTab(2);
+    ui->mainTabWidget->insertTab(2, m_networksWidget, "Networks");
+
+    connect(m_networksWidget, &NetworksWidget::userNetworksEditInProgress,
+            this, &MainWindow::on_userNetworksEditInProgress);
+
+    // Create a log manager
     m_logMgr = ILogMgr::factory(this);
     if (!m_networkMgr) {
         qFatal("Could not initialise Service Mgr");
         abort();
     }
 
-    // create the settings
-    stubbySettings = new QSettings("Sinodun.com", "Stubby Manager");
-    QVariant details = stubbySettings->value("info/hideDetails");
-    if (!details.isNull())
-        ui->hideDetailsCheckBox->setChecked(details.toBool());
-
     // Set initially displayed tab.
     ui->mainTabWidget->setCurrentIndex(0);
     ui->statusTab->setFocus();
 
-    //Create some timers
+    m_serviceMgr->getState();
+    m_networkMgr->getDNSState(true);
+    m_networksWidget->setNWGuiState();
+    m_untrustedNetworkWidget->setNPWGuiState();
+    m_trustedNetworkWidget->setNPWGuiState();
+    m_hostileNetworkWidget->setNPWGuiState();
+    setTopPanelNetworkInfo();
+
+    // Create some timers
     timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::timerExpired));
     probeTimer = new QTimer(this);
     connect(probeTimer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::probeTimerExpired));
     probeTimer->start(300000);
+
+    // Create the settings
+    stubbySettings = new QSettings("Sinodun.com", "Stubby Manager");
+    QVariant details = stubbySettings->value("info/hideDetails");
+    if (!details.isNull())
+        ui->hideDetailsCheckBox->setChecked(details.toBool());
+    updateState = None;
+
 }
 
 MainWindow::~MainWindow()
@@ -197,7 +189,7 @@ MainWindow::~MainWindow()
     delete m_untrustedNetworkWidget;
     delete m_trustedNetworkWidget;
     delete m_hostileNetworkWidget;
-    delete m_networkListWidget;
+    delete m_networksWidget;
     delete timer;
     delete probeTimer;
     delete quitAction;
@@ -227,21 +219,22 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::timerExpired() {
     if (updateState == None)
         return;
-    statusMsg("Stubby timed out trying to complete an action");
-    updateMainTab();
+    statusMsg("WARNING: Stubby timed out trying to complete an action");
+    setTopPanelStatus();
     updateState = None;
 }
 
 void MainWindow::probeTimerExpired() {
     if (updateState != None)
         return;
-    statusMsg("\nProbing State");
+    statusMsg("Action: Checking Stubby status...");
     updateState = Probe;
     m_serviceMgr->getState();
 }
 
 void MainWindow::closeFromSystray() {
-    handleUnsavedChanges();
+    if (handleUnsavedChanges() == 1 )
+        return;
     qApp->quit();
     return;
 }
@@ -254,7 +247,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 #endif
 
-    handleUnsavedChanges();
+    if (handleUnsavedChanges() == 1) {
+        event->ignore();
+        return;
+    }
 
     if (trayIcon->isVisible()) {
        QVariant exitMessage = stubbySettings->value("app/exitMessage");
@@ -291,9 +287,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::statusMsg(QString statusMsg) {
     ui->statusOutput->moveCursor (QTextCursor::End);
+    ui->statusOutput->insertPlainText (QDateTime::currentDateTime().toString());
+    ui->statusOutput->insertPlainText (":  ");
     ui->statusOutput->insertPlainText (statusMsg);
     ui->statusOutput->insertPlainText ("\n");
     ui->statusOutput->moveCursor (QTextCursor::End);
+}
+
+void MainWindow::systrayMsg(QString status_msg) {
+    trayIcon->showMessage("Stubby message",
+    status_msg, QSystemTrayIcon::Information, 600*1000);
 }
 
 void MainWindow::logMsg(QString logMsg) {
@@ -339,7 +342,7 @@ void MainWindow::on_onOffSlider_stateChanged()
                 handleCancel();
                 return;
             }
-            if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
+            if (m_serviceMgr->start(*m_configMgr))
                handleError();
         }
         else if (m_networkState != NetworkMgr::Localhost) {
@@ -348,7 +351,7 @@ void MainWindow::on_onOffSlider_stateChanged()
         }
         else {
             // Nothing to do.... possilby recovering from error?
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
         }
     }
@@ -367,7 +370,7 @@ void MainWindow::on_onOffSlider_stateChanged()
         }
         else {
             // Nothing to do.... possilby recovering from error?
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
         }
     }
@@ -391,32 +394,56 @@ void MainWindow::on_restartButton_clicked() {
 }
 
 void MainWindow::on_probeButton_clicked() {
-    statusMsg("\nProbing State");
+    statusMsg("Action: Checking Stubby status...");
     updateState = Probe;
     m_serviceMgr->getState();
 }
 
 void MainWindow::on_testButton_clicked() {
     if (!(m_serviceState == ServiceMgr::Running && m_networkState == NetworkMgr::Localhost)) {
-        statusMsg("Stubby not running - no connection test performed");
+        statusMsg("Status: Stubby not running - no connection test performed");
         return;
     }
-    statusMsg("Testing connection");
+    statusMsg("Action: Testing connection");
     ui->connectStatus->setPixmap(*yellowPixmap);
     m_networkMgr->testQuery();
 }
 
 void MainWindow::on_testQueryResult(bool result) {
     if (result) {
-        statusMsg("Connection test was a success");
+        statusMsg("Status: Connection test was a success");
         ui->connectStatus->setPixmap(*greenPixmap);
     }
     else {
-        statusMsg("Connection test failed");
+        statusMsg("Status: Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
-        trayIcon->showMessage("Connection Test Failed",
-        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60);
+        trayIcon->showMessage("WARNING: Connection Test Failed",
+        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60*1000);
     }
+}
+
+void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile profile) {
+    if (updateState == Init)
+        return;
+    QString message = "A new network was joined which will use the default ";
+    message.append(Config::networkProfileDisplayName(profile).c_str());
+    message.append(" network profile. If you want to change the profile for this network go to the Networks tab.");
+    trayIcon->showMessage("New network joined",
+    message, QSystemTrayIcon::Information, 60*1000);
+    message.prepend("Status: ");
+    statusMsg(message);
+}
+
+void MainWindow::alertOnNetworksUpdatedRestart() {
+    if (updateState == Init)
+        return;
+    QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
+    message.append(m_configMgr->getCurrentNetworksString().c_str());
+    message.append(" network profile.");
+    trayIcon->showMessage("Stubby is restarting",
+    message, QSystemTrayIcon::Information, 60*1000);
+    message.prepend("Status: ");
+    statusMsg(message);
 }
 
 void MainWindow::on_showLogButton_toggled() {
@@ -459,7 +486,7 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         case ServiceMgr::Error:
             ui->serviceStatus->setPixmap(*redPixmap);
             if (updateState == Start || updateState == Stop || updateState == Restart) {
-                updateMainTab();
+                setTopPanelStatus();
                 updateState = None;
             }
             return;
@@ -483,29 +510,29 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         }
     }
     else if (updateState == Stop && m_serviceState == ServiceMgr::Stopped) {
-        updateMainTab();
+        setTopPanelStatus();
         updateState = None;
         return;
     }
     else if (updateState == Restart) {
         if (m_serviceState == ServiceMgr::Stopped) {
-            if (m_serviceMgr->start(*m_configMgr, m_currentNetworkProfile))
+            if (m_serviceMgr->start(*m_configMgr))
                 handleError();
         }
         else if (m_serviceState == ServiceMgr::Running) {
             on_testButton_clicked();
-            updateMainTab();
+            setTopPanelStatus();
             updateState = None;
             return;
         }
     }
     else if (updateState == Probe)
-        m_networkMgr->getState(true);
+        m_networkMgr->getDNSState(true);
 
-    updateMainTab();
+    setTopPanelStatus();
 }
 
-void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
+void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
 
     qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
     m_networkState = state;
@@ -513,27 +540,25 @@ void MainWindow::on_networkStateChanged(NetworkMgr::NetworkState state) {
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
 
-    updateCurrentNetworkInfo();
+    //setTopPanelNetworkInfo();
     if (updateState == None)
         return;
 
     if (updateState == Stop && (m_serviceState == ServiceMgr::Running || m_serviceState == ServiceMgr::Starting)) {
         if (m_serviceMgr->stop())
             handleError();
-        updateMainTab();
+        setTopPanelStatus();
         return;
     }
-    updateMainTab();
+    setTopPanelStatus();
     on_testButton_clicked();
     updateState = None;
 }
 
-void MainWindow::on_networkConfigChanged()
-{
-    m_networkMgr->getState(false);
-    updateCurrentNetworkInfo();
-    m_networkListWidget->on_globalConfigChanged();
+void MainWindow::refreshNetworks(std::map<std::string, NetworkMgr::interfaceInfo> running_networks) {
+    m_configMgr->updateNetworks(running_networks);
 }
+
 
 /*
  * Private functions
@@ -565,23 +590,27 @@ QString MainWindow::getNetworkStateString(const NetworkMgr::NetworkState state)
 
 void MainWindow::handleError() {
     ui->runningStatus->setText("An error occurred");
-    statusMsg("An Error occurred while stubby was starting or stopping");
+    statusMsg("ERROR: An Error occurred while stubby was starting or stopping");
     ui->stubbyStatus->setPixmap(*redPixmap);
     updateState = None;
     timer->stop();
 }
 
 void MainWindow::handleCancel() {
-    statusMsg("The action was cancelled");
-    updateMainTab();
+    statusMsg("Status: The action was cancelled");
+    setTopPanelStatus();
     updateState = None;
     timer->stop();
+}
+
+bool MainWindow::isServiceRunning() const {
+    return (m_serviceState == ServiceMgr::Running);
 }
 
 int MainWindow::handleUnsavedChanges() {
 
     // Are there unsaved changes to any config?
-    if (!m_configMgr->unsavedChanges(true, true))
+    if (!ui->applyAllButton->isEnabled())
         return 0;
 
     //TODO: We should be able to offer saving just the bits that matter...
@@ -595,7 +624,7 @@ int MainWindow::handleUnsavedChanges() {
     int result = 0;
     switch (ret) {
       case QMessageBox::Save:
-         m_configMgr->save(false);
+         result = m_configMgr->saveAll(true);
          break;
       case QMessageBox::Discard:
          m_configMgr->restoreSaved();
@@ -611,7 +640,7 @@ int MainWindow::handleUnsavedChanges() {
 }
 
 
-void MainWindow::updateMainTab() {
+void MainWindow::setTopPanelStatus() {
 
     if (updateState == None)
         return;
@@ -661,27 +690,33 @@ void MainWindow::updateMainTab() {
 
 }
 
-void MainWindow::on_networkProfileStateUpdated(Config::NetworkProfile np, bool, bool)
+void MainWindow::on_userProfileEditInProgress()
 {
-    setButtonStates();
-    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
+    setMainButtonStates();
+}
+
+void MainWindow::on_userNetworksEditInProgress()
+{
+    setMainButtonStates();
+}
+
+void MainWindow::on_SavedConfigChanged(bool restart) {
+
+    qInfo("Refreshing displayed Config and Current Info");
+    m_networksWidget->setNWGuiState();
+    m_untrustedNetworkWidget->setNPWGuiState();
+    m_trustedNetworkWidget->setNPWGuiState();
+    m_hostileNetworkWidget->setNPWGuiState();
+    setMainButtonStates();
+    setTopPanelNetworkInfo();
+
+    if (m_serviceState == ServiceMgr::Running && restart && updateState != Init) {
         updateState = Restart;
         m_serviceMgr->restart();
     }
-    m_configMgr->restartDone();
 }
 
-void MainWindow::on_networksStateUpdated(bool)
-{
-    setButtonStates();
-    if (m_serviceState == ServiceMgr::Running && m_configMgr->getRestartRequired()) {
-        updateState = Restart;
-        m_serviceMgr->restart();
-    }
-    m_configMgr->restartDone();
-}
-
-void MainWindow::setButtonStates()
+void MainWindow::setMainButtonStates()
 {
     bool unsaved = m_configMgr->modifiedFromSavedConfig();
     bool notdefault = m_configMgr->modifiedFromFactoryDefaults();
@@ -689,15 +724,11 @@ void MainWindow::setButtonStates()
     ui->applyAllButton->setEnabled(unsaved);
     ui->discardAllButton->setEnabled(unsaved);
     ui->revertAllButton->setEnabled(notdefault);
-
-    if (m_networkMgr)
-      updateCurrentNetworkInfo();
-
 }
 
 void MainWindow::on_applyAllButton_clicked()
 {
-    m_configMgr->save(true);
+    m_configMgr->saveAll(true);
 }
 
 void MainWindow::on_discardAllButton_clicked()
@@ -710,46 +741,8 @@ void MainWindow::on_revertAllButton_clicked()
     m_configMgr->restoreFactory();
 }
 
-void MainWindow::updateCurrentNetworkInfo()
+void MainWindow::setTopPanelNetworkInfo()
 {
-    qInfo("Updating Current Network Info");
-    std::map<std::string, NetworkMgr::interfaceInfo> networks = m_networkMgr->getRunningNetworks();
-    std::string net_text;
-
-    m_currentNetworkProfile = Config::NetworkProfile::trusted;
-
-    // Set all networks to inactive, to ensure only active ones are set below
-    m_configMgr->resetNetworksActiveState();
-
-    for ( const auto& net : networks )
-    {
-        auto net_name = net.first;
-        auto net_type = net.second.interfaceType;
-        auto net_active = net.second.interfaceActive;
-        // Ignore the wifi when it is not connected as it has no ssid
-        if (net_name.compare("Wi-Fi") == 0) {
-            continue;
-        }
-        // This actually also updates the active status of the existing network.....
-        m_configMgr->addNetwork(net_name, net_type, net_active);
-        // Only disply the active networks
-        if (net_active) {
-            if ( !net_text.empty())
-                net_text.append("\n");
-            net_text.append(net_name);
-            if (net_type == Config::InterfaceTypes::WiFi)
-                net_text.append(" (Wi-Fi)");
-
-            Config::NetworkProfile np = m_configMgr->getDisplayedNetworkProfile(net_name, net_type, net_active);
-            if ( np > m_currentNetworkProfile )
-                m_currentNetworkProfile = np;
-        }
-    }
-
-    ui->network_name->setText(net_text.c_str());
-    std::string net_profile = (Config::networkProfileDisplayName(m_currentNetworkProfile));
-    if (m_configMgr->displayedConfig.defaultNewNetworkProfileSet && m_configMgr->displayedConfig.defaultNewNetworkProfile == m_currentNetworkProfile)
-        net_profile.append(" (Default)");
-    ui->network_profile->setText(net_profile.c_str());
-
+    ui->network_profile->setText(m_configMgr->getCurrentProfileString().c_str());
+    ui->network_name->setText(m_configMgr->getCurrentNetworksString().c_str());
 }

@@ -105,16 +105,18 @@ add_executable( stubby_gui ${PLAFORM_BUILD}
   main.cpp
   mainwindow.cpp
   mainwindow.ui
-  networkprofile.cpp
+  networkprofilewidget.cpp
   networkprofilewidget.ui
   networkprofiledelegate.cpp
-  networkslistwidget.cpp
-  networklistfilterproxymodel.cpp
-  networklist.ui
+  networkswidget.cpp
+  networkswidgetfilterproxymodel.cpp
+  networkswidget.ui
   config.cpp
   configmanager.cpp
   networkprofiletablemodel.cpp
-  profileserverstablemodel.cpp
+  serverstablemodel.cpp
+  serverdatadialog.cpp
+  serverdatadialog.ui
   servicemanager.cpp
   networkmanager.cpp
   stubby.qrc

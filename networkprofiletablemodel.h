@@ -28,7 +28,7 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    void configChanged();
+    void NPTMConfigChanged();
 
 private:
     Config& m_config;

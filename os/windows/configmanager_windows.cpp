@@ -48,7 +48,7 @@ static std::string GetKnownFolder(REFKNOWNFOLDERID rfid, const std::string& appd
         return dir.filePath(QString::fromStdString(appdir)).toStdString();
     }
 
-    throw windows_system_error("Can't find known folder");
+    //throw windows_system_error("Can't find known folder");
 }
 
 std::string ConfigMgrWindows::appDataDir()

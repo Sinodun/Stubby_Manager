@@ -46,13 +46,12 @@ public:
 
     int setLocalhost();
     int unsetLocalhost();
-    int getState(bool reportNoChange);
+    int getDNSState(bool reportNoChange);
     virtual int testQuery() = 0;
     std::map<std::string, interfaceInfo>  getRunningNetworks();
 
 signals:
-    void networkConfigChanged();
-    void networkStateChanged(NetworkMgr::NetworkState state);
+    void DNSStateChanged(NetworkMgr::NetworkState state);
     void testQueryResult(bool result);
 
 protected:

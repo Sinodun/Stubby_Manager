@@ -6,6 +6,7 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <stdexcept>
@@ -55,8 +56,7 @@ Config::Profile::Profile()
 
 Config::Config()
     : servers(), profiles(),
-      defaultNewNetworkProfile(), defaultNewNetworkProfileSet(false),
-      networks()
+      defaultNetworkProfile(NetworkProfile::untrusted), networks()
 {
     reset();
 }
@@ -73,15 +73,26 @@ void Config::reset()
     profiles[NetworkProfile::untrusted] = Profile({ true, true, false, false, UseNetworkProvidedServer::include });
     profiles[NetworkProfile::hostile] = Profile({ true, true, false, false, UseNetworkProvidedServer::exclude });
 
-    defaultNewNetworkProfile = NetworkProfile::untrusted;
-    defaultNewNetworkProfileSet = true;
+    defaultNetworkProfile = NetworkProfile::untrusted;
 }
 
 static Config::NetworkProfile networkProfileFromYaml(const std::string& key, const YAML::Mark& mark)
 {
     try
     {
-        return Config::networkProfileFromKey(key);
+        return Config::networkProfileFromYamlKey(key);
+    }
+    catch (const std::invalid_argument& ie)
+    {
+        throw YAML::ParserException(mark, ie.what());
+    }
+}
+
+static Config::NetworkProfileChoice networkProfileChoiceFromYaml(const std::string& key, const YAML::Mark& mark)
+{
+    try
+    {
+        return Config::networkProfileChoiceFromYamlKey(key);
     }
     catch (const std::invalid_argument& ie)
     {
@@ -167,10 +178,7 @@ void Config::loadFromFile(const std::string& path)
 
     YAML::Node ymldefnetprofile = ymlcfg["default_network_profile"];
     if ( ymldefnetprofile )
-        defaultNewNetworkProfile = networkProfileFromYaml(ymldefnetprofile.as<std::string>(), ymlcfg.Mark());
-    YAML::Node ymldefnetprofileset = ymlcfg["default_network_profile_set"];
-    if ( ymldefnetprofileset )
-        defaultNewNetworkProfileSet = ymldefnetprofileset.as<bool>();
+        defaultNetworkProfile = networkProfileFromYaml(ymldefnetprofile.as<std::string>(), ymlcfg.Mark());
 
     YAML::Node ymlnetworks = ymlcfg["networks"];
     if ( !ymlnetworks )
@@ -180,8 +188,10 @@ void Config::loadFromFile(const std::string& path)
     for ( const auto& n : ymlnetworks )
     {
         std::string name = n.first.as<std::string>();
-        NetworkProfile profile = networkProfileFromYaml(n.second.as<std::string>(), ymlnetworks.Mark());
+        NetworkProfileChoice profile = networkProfileChoiceFromYaml(n.second["profile"].as<std::string>(), ymlnetworks.Mark());
         networks[name].profile = profile;
+        std::string type = n.second["type"].as<std::string>();
+        networks[name].interfaceType = (InterfaceTypes)std::atoi(type.c_str());
     }
 }
 
@@ -189,7 +199,7 @@ static void yamlOutputNetworkProfileSet(YAML::Emitter& out, const std::unordered
 {
     out << YAML::BeginSeq;
     for ( const auto& np : set )
-        out << Config::networkProfileKey(np);
+        out << Config::networkProfileYamlKey(np);
     out << YAML::EndSeq;
 }
 
@@ -224,7 +234,7 @@ void Config::saveToFile(const std::string& path) const
     out << YAML::Key << "profiles" << YAML::Value << YAML::BeginMap;
     for (const auto& nt : profiles)
     {
-        out << YAML::Key << networkProfileKey(nt.first) << YAML::Value
+        out << YAML::Key << networkProfileYamlKey(nt.first) << YAML::Value
             << YAML::BeginMap
             << YAML::Key << "encrypt_all" << YAML::Value << nt.second.encryptAll
             << YAML::Key << "always_authenticate" << YAML::Value << nt.second.alwaysAuthenticate
@@ -249,12 +259,16 @@ void Config::saveToFile(const std::string& path) const
     }
     out << YAML::EndMap;
 
-    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileKey(defaultNewNetworkProfile);
-    out << YAML::Key << "default_network_profile_set" << YAML::Value << defaultNewNetworkProfileSet;
+    out << YAML::Key << "default_network_profile" << YAML::Value << networkProfileYamlKey(defaultNetworkProfile);
 
     out << YAML::Key << "networks" << YAML::Value << YAML::BeginMap;
-    for (const auto& nt : networks)
-        out << YAML::Key << nt.first << YAML::Value << networkProfileKey(nt.second.profile);
+    for (const auto& nt : networks) {
+        out << YAML::Key << nt.first << YAML::Value;
+        out << YAML::BeginMap;
+        out << YAML::Key << "profile" << YAML::Value << networkProfileChoiceYamlKey(nt.second.profile);
+        out << YAML::Key << "type" << YAML::Value << nt.second.interfaceType;
+        out << YAML::EndMap;
+    }
     out << YAML::EndMap;
 
     fout.close();
@@ -271,6 +285,53 @@ bool Config::Server::operator==(const Config::Server& server) const
         pubKeyDigestValue == server.pubKeyDigestValue &&
         hidden == server.hidden &&
         inactive == server.inactive;
+}
+
+bool Config::serverDataIsEqual(const Config::Server& server1, const Config::Server& server2) const
+{
+    return
+        server1.name == server2.name &&
+        server1.link == server2.link &&
+        server1.addresses == server2.addresses &&
+        server1.tlsAuthName == server2.tlsAuthName &&
+        server1.pubKeyDigestType == server2.pubKeyDigestType &&
+        server1.pubKeyDigestValue == server2.pubKeyDigestValue;
+}
+
+bool Config::serverActiveIsEqualForProfile(const Config::Server& server1, const Config::Server& server2, Config::NetworkProfile profile) const
+{
+    if (server1.inactive.find(profile) != server1.inactive.end() &&
+        server2.inactive.find(profile) != server2.inactive.end())
+        return true;
+    if (server1.inactive.find(profile) == server1.inactive.end() &&
+        server2.inactive.find(profile) == server2.inactive.end())
+        return true;
+    return false;
+}
+
+void Config::Server::setServerDataEqual(const Config::Server& server)
+{
+   name = server.name;
+   link = server.link;
+   addresses = server.addresses;
+   tlsAuthName = server.tlsAuthName;
+   pubKeyDigestType = server.pubKeyDigestType;
+   pubKeyDigestValue = server.pubKeyDigestValue;
+}
+
+void Config::Server::setServerActiveEqualForProfile(const Config::Server& server, Config::NetworkProfile profile)
+{
+    if (server.inactive.find(profile) != server.inactive.end()) {
+        // profile is in inactive list
+        if (inactive.find(profile) == inactive.end()) {
+            inactive.insert(profile);
+        }
+    } else if (server.inactive.find(profile) == server.inactive.end()) {
+        // profile is NOT in inactive list
+        if (inactive.find(profile) != inactive.end()) {
+            inactive.erase(profile);
+        }
+    }
 }
 
 bool Config::Profile::operator==(const Config::Profile& server) const
@@ -294,11 +355,11 @@ bool Config::NetworkInformation::operator==(const Config::NetworkInformation& ne
 bool Config::operator==(const Config& cfg) const
 {
     return
-        defaultNewNetworkProfile == cfg.defaultNewNetworkProfile &&
-        defaultNewNetworkProfileSet == cfg.defaultNewNetworkProfileSet &&
+        defaultNetworkProfile == cfg.defaultNetworkProfile &&
         profiles == cfg.profiles &&
         servers == cfg.servers &&
-        networks == cfg.networks;
+        networks == cfg.networks &&
+        defaultNetworkProfile == cfg.defaultNetworkProfile;
 }
 
 bool Config::operator!=(const Config& cfg) const
@@ -308,53 +369,28 @@ bool Config::operator!=(const Config& cfg) const
 
 void Config::copyProfile(const Config& cfg, Config::NetworkProfile networkProfile)
 {
-    defaultNewNetworkProfile = cfg.defaultNewNetworkProfile;
-    defaultNewNetworkProfileSet = cfg.defaultNewNetworkProfileSet;
     profiles[networkProfile] = cfg.profiles.at(networkProfile);
-
-    for ( auto& s : servers )
-    {
-        s.hidden.erase(networkProfile);
-        s.inactive.erase(networkProfile);
-
-        for ( const auto& s2 : cfg.servers )
-            if ( s.name == s2.name )
-            {
-                if ( s2.hidden.find(networkProfile) != s2.hidden.end() )
-                    s.hidden.insert(networkProfile);
-                if ( s2.inactive.find(networkProfile) != s2.inactive.end() )
-                    s.inactive.insert(networkProfile);
-                break;
-            }
+    // At the moment we cannot delete servers or re-order
+    for (std::size_t i = 0; i < servers.size(); ++i) {
+        servers[i].setServerDataEqual(cfg.servers[i]);
+        servers[i].setServerActiveEqualForProfile(cfg.servers[i], networkProfile);
     }
 }
 
 bool Config::equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const
 {
-    // TODO: strictly need to check if either of the default new profiles match the one we are interested in...
-    if ( defaultNewNetworkProfile != cfg.defaultNewNetworkProfile ||
-         defaultNewNetworkProfileSet != cfg.defaultNewNetworkProfileSet ||
-         !(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
-        return false;    
 
-    for ( auto& s : servers )
-    {
-        bool found = false;
-
-        for ( const auto& s2 : cfg.servers )
-            if ( s.name == s2.name )
-            {
-                if ( s.hidden.count(networkProfile) != s2.hidden.count(networkProfile) ||
-                     s.inactive.count(networkProfile) != s2.inactive.count(networkProfile) )
-                     return false;
-                found = true;
-                break;
-            }
-
-        if ( !found )
+    if (!(profiles.at(networkProfile)== cfg.profiles.at(networkProfile)))
+        return false;
+    if (servers.size() != cfg.servers.size())
+        return false;
+    // At the moment we cannot delete servers or re-order
+    for (std::size_t i = 0; i < servers.size(); ++i) {
+        if (!serverDataIsEqual(servers[i], cfg.servers[i]))
+            return false;
+        if (!serverActiveIsEqualForProfile(servers[i], cfg.servers[i], networkProfile))
             return false;
     }
-
     return true;
 }
 
@@ -372,10 +408,10 @@ std::string Config::networkProfileDisplayName(Config::NetworkProfile np)
         return "Hostile";
     }
     assert("Unknown network type");
-    return "unknown";
+    return "Unknown";
 }
 
-std::string Config::networkProfileKey(Config::NetworkProfile np)
+std::string Config::networkProfileYamlKey(Config::NetworkProfile np)
 {
     switch(np)
     {
@@ -392,7 +428,7 @@ std::string Config::networkProfileKey(Config::NetworkProfile np)
     return "unknown";
 }
 
-Config::NetworkProfile Config::networkProfileFromKey(const std::string& key)
+Config::NetworkProfile Config::networkProfileFromYamlKey(const std::string& key)
 {
     if ( key == "trusted" )
         return Config::NetworkProfile::trusted;
@@ -416,4 +452,64 @@ std::string Config::interfaceTypeDisplayName(Config::InterfaceTypes it)
     }
     assert("Unknown interface type");
     return "unknown";
+}
+
+std::string Config::networkProfileChoiceDisplayName(Config::NetworkProfileChoice npc)
+{
+    if ( npc == Config::NetworkProfileChoice::default_profile )
+        return "Default";
+
+    return networkProfileDisplayName(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
+}
+
+std::string Config::networkProfileChoiceYamlKey(Config::NetworkProfileChoice npc)
+{
+    if ( npc == Config::NetworkProfileChoice::default_profile )
+        return "default";
+
+    return networkProfileYamlKey(networkProfileFromChoice(npc, Config::NetworkProfile::untrusted));
+}
+
+Config::NetworkProfileChoice Config::networkProfileChoiceFromYamlKey(const std::string& key)
+{
+    if ( key == "default" )
+        return Config::NetworkProfileChoice::default_profile;
+    else return networkChoiceFromProfile(networkProfileFromYamlKey(key));
+}
+
+Config::NetworkProfile Config::networkProfileFromChoice(Config::NetworkProfileChoice npc, Config::NetworkProfile default_profile)
+{
+    switch(npc)
+    {
+    case Config::NetworkProfileChoice::default_profile:
+        return default_profile;
+
+    case Config::NetworkProfileChoice::trusted:
+        return Config::NetworkProfile::trusted;
+
+    case Config::NetworkProfileChoice::untrusted:
+        return Config::NetworkProfile::untrusted;
+
+    case Config::NetworkProfileChoice::hostile:
+        return Config::NetworkProfile::hostile;
+    }
+    assert("Unknown network type");
+    return Config::NetworkProfile::untrusted;
+}
+
+Config::NetworkProfileChoice Config::networkChoiceFromProfile(Config::NetworkProfile np)
+{
+    switch(np)
+    {
+    case Config::NetworkProfile::trusted:
+        return Config::NetworkProfileChoice::trusted;
+
+    case Config::NetworkProfile::untrusted:
+        return Config::NetworkProfileChoice::untrusted;
+
+    case Config::NetworkProfile::hostile:
+        return Config::NetworkProfileChoice::hostile;
+    }
+    assert("Unknown network type");
+    return Config::NetworkProfileChoice::untrusted;
 }

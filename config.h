@@ -18,6 +18,7 @@
 struct Config
 {
     enum class NetworkProfile { trusted, untrusted, hostile };
+    enum class NetworkProfileChoice { default_profile, trusted, untrusted, hostile };
 
     enum class UseNetworkProvidedServer { exclude, include, use_only };
 
@@ -37,6 +38,8 @@ struct Config
         std::unordered_set<NetworkProfile> inactive;
 
         bool operator==(const Server& server) const;
+        void setServerDataEqual(const Config::Server& server);
+        void setServerActiveEqualForProfile(const Config::Server& server, Config::NetworkProfile);
     };
 
     struct Profile
@@ -56,8 +59,7 @@ struct Config
 
     std::vector<Server> servers;
     std::unordered_map<NetworkProfile, Profile> profiles;
-    NetworkProfile defaultNewNetworkProfile;
-    bool defaultNewNetworkProfileSet;
+    NetworkProfile defaultNetworkProfile;
 
     typedef enum {
         WiFi = 0,
@@ -66,7 +68,7 @@ struct Config
 
     struct NetworkInformation
     {
-        NetworkProfile profile;
+        NetworkProfileChoice profile;
         InterfaceTypes interfaceType;
         bool interfaceActive;
 
@@ -85,10 +87,20 @@ struct Config
     bool operator!=(const Config& cfg) const;
     bool equalProfile(const Config& cfg, Config::NetworkProfile networkProfile) const;
 
+    bool serverDataIsEqual(const Config::Server& server1, const Config::Server& server2) const;
+    bool serverActiveIsEqualForProfile(const Config::Server& server1, const Config::Server& server2, Config::NetworkProfile) const;
+
     static std::string networkProfileDisplayName(NetworkProfile np);
-    static std::string networkProfileKey(NetworkProfile np);
-    static NetworkProfile networkProfileFromKey(const std::string& key);
+    static std::string networkProfileChoiceDisplayName(NetworkProfileChoice npc);
     static std::string interfaceTypeDisplayName(InterfaceTypes it);
+
+    static NetworkProfile           networkProfileFromChoice(NetworkProfileChoice npc, NetworkProfile default_profile);
+    static NetworkProfileChoice     networkChoiceFromProfile(NetworkProfile np);
+
+    static std::string              networkProfileYamlKey(NetworkProfile np);
+    static NetworkProfile           networkProfileFromYamlKey(const std::string& key);
+    static std::string              networkProfileChoiceYamlKey(NetworkProfileChoice npc);
+    static NetworkProfileChoice     networkProfileChoiceFromYamlKey(const std::string& key);
 };
 
 #endif

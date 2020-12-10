@@ -13,7 +13,7 @@
 #include <QWidget>
 
 #include "configmanager.h"
-#include "profileserverstablemodel.h"
+#include "serverstablemodel.h"
 #include "ui_networkprofilewidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -28,14 +28,12 @@ public:
     explicit NetworkProfileWidget(ConfigMgr& configMsg, Config::NetworkProfile np, QWidget* parent = nullptr);
     virtual ~NetworkProfileWidget();
 
-    void setGuiState();
+    void setNPWGuiState();
 
 signals:
-    void stateUpdated(Config::NetworkProfile np, bool unsaved, bool notdefault);
-    void globalConfigChanged();
+    void userProfileEditInProgress();
 
 public slots:
-    void on_useAsDefaultProfile_stateChanged(int state);
     void on_alwaysAuthenticate_stateChanged(int state);
     void on_encryptAllTraffic_stateChanged(int state);
     void on_roundRobin_stateChanged(int state);
@@ -44,21 +42,19 @@ public slots:
     void on_applyButton_clicked();
     void on_discardButton_clicked();
     void on_revertButton_clicked();
-    void on_openWebsite_clicked();
     void on_serverTable_clicked();
-
-    void on_globalConfigChanged();
+    void on_editServerButton_clicked();
 
     void on_serverTableDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-
+    void onTableClicked(const QModelIndex &index);
 private:
-    void setButtonStates();
+    void setNPWButtonStates();
 
     Ui::NetworkProfileWidget* ui;
 
     ConfigMgr& m_configMgr;
-    Config::NetworkProfile m_np;
-    ProfileServersTableModel* m_serverTableModel;
+    Config::NetworkProfile m_networkProfile;
+    ServersTableModel* m_serverTableModel;
 };
 
 #endif
