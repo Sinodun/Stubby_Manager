@@ -284,7 +284,7 @@ border:none;</string>
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;br/&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;v0.4.0-a1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Stubby Manager&lt;br/&gt;&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;v0.4.0-a2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -591,7 +591,7 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
               <item row="5" column="0">
                <widget class="QPushButton" name="probeButton">
                 <property name="text">
-                 <string>Recheck status</string>
+                 <string>Recheck service status</string>
                 </property>
                </widget>
               </item>
@@ -726,7 +726,7 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>11</pointsize>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <property name="horizontalScrollBarPolicy">

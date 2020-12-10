@@ -296,7 +296,7 @@ void MainWindow::statusMsg(QString statusMsg) {
 
 void MainWindow::systrayMsg(QString status_msg) {
     trayIcon->showMessage("Stubby message",
-    status_msg, QSystemTrayIcon::Information, 600*1000);
+    status_msg, QSystemTrayIcon::Information, 6000*1000);
 }
 
 void MainWindow::logMsg(QString logMsg) {
@@ -438,7 +438,7 @@ void MainWindow::alertOnNetworksUpdatedRestart() {
     if (updateState == Init)
         return;
     QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
-    message.append(m_configMgr->getCurrentNetworksString().c_str());
+    message.append(m_configMgr->getCurrentProfileString().c_str());
     message.append(" network profile.");
     trayIcon->showMessage("Stubby is restarting",
     message, QSystemTrayIcon::Information, 60*1000);

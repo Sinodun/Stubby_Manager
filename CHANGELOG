@@ -1,3 +1,33 @@
-Version 0.4.0-alpha  - 2020-09-25
+Version 0.4.0-alpha2 - 2020-12-
+
+* Split the networks into wireless and wired and display active networks
+   as green.
+* Re-factor internals so saved profile is the base reference
+* Move default profile selection from Network Profile to Networks tab
+* Add default option to profile and require one to be set for now
+* Automatically save a new config and restart the service if the current
+  profile would change because the active network interfaces change
+* Enable editing of server properties
+* Review of log messages and serveral error paths
+* Fix crash on load of invalid configuration file
+* Add serveral alerts to the system tray
+* Update the Trusted profile default servers to be Quad9
+* Convert 3rd column of server table to be clickable link
+* Re-factor cascade of network changes through code
+* Detect whether network properties we really care about have actually
+  changed on a callback from the system network manager
+* Add validation on save of network profile settings and also on 
+  export of stubby service file
+* Add button to forget wireless networks
+* Add StubbyManager.xml file so user can configure service to 
+  automatically start at login/restart 
+* Improve handling of unsaved changes and ensure quitting from the
+  system tray icon also prompts for this
+* Add first run dialog to inform user Stubby runs as a system tray
+  process
+* Add process report to installer
+
+
+Version 0.4.0-alpha1  - 2020-09-25
 
 * First alpha version of GUI for Windows.

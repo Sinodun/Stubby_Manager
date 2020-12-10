@@ -531,7 +531,7 @@ void NetworkMgrWindows::on_testQuery_finished(int, QProcess::ExitStatus)
         emit testQueryResult(true);
     }
     else {
-        qDebug() << __FILE__ << ":" << __FUNCTION__ << stdoutData;
+        //qDebug() << __FILE__ << ":" << __FUNCTION__ << stdoutData;
         emit testQueryResult(false);
     }
 }

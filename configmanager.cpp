@@ -335,7 +335,7 @@ std::string ConfigMgr::generateStubbyConfig()
     std::ifstream  src(res, std::ios::binary);
     std::ofstream  dst(stubby_yml_real.filePath().toStdString(),   std::ios::binary);
     dst << src.rdbuf();
-    return res;
+    return stubby_yml_real.filePath().toStdString();
 }
 
 std::string ConfigMgr::appDir()

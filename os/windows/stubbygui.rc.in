@@ -14,14 +14,8 @@
 #define VER_DBG 0
 #endif
 
-#if 0
-/*
- * The statistical likelihood is that other civilisations will one day arise and
- * there will one day be a Stubby Manager icon. Until then, there will be a short
- * delay. Please return to your seats.
- */
+
 1 ICON "stubbygui.ico"
-#endif
 
 1 VERSIONINFO
 FILEVERSION     @VER_PRODUCTVERSION@

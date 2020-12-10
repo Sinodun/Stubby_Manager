@@ -47,7 +47,7 @@ static std::string GetKnownFolder(REFKNOWNFOLDERID rfid, const std::string& appd
         QDir dir(QDir::cleanPath(qstr));
         return dir.filePath(QString::fromStdString(appdir)).toStdString();
     }
-
+    return "C:\\Program Data\\Stubby";
     //throw windows_system_error("Can't find known folder");
 }
 

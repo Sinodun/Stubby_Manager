@@ -157,6 +157,6 @@ void NetworkProfileWidget::setNPWButtonStates()
     ui->discardButton->setEnabled(unsaved);
     ui->revertButton->setEnabled(notdefault);
 
-    if (unsaved)
-        emit userProfileEditInProgress();
+    //if (unsaved)
+    emit userProfileEditInProgress();
 }

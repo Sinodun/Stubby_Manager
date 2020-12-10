@@ -45,4 +45,6 @@ bool NetworksWidgetFilterProxyModel::lessThan(const QModelIndex &left,
     }
     else if (leftData.userType() == QMetaType::QString)
          return QString::localeAwareCompare(leftData.toString(), rightData.toString()) > 0;
+    else
+        return true;
 }
