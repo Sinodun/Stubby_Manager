@@ -31,35 +31,6 @@
       <Custom Action="DeleteScheduledTaskId" After="CostFinalize">Installed</Custom>
       <Custom Action="DeleteScheduledTask" Before="RemoveFiles">Installed </Custom>
     </InstallExecuteSequence>
-
-    <!--Create StubbyManager Scheduled Task-->
-    <CustomAction Id="CreateScheduledTaskId"
-               Property="CreateScheduledTask"
-               Return="check"
-               Execute="immediate"
-               Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /CREATE /TN &quot;StubbyManager&quot; /XML &quot;[INSTALLFOLDER]StubbyManager.xml&quot; /RU &quot;[%USERDOMAIN]\[LogonUser]&quot;" />
-
-    <CustomAction Id="CreateScheduledTask"
-              Return="ignore"
-              Impersonate="no"
-              Execute="deferred"
-              BinaryKey="WixCA"
-              DllEntry="CAQuietExec" />
-
-    <!--Delete StubbyManager Scheduled Task-->
-    <CustomAction Id="DeleteScheduledTaskId"
-              Property="DeleteScheduledTask"
-              Return="check"
-              Execute="immediate"
-              Value="&quot;[SystemFolder]SCHTASKS.EXE&quot; /DELETE /TN &quot;StubbyManager&quot; /F" />
-
-    <CustomAction Id="DeleteScheduledTask"
-              Return="ignore"
-              Impersonate="no"
-              Execute="deferred"
-              BinaryKey="WixCA"
-              DllEntry="CAQuietExec" />
-
     <FeatureRef Id="StubbyFeature" />
     <FeatureRef Id="StubbyManangerFeature" />
   </Product>
