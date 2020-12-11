@@ -458,8 +458,6 @@ void ConfigMgr::updateNetworks(std::map<std::string, NetworkMgr::interfaceInfo> 
         a.second.interfaceActive = false;
     }
 
-    m_current_networks_string="";
-    m_current_profile=Config::NetworkProfile::trusted;
     for ( const auto& net : running_networks ) {
         // Ignore the wifi when it is not connected as it has no ssid
         if (net.first.compare("Wi-Fi") == 0) {

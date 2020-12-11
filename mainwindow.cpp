@@ -435,7 +435,7 @@ void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile p
 }
 
 void MainWindow::alertOnNetworksUpdatedRestart() {
-    if (updateState == Init)
+    if (updateState == Init || m_serviceState != ServiceMgr::Running)
         return;
     QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
     message.append(m_configMgr->getCurrentProfileString().c_str());
