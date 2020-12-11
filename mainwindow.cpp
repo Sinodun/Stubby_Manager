@@ -534,13 +534,14 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
 void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
 
+    if (state == m_networkState)
+        return;
     qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
     m_networkState = state;
     if (m_networkState == NetworkMgr::Localhost)  ui->networkStatus->setPixmap(*greenPixmap);
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
 
-    //setTopPanelNetworkInfo();
     if (updateState == None)
         return;
 
