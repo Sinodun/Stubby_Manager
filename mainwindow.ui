@@ -17,6 +17,9 @@
    <iconset resource="stubby.qrc">
     <normaloff>:/images/stubby.ico</normaloff>:/images/stubby.ico</iconset>
   </property>
+  <property name="toolTipDuration">
+   <number>-7</number>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="font">
     <font>
@@ -108,7 +111,7 @@ border:none;</string>
             <string notr="true">background-color: rgba(85, 170, 255, 0);</string>
            </property>
            <property name="text">
-            <string>Networks:</string>
+            <string>Active Networks:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -451,6 +454,9 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
           <height>23</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string extracomment="Open webpage for Stubby Manager help"/>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(181, 213, 255);</string>
         </property>
@@ -541,14 +547,14 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
                <number>6</number>
               </property>
               <item row="3" column="0">
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="connectionLabel">
                 <property name="text">
                  <string>Connection:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="serviceRunningLabel">
                 <property name="text">
                  <string>Service running:   </string>
                 </property>
@@ -562,7 +568,7 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_5">
+               <widget class="QLabel" name="serviceInUseLabel">
                 <property name="text">
                  <string>Service in use:</string>
                 </property>

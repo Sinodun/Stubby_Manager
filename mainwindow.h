@@ -80,6 +80,7 @@ private:
     void setTopPanelStatus();
     void setTopPanelNetworkInfo();
     void firstRunPopUp();
+    void setToolTips();
 
     void timerExpired();
     void probeTimerExpired();

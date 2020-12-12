@@ -20,6 +20,12 @@ ServerDataDialog::ServerDataDialog(Config::Server& server, QWidget *parent) :
     ui->v6AddressEdit->setVisible(false);
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+    ui->serverNameData->setToolTip("(Required) Set a user friendly name for this server");
+    ui->serverWebsiteData->setToolTip("Set a link to a website with information about this server/service");
+    ui->serverAddressData->setToolTip("(Required) The IPv4 Address for the server (IPv6 support coming soon)");
+    ui->serverAuthName->setToolTip("Specify the TLS authentication name to use when authenticating this server");
+    ui->serverPinData->setToolTip("Specify the pin (SPKI Digest Value to use when authenticating this server");
 }
 
 ServerDataDialog::~ServerDataDialog()

@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->toggleDNSButton->setVisible(false);
     ui->toggleServiceButton->setVisible(false);
 
+    setToolTips();
+
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
     ui->runningStatus->setText("Checking status...");
@@ -201,6 +203,18 @@ MainWindow::~MainWindow()
     delete yellowPixmap;
     delete redPixmap;
     delete greyPixmap;
+}
+
+void MainWindow::setToolTips() {
+    ui->helpButton->setToolTip("Open the webpage with the Stubby Manager help");
+    ui->hideDetailsCheckBox->setToolTip("Hide most of the text displayed on the Info tab");
+    ui->restartButton->setToolTip("Restart just the Stubby Service");
+    ui->probeButton->setToolTip("Check the status of the service, DNS settings and do a connection test");
+    ui->testButton->setToolTip("Perform a test DNS query using Stubby");
+    ui->serviceRunningLabel->setToolTip("Reports the status of the Stubby Service");
+    ui->serviceInUseLabel->setToolTip("Report the status of the system DNS settings:\n when the Stubby service is in use the DNS is set to Localhost,\n otherwise it is using the system DNS defaults");
+    ui->connectionLabel->setToolTip("Report the result of a test DNS query using Stubby");
+    ui->showLogButton->setToolTip("Enable display of logs from the Stubby service");
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -432,9 +446,11 @@ void MainWindow::on_testQueryResult(bool result) {
 }
 
 void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile profile) {
-    if (updateState == Init)
+    if (updateState == Init || m_serviceState != ServiceMgr::Running)
         return;
-    QString message = "A new network was joined which will use the default ";
+    QString message = "A new network '";
+    message.append(network.c_str());
+    message.append("' was joined which will use the default ");
     message.append(Config::networkProfileDisplayName(profile).c_str());
     message.append(" network profile. If you want to change the profile for this network go to the Networks tab.");
     systrayAlert(message);

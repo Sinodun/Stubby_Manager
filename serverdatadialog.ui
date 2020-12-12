@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>524</width>
+    <height>302</height>
    </rect>
   </property>
   <property name="font">
@@ -34,9 +34,9 @@
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>39</x>
-     <y>19</y>
-     <width>321</width>
+     <x>30</x>
+     <y>20</y>
+     <width>461</width>
      <height>164</height>
     </rect>
    </property>
@@ -44,7 +44,7 @@
     <item row="0" column="0">
      <widget class="QLabel" name="serverName">
       <property name="text">
-       <string>Name</string>
+       <string>Name*</string>
       </property>
      </widget>
     </item>
@@ -64,7 +64,7 @@
        <string extracomment="A"/>
       </property>
       <property name="text">
-       <string>IP Address</string>
+       <string>IP Address*</string>
       </property>
      </widget>
     </item>

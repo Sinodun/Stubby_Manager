@@ -37,6 +37,12 @@ NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::Network
     ui->filterServersButton->setVisible(false);
     ui->validateData->setVisible(false);
     setNPWButtonStates();
+
+    ui->encryptAllTraffic->setToolTip("Always use encrypted connections (TLS) for all queries.\n Otherwise clear text (UCP/TCP) may also be used if the server does not support TLS.");
+    ui->alwaysAuthenticate->setToolTip("Only use servers that can be authenticated using either\n a TLS authentication name or a Pin (SPKI Digest Value)");
+    ui->roundRobin->setToolTip("Open connections to all available servers and send queries in turn to each.\n Otherwise, use the first server only until a problem is encountered then move on to the next server and so on.");
+    ui->editServerButton->setToolTip("Edit the properties of one of the servers (when that row is selected in the table)");
+    ui->revertButton->setToolTip("Revert to the default servers and profile settings built into Stubby Manager");
 }
 
 NetworkProfileWidget::~NetworkProfileWidget()

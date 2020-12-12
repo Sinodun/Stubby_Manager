@@ -55,6 +55,9 @@ NetworksWidget::NetworksWidget(ConfigMgr& configMgr, MainWindow* main, QWidget* 
     bool sel=m_selectionWifiModel->hasSelection();
     ui->forgetButton->setEnabled(sel);
 
+    ui->forgetButton->setToolTip("Remove an inactive WiFi network from the configuration.\n Active networks cannot be removed.");
+    ui->defaultProfile->setToolTip("Set a profile to be used automatically whenever new networks are joined");
+
     connect(m_networkTableModel, &NetworkProfileTableModel::dataChanged,
             this, &NetworksWidget::on_networkTableDataChanged);
     connect(m_selectionWifiModel, &QItemSelectionModel::selectionChanged,
