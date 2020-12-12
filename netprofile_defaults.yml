@@ -1,6 +1,6 @@
 servers:
   - name: Stubby server (Sinodun)
-    link: dnsprivacy.org
+    link: dnsprivacy.org/wiki/x/E4AT
     addresses:
       - 145.100.185.15
     tls_auth_name: dnsovertls.sinodun.com
@@ -13,7 +13,7 @@ servers:
       - hostile
       - trusted
   - name: Stubby server (Sinodun1)
-    link: dnsprivacy.org
+    link: dnsprivacy.org/wiki/x/E4AT
     addresses:
       - 145.100.185.16
     tls_auth_name: dnsovertls1.sinodun.com
@@ -26,7 +26,7 @@ servers:
       - hostile
       - trusted
   - name: Stubby server (getdnsapi.net)
-    link: dnsprivacy.org
+    link: dnsprivacy.org/wiki/x/E4AT
     addresses:
       - 185.49.141.37
     tls_auth_name: getdnsapi.net

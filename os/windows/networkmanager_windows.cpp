@@ -316,7 +316,7 @@ int NetworkMgrWindows::getStateDNS(bool reportNoChange)
                 }
      }
      if (networksChanged) {
-         qInfo("Networks have changed");
+         qInfo("NETWORKS: Network change detected");
          for (const auto& i: interfaces) {
             qDebug("Interface %30s running state is %d, localhost state is %d, ssid is %s, is ethernet %s, op status %d", i.name().c_str(), i.is_running(), i.is_resolver_loopback(), i.ssid().c_str(), i.is_ethernet()? "yes":"no", i.is_up());
          }

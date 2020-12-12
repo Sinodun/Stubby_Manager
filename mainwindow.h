@@ -38,6 +38,7 @@ public:
 
     void statusMsg(QString status_msg);
     void systrayMsg(QString status_msg);
+    void systrayAlert(QString status_msg);
     void logMsg(QString log_msg);
     enum UpdateState{Init, Start, Stop, Restart, Probe, None};
     int getUpdateState() const {return updateState;};

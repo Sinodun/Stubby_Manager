@@ -98,7 +98,7 @@ ServiceMgrWindows::~ServiceMgrWindows()
 
 void ServiceMgrWindows::notifyCallback()
 {
-    qDebug("Notify callback status %d", m_serviceNotify.dwNotificationStatus);
+    //qDebug("Notify callback status %d", m_serviceNotify.dwNotificationStatus);
     if ( m_serviceNotify.dwNotificationStatus == ERROR_SUCCESS )
         updateState(m_serviceNotify.ServiceStatus.dwCurrentState);
 

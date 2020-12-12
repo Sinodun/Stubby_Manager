@@ -16,7 +16,20 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit server</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="stubby.qrc">
+    <normaloff>:/images/stubby.ico</normaloff>:/images/stubby.ico</iconset>
+  </property>
+  <property name="toolTip">
+   <string extracomment="Edit server properties"/>
+  </property>
+  <property name="toolTipDuration">
+   <number>-7</number>
+  </property>
+  <property name="statusTip">
+   <string extracomment="B"/>
   </property>
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
@@ -44,8 +57,14 @@
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label_3">
+      <property name="toolTip">
+       <string extracomment="Edit the IP Address of a server (only IPv4 accepted)"/>
+      </property>
+      <property name="statusTip">
+       <string extracomment="A"/>
+      </property>
       <property name="text">
-       <string>Main IPv4 Address</string>
+       <string>IP Address</string>
       </property>
      </widget>
     </item>
@@ -79,7 +98,7 @@
      <widget class="QLineEdit" name="serverPinData"/>
     </item>
     <item row="3" column="0">
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="v6AddressLabel">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -89,7 +108,7 @@
      </widget>
     </item>
     <item row="3" column="1">
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="v6AddressEdit">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -137,6 +156,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="stubby.qrc"/>
+ </resources>
  <connections/>
 </ui>

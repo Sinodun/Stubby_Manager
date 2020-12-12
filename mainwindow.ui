@@ -547,13 +547,6 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
                 </property>
                </widget>
               </item>
-              <item row="5" column="3">
-               <widget class="QPushButton" name="restartButton">
-                <property name="text">
-                 <string>Restart Stubby</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label">
                 <property name="text">
@@ -575,33 +568,6 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QPushButton" name="pushButton">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Toggle service state </string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QPushButton" name="probeButton">
-                <property name="text">
-                 <string>Recheck service status</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QPushButton" name="pushButton_5">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Toggle service use</string>
                 </property>
                </widget>
               </item>
@@ -645,6 +611,40 @@ Want to know more about Stubby? [Click here for more information!](https://dnspr
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="3">
+               <widget class="QPushButton" name="toggleServiceButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Toggle service state </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="restartButton">
+                <property name="text">
+                 <string>Restart Stubby service</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QPushButton" name="probeButton">
+                <property name="text">
+                 <string>Recheck service status</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="2">
+               <widget class="QPushButton" name="toggleDNSButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Toggle service use</string>
                 </property>
                </widget>
               </item>

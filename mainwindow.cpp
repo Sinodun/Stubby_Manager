@@ -58,8 +58,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->statusOutput->setFont(f);
 //#endif
 
-    // For now, make the Revert all button disapear
+    // For now, make unimplemented buttons disappear
     ui->revertAllButton->setVisible(false);
+    ui->toggleDNSButton->setVisible(false);
+    ui->toggleServiceButton->setVisible(false);
 
     // TODO - add a 'clear status messages' button to the GUI
     statusMsg("Stubby Manager Started.");
@@ -299,6 +301,11 @@ void MainWindow::systrayMsg(QString status_msg) {
     status_msg, QSystemTrayIcon::Information, 6000*1000);
 }
 
+void MainWindow::systrayAlert(QString status_msg) {
+    trayIcon->showMessage("Stubby ALERT",
+    status_msg, QSystemTrayIcon::Critical);
+}
+
 void MainWindow::logMsg(QString logMsg) {
     ui->logOutput->moveCursor (QTextCursor::End);
     ui->logOutput->insertPlainText (logMsg);
@@ -327,7 +334,7 @@ void MainWindow::firstRunPopUp()
 
 void MainWindow::on_onOffSlider_stateChanged()
 {
-    qInfo("Slider toggled");
+    qInfo("Slider toggled, update State is %d", updateState);
     if (updateState != None)
         return;
     statusMsg("");
@@ -402,10 +409,12 @@ void MainWindow::on_probeButton_clicked() {
 void MainWindow::on_testButton_clicked() {
     if (!(m_serviceState == ServiceMgr::Running && m_networkState == NetworkMgr::Localhost)) {
         statusMsg("Status: Stubby not running - no connection test performed");
+        ui->connectStatus->setPixmap(*greyPixmap);
         return;
     }
     statusMsg("Action: Testing connection");
     ui->connectStatus->setPixmap(*yellowPixmap);
+    setTopPanelStatus();
     m_networkMgr->testQuery();
 }
 
@@ -417,9 +426,9 @@ void MainWindow::on_testQueryResult(bool result) {
     else {
         statusMsg("Status: Connection test failed");
         ui->connectStatus->setPixmap(*redPixmap);
-        trayIcon->showMessage("WARNING: Connection Test Failed",
-        "There was a problem with a test connection to the active server. Please check your settings.", QSystemTrayIcon::Critical, 60*1000);
+        systrayAlert("WARNING: Connection Test Failed. There was a problem with a test connection to the active server. Please check your settings.");
     }
+    setTopPanelStatus();
 }
 
 void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile profile) {
@@ -428,8 +437,7 @@ void MainWindow::alertOnNewNetwork(std::string network, Config::NetworkProfile p
     QString message = "A new network was joined which will use the default ";
     message.append(Config::networkProfileDisplayName(profile).c_str());
     message.append(" network profile. If you want to change the profile for this network go to the Networks tab.");
-    trayIcon->showMessage("New network joined",
-    message, QSystemTrayIcon::Information, 60*1000);
+    systrayAlert(message);
     message.prepend("Status: ");
     statusMsg(message);
 }
@@ -440,8 +448,7 @@ void MainWindow::alertOnNetworksUpdatedRestart() {
     QString message = "There was a change in the active networks - Stubby is restarting to switch to the ";
     message.append(m_configMgr->getCurrentProfileString().c_str());
     message.append(" network profile.");
-    trayIcon->showMessage("Stubby is restarting",
-    message, QSystemTrayIcon::Information, 60*1000);
+    systrayMsg(message);
     message.prepend("Status: ");
     statusMsg(message);
 }
@@ -474,8 +481,9 @@ void MainWindow::on_helpButton_clicked() {
 
 void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
 
-    qDebug("Stubby Service state changed from %s to %s ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
+    qDebug("SERVICE: Stubby Service state changed from '%s' to '%s' ", getServiceStateString(m_serviceState).toLatin1().data(), getServiceStateString(state).toLatin1().data());
     m_serviceState = state;
+    setTopPanelStatus();
     switch (m_serviceState) {
         case ServiceMgr::Running:
             ui->serviceStatus->setPixmap(*greenPixmap);
@@ -486,7 +494,6 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         case ServiceMgr::Error:
             ui->serviceStatus->setPixmap(*redPixmap);
             if (updateState == Start || updateState == Stop || updateState == Restart) {
-                setTopPanelStatus();
                 updateState = None;
             }
             return;
@@ -494,9 +501,18 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
             ui->serviceStatus->setPixmap(*yellowPixmap);
             break;
     }
-
-    if (updateState == None)
+    if (updateState == None) {
+        qInfo("*** Hitting on_serviceStateChanged while updateState is None");
+        if (m_serviceState == ServiceMgr::Stopped && m_networkState == NetworkMgr::Localhost) {
+            // error, reset network
+            updateState = Stop;
+            statusMsg("ERROR: The service stopped unexpectedly, disabling Stubby. Try to restart mually.");
+            systrayAlert("ERROR: The Stubby service stopped unexpectedly, disabling Stubby. Try to restart mually.");
+            if (m_networkMgr->unsetLocalhost())
+                handleError();
+        }
         return;
+    }
 
     if (updateState == Start) {
         if (m_serviceState == ServiceMgr::Running) {
@@ -510,7 +526,6 @@ void MainWindow::on_serviceStateChanged(ServiceMgr::ServiceState state) {
         }
     }
     else if (updateState == Stop && m_serviceState == ServiceMgr::Stopped) {
-        setTopPanelStatus();
         updateState = None;
         return;
     }
@@ -536,14 +551,17 @@ void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
 
     if (state == m_networkState)
         return;
-    qDebug("Network DNS state changed from %s to %s ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
+    qDebug("DNS:    Network DNS state changed from '%s' to '%s' ", getNetworkStateString(m_networkState).toLatin1().data(), getNetworkStateString(state).toLatin1().data());
     m_networkState = state;
+    setTopPanelStatus();
     if (m_networkState == NetworkMgr::Localhost)  ui->networkStatus->setPixmap(*greenPixmap);
     else if (m_networkState == NetworkMgr::NotLocalhost)  ui->networkStatus->setPixmap(*greyPixmap);
     else ui->networkStatus->setPixmap(*yellowPixmap);
 
-    if (updateState == None)
+    if (updateState == None) {
+       qInfo("*** Hitting on_DNSStateChanged while updateState is None");
         return;
+    }
 
     if (updateState == Stop && (m_serviceState == ServiceMgr::Running || m_serviceState == ServiceMgr::Starting)) {
         if (m_serviceMgr->stop())
@@ -551,7 +569,6 @@ void MainWindow::on_DNSStateChanged(NetworkMgr::NetworkState state) {
         setTopPanelStatus();
         return;
     }
-    setTopPanelStatus();
     on_testButton_clicked();
     updateState = None;
 }
@@ -646,7 +663,7 @@ void MainWindow::setTopPanelStatus() {
     if (updateState == None)
         return;
 
-    qDebug ("Updating overall state: Service is %s and Network %s ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
+    qDebug ("STATE: Updating overall state: Service is '%s' and Network '%s' ", getServiceStateString(m_serviceState).toLatin1().data(), getNetworkStateString(m_networkState).toLatin1().data());
     if (m_serviceState == ServiceMgr::Running &&
         m_networkState == NetworkMgr::Localhost) {
         ui->runningStatus->setText(getServiceStateString(m_serviceState));
@@ -666,7 +683,7 @@ void MainWindow::setTopPanelStatus() {
              (m_serviceState == ServiceMgr::Stopped &&
               m_networkState == NetworkMgr::Localhost)) {
         if (updateState == Start || updateState == Stop || updateState == Restart)
-            ui->runningStatus->setText("Waiting...");
+            ui->runningStatus->setText("Updating...");
         else
             ui->runningStatus->setText("Partly running...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
@@ -682,7 +699,7 @@ void MainWindow::setTopPanelStatus() {
         ui->onOffSlider->setChecked(false);
     }
     else {
-        ui->runningStatus->setText("Waiting...");
+        ui->runningStatus->setText("Updating...");
         ui->stubbyStatus->setPixmap(*yellowPixmap);
         trayIcon->setIcon(QIcon(":/images/stubby@245x145_red.png"));
     }
@@ -703,7 +720,7 @@ void MainWindow::on_userNetworksEditInProgress()
 
 void MainWindow::on_SavedConfigChanged(bool restart) {
 
-    qInfo("Refreshing displayed Config and Current Info");
+    //qInfo("Refreshing displayed Config and Current Info");
     m_networksWidget->setNWGuiState();
     m_untrustedNetworkWidget->setNPWGuiState();
     m_trustedNetworkWidget->setNPWGuiState();

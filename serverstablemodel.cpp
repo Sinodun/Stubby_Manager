@@ -122,7 +122,7 @@ QVariant ServersTableModel::headerData(int section, Qt::Orientation orientation,
     case 0: return QString("Active");
     case 1: return QString("Name");
     case 2: return QString("Website");
-    case 3: return QString("Main Address");
+    case 3: return QString("IP Address");
     case 4: return QString("TLS Auth Name");
     case 5: return QString("Pin (Key Digest Value)");
     }

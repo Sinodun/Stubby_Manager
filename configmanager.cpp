@@ -223,7 +223,7 @@ bool ConfigMgr::saveConfig(const Config& config)
             if ( !m_current_networks_string.empty())
                 m_current_networks_string.append("\n");
             m_current_networks_string.append(net_name);
-            qInfo("Saving: network %s has profile %d", net_name.c_str(), profile);
+            qInfo("SAVING: network %s has profile %d", net_name.c_str(), profile);
             if ( profile > m_current_profile )
                 m_current_profile = profile;
         }
@@ -237,7 +237,7 @@ bool ConfigMgr::saveConfig(const Config& config)
     // is restart needed?
     int restart = false;
     if (temp_current_profile != m_current_profile) {
-        qInfo("Restart required if running - active profile changed from %s to %s",
+        qInfo("RESTART: Restart required if running - active profile changed from %s to %s",
                Config::networkProfileDisplayName(temp_current_profile).c_str(),
                Config::networkProfileDisplayName(m_current_profile).c_str());
         restart = true;

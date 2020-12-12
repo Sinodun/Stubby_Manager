@@ -16,6 +16,10 @@ ServerDataDialog::ServerDataDialog(Config::Server& server, QWidget *parent) :
     //ui->serverAddressData->setInputMask("000.000.000.000;");
     ui->serverAuthName->setText(server.tlsAuthName.c_str());
     ui->serverPinData->setText(server.pubKeyDigestValue.c_str());
+    ui->v6AddressLabel->setVisible(false);
+    ui->v6AddressEdit->setVisible(false);
+    // remove question mark from the title bar
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 }
 
 ServerDataDialog::~ServerDataDialog()

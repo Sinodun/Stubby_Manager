@@ -33,6 +33,9 @@ NetworkProfileWidget::NetworkProfileWidget(ConfigMgr& configMgr, Config::Network
             this, &NetworkProfileWidget::on_serverTableDataChanged);
     ui->editServerButton->setEnabled(false);
     ui->deleteServerButton->setVisible(false);
+    ui->addServerButton->setVisible(false);
+    ui->filterServersButton->setVisible(false);
+    ui->validateData->setVisible(false);
     setNPWButtonStates();
 }
 
