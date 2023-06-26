@@ -64,8 +64,6 @@ Config::Config()
 void Config::reset()
 {
     servers.clear();
-    servers.push_back(Server("Stubby server (Sinodun)", "dnsprivacy.org", {"145.100.185.15"}, "dnsovertls.sinodun.com", "62lKu9HsDVbyiPenApnc4sfmSYTHOVfFgL3pyB+cBL4="));
-    servers.push_back(Server("Stubby server (Sinodun1)", "dnsprivacy.org", {"145.100.185.16"}, "dnsovertls1.sinodun.com", "cE2ecALeE5B+urJhDrJlVFmf38cJLAvqekONvjvpqUA="));
     servers.push_back(Server("Stubby server (getdnsapi.net)", "dnsprivacy.org", {"185.49.141.37"}, "getdnsapi.net", "foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q="));
 
     profiles.clear();

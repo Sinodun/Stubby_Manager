@@ -1,4 +1,11 @@
-Version 0.4.0-alpha2 - 2020-12-
+Version 0.4.4-rc1 - 2023-07-26
+
+* Fix regex for package generation
+* Remove Sinodun servers from config
+* Version aligned with Stubby
+
+
+Version 0.4.0-alpha2 - 2020-12-12
 
 * Split the networks into wireless and wired and display active networks
    as green.
